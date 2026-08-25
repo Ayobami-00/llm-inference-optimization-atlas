@@ -213,7 +213,17 @@ class GraphCompiler:
             values = artifact.get(key, [])
             if isinstance(values, list):
                 tags.extend(str(value) for value in values)
-        for key in ("category", "level", "layer", "resource", "stage", "type"):
+        for key in (
+            "category",
+            "level",
+            "layer",
+            "resource",
+            "stage",
+            "type",
+            "result",
+            "claim_status",
+            "outcome",
+        ):
             if artifact.get(key):
                 tags.append(str(artifact[key]))
         return sorted(set(tags))

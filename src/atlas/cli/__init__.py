@@ -41,6 +41,7 @@ from atlas.proposals import (
 )
 from atlas.proposals.service import ProposalError
 from atlas.schemas import SchemaCatalog
+from atlas.site import SiteBuildError, build_site
 from atlas.sources import build_source_catalog, check_sources
 from atlas.studies import StudyError, new_experiment, new_study
 from atlas.utilities.repository import find_repository_root, repository_relative
@@ -68,6 +69,7 @@ finding_app = typer.Typer(no_args_is_help=True, help="Validate evidence-backed f
 decision_app = typer.Typer(no_args_is_help=True, help="Validate deployment decisions.")
 cache_app = typer.Typer(no_args_is_help=True, help="Inspect and prune the shared artifact cache.")
 graph_app = typer.Typer(no_args_is_help=True, help="Compile and serve evidence graph projections.")
+site_app = typer.Typer(no_args_is_help=True, help="Build the static interactive Atlas explorer.")
 app.add_typer(schema_app, name="schema")
 app.add_typer(ontology_app, name="ontology")
 app.add_typer(sources_app, name="sources")
@@ -81,6 +83,7 @@ app.add_typer(finding_app, name="finding")
 app.add_typer(decision_app, name="decision")
 app.add_typer(cache_app, name="cache")
 app.add_typer(graph_app, name="graph")
+app.add_typer(site_app, name="site")
 
 
 @app.callback()
@@ -636,3 +639,17 @@ def graph_serve(
     except FileNotFoundError as error:
         Console(stderr=True).print(f"[red]{error}[/]")
         raise typer.Exit(EXIT_EXECUTION) from error
+
+
+@site_app.command("build")
+def site_build(ctx: typer.Context) -> None:
+    """Build graph data and the GitHub Pages-compatible static explorer."""
+    root = find_repository_root()
+    try:
+        result = build_site(root)
+    except (GraphError, SiteBuildError) as error:
+        Console(stderr=True).print(f"[red]{error}[/]")
+        raise typer.Exit(EXIT_EXECUTION) from error
+    payload = result.as_dict()
+    payload["path"] = repository_relative(result.path, root)
+    _emit(ctx, payload, title="Atlas site built")
