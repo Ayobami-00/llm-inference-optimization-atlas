@@ -80,8 +80,8 @@ candidate_space:
 maintainers:
   - Ayobami-00
 lifecycle:
-  phase: PHASE-1
-  phase_status: running
+  phase: PHASE-15
+  phase_status: completed
 completion_criteria:
   - All preregistered experiments have three valid full-profile replicates.
   - Every finding is supported by eligible comparisons and has an explicit 
