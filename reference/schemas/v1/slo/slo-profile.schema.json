@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/slo/slo-profile.schema.json",
+  "title": "Service-level objective profile",
+  "allOf": [
+    { "$ref": "../common/artifact.schema.json" },
+    {
+      "type": "object",
+      "required": ["request_classes", "reliability", "capacity", "frozen_before_experiment"],
+      "properties": {
+        "kind": { "const": "SLOProfile" },
+        "id": { "pattern": "^SLO[0-9]{3}$" },
+        "request_classes": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["name", "constraints"], "properties": { "name": { "type": "string" }, "constraints": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["metric", "percentile", "operator", "threshold", "unit"], "properties": { "metric": { "enum": ["client_ttft", "server_ttft", "queue_delay", "tpot", "itl", "e2e"] }, "percentile": { "enum": ["p50", "p90", "p95", "p99"] }, "operator": { "enum": ["lt", "lte"] }, "threshold": { "type": "number", "minimum": 0 }, "unit": { "enum": ["s", "ms", "us"] } }, "additionalProperties": false } } }, "additionalProperties": false } },
+        "reliability": { "type": "object", "required": ["minimum_success_rate", "maximum_error_rate"], "properties": { "minimum_success_rate": { "type": "number", "minimum": 0, "maximum": 1 }, "maximum_error_rate": { "type": "number", "minimum": 0, "maximum": 1 }, "maximum_timeout_rate": { "type": "number", "minimum": 0, "maximum": 1 } }, "additionalProperties": false },
+        "capacity": { "type": "object", "required": ["minimum_slo_goodput"], "properties": { "minimum_slo_goodput": { "type": "number", "minimum": 0 }, "unit": { "enum": ["request/s", "task/s"] } }, "additionalProperties": false },
+        "economics": { "type": "object" },
+        "energy": { "type": "object" },
+        "frozen_before_experiment": { "const": true }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/workloads/workload-archetype.schema.json",
+  "title": "Workload archetype",
+  "allOf": [
+    { "$ref": "../common/artifact.schema.json" },
+    {
+      "type": "object",
+      "required": ["application", "modalities", "interaction_pattern", "service_modes", "characteristics", "system_pressures", "candidate_optimizations", "representative_sources", "limitations"],
+      "properties": {
+        "kind": { "const": "WorkloadArchetype" },
+        "id": { "pattern": "^W[0-9]{3}$" },
+        "application": { "type": "string" },
+        "modalities": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["text", "code", "image", "video", "audio", "structured_data", "tool_call"] } },
+        "interaction_pattern": { "enum": ["single_turn", "multi_turn", "closed_loop_agent", "offline"] },
+        "service_modes": { "type": "array", "minItems": 1, "items": { "enum": ["interactive", "online", "offline_batch", "streaming"] } },
+        "request_shape": { "type": "object" },
+        "latency_sensitivity": { "enum": ["low", "moderate", "high", "extreme"] },
+        "characteristics": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "../common/reference.schema.json" } },
+        "system_pressures": { "type": "array", "minItems": 1, "items": { "$ref": "../common/reference.schema.json" } },
+        "candidate_optimizations": { "type": "array", "items": { "$ref": "../common/reference.schema.json" } },
+        "representative_sources": { "type": "array", "items": { "$ref": "../common/reference.schema.json" } },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

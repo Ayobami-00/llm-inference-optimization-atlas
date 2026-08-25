@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json",
+  "title": "External source record",
+  "allOf": [
+    { "$ref": "artifact.schema.json" },
+    {
+      "type": "object",
+      "required": ["type", "source_authors", "url", "topics", "relevance"],
+      "properties": {
+        "kind": { "const": "Source" },
+        "id": { "pattern": "^SRC[0-9]{4}$" },
+        "type": { "enum": ["paper", "official_documentation", "dataset", "benchmark", "specification"] },
+        "source_authors": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "url": { "type": "string", "format": "uri" },
+        "identifiers": {
+          "type": "object",
+          "properties": {
+            "doi": { "type": "string" },
+            "arxiv": { "type": "string" },
+            "isbn": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "published": {
+          "type": "object",
+          "properties": {
+            "year": { "type": "integer", "minimum": 1900 },
+            "venue": { "type": "string" },
+            "publisher": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "upstream": {
+          "type": "object",
+          "properties": {
+            "product": { "type": "string" },
+            "version": { "type": "string" },
+            "revision": { "type": "string" },
+            "retrieved_at": { "type": "string", "format": "date" }
+          },
+          "additionalProperties": false
+        },
+        "topics": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+        "relevance": { "type": "string", "minLength": 1 },
+        "replacement": { "$ref": "reference.schema.json" }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

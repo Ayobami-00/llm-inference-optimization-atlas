@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/metrics/metric-definition.schema.json",
+  "title": "Metric definition",
+  "allOf": [
+    { "$ref": "../common/artifact.schema.json" },
+    {
+      "type": "object",
+      "required": ["level", "category", "unit", "value_type", "direction", "aggregation", "measurement_boundary", "mandatory"],
+      "properties": {
+        "kind": { "const": "MetricDefinition" },
+        "id": { "pattern": "^MET[0-9]{3}$" },
+        "level": { "enum": ["M0", "M1", "M2", "M3", "M4", "M5"] },
+        "category": { "enum": ["request", "latency", "throughput", "goodput", "scheduler", "cache", "hardware", "kernel", "communication", "economics", "energy", "quality", "reliability"] },
+        "unit": { "type": "string" },
+        "value_type": { "enum": ["integer", "number", "boolean", "distribution", "duration", "ratio"] },
+        "direction": { "enum": ["higher_is_better", "lower_is_better", "target", "informational"] },
+        "aggregation": { "type": "array", "minItems": 1, "items": { "enum": ["sum", "mean", "min", "max", "p50", "p90", "p95", "p99", "rate"] } },
+        "measurement_boundary": { "type": "string" },
+        "mandatory": { "type": "boolean" },
+        "minimum_sample_count": { "type": "integer", "minimum": 1 }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/study.schema.json",
+  "title": "Atlas study",
+  "allOf": [
+    { "$ref": "../common/artifact.schema.json" },
+    {
+      "type": "object",
+      "required": ["archetype", "proposal", "product_brief", "research_questions", "boundaries", "contracts", "candidate_space", "maintainers", "lifecycle", "completion_criteria"],
+      "properties": {
+        "kind": { "const": "Study" },
+        "id": { "pattern": "^S[0-9]{3}$" },
+        "archetype": { "$ref": "../common/reference.schema.json" },
+        "proposal": { "type": "object", "required": ["id", "issue_url", "approval"], "properties": { "id": { "$ref": "../common/reference.schema.json" }, "issue_url": { "type": "string", "format": "uri" }, "approval": { "enum": ["pending", "approved", "rejected"] } }, "additionalProperties": false },
+        "product_brief": { "type": "string" },
+        "research_questions": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "boundaries": { "type": "object", "required": ["included", "excluded"], "properties": { "included": { "type": "array", "items": { "type": "string" } }, "excluded": { "type": "array", "items": { "type": "string" } } }, "additionalProperties": false },
+        "contracts": { "type": "object", "required": ["workload", "quality", "slo"], "properties": { "workload": { "$ref": "../common/reference.schema.json" }, "quality": { "$ref": "../common/reference.schema.json" }, "slo": { "$ref": "../common/reference.schema.json" } }, "additionalProperties": false },
+        "candidate_space": { "type": "object", "required": ["models", "hardware", "runtimes"], "properties": { "models": { "type": "array", "items": { "$ref": "../common/reference.schema.json" } }, "hardware": { "type": "array", "items": { "$ref": "../common/reference.schema.json" } }, "runtimes": { "type": "array", "items": { "$ref": "../common/reference.schema.json" } } }, "additionalProperties": false },
+        "maintainers": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "lifecycle": { "type": "object" },
+        "completion_criteria": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

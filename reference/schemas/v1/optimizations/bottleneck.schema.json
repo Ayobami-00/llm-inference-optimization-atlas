@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/optimizations/bottleneck.schema.json",
+  "title": "Inference bottleneck",
+  "allOf": [
+    { "$ref": "../common/artifact.schema.json" },
+    {
+      "type": "object",
+      "required": ["resource", "stage", "symptoms", "diagnostic_metrics", "candidate_causes", "disambiguating_measurements", "applicable_characteristics", "candidate_optimizations"],
+      "properties": {
+        "kind": { "const": "Bottleneck" },
+        "id": { "pattern": "^B[0-9]{3}$" },
+        "resource": { "type": "string" },
+        "stage": { "type": "string" },
+        "symptoms": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "diagnostic_metrics": { "type": "array", "minItems": 1, "items": { "$ref": "../common/reference.schema.json" } },
+        "candidate_causes": { "type": "array", "items": { "type": "string" } },
+        "disambiguating_measurements": { "type": "array", "items": { "type": "string" } },
+        "applicable_characteristics": { "type": "array", "items": { "$ref": "../common/reference.schema.json" } },
+        "candidate_optimizations": { "type": "array", "items": { "$ref": "../common/reference.schema.json" } }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

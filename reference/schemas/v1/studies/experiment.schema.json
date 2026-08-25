@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/experiment.schema.json",
+  "title": "Controlled experiment",
+  "allOf": [
+    { "$ref": "../common/artifact.schema.json" },
+    {
+      "type": "object",
+      "required": ["study", "question", "hypothesis", "design", "baseline", "candidates", "changed_factors", "frozen_factors", "protocol", "metrics", "quality_gate", "expected_mechanism", "analysis", "stopping_rule", "failure_policy"],
+      "properties": {
+        "kind": { "const": "Experiment" },
+        "id": { "pattern": "^E[0-9]{4}$" },
+        "study": { "$ref": "../common/reference.schema.json" },
+        "question": { "type": "string" },
+        "hypothesis": { "$ref": "../common/reference.schema.json" },
+        "design": { "enum": ["characterization", "ablation", "interaction", "replication", "transferability", "composition"] },
+        "baseline": { "$ref": "../common/reference.schema.json" },
+        "candidates": { "type": "array", "minItems": 1, "items": { "$ref": "../common/reference.schema.json" } },
+        "changed_factors": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "frozen_factors": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "protocol": { "type": "object", "required": ["warmup", "measurement", "replicates", "seeds", "ordering"], "properties": { "warmup": { "type": "object" }, "measurement": { "type": "object" }, "replicates": { "type": "integer", "minimum": 1 }, "seeds": { "type": "array", "minItems": 1, "items": { "type": "integer" } }, "ordering": { "enum": ["fixed", "randomized", "aba"] } }, "additionalProperties": false },
+        "metrics": { "type": "object", "required": ["primary", "secondary", "guardrails"], "properties": { "primary": { "type": "array", "minItems": 1, "items": { "$ref": "../common/reference.schema.json" } }, "secondary": { "type": "array", "items": { "$ref": "../common/reference.schema.json" } }, "guardrails": { "type": "array", "items": { "$ref": "../common/reference.schema.json" } } }, "additionalProperties": false },
+        "quality_gate": { "enum": ["Q0", "Q1", "Q2"] },
+        "expected_mechanism": { "type": "string" },
+        "analysis": { "type": "object" },
+        "stopping_rule": { "type": "string" },
+        "failure_policy": { "type": "string" },
+        "background_sources": { "type": "array", "items": { "$ref": "../common/reference.schema.json" } }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

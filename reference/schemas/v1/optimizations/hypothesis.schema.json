@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/optimizations/hypothesis.schema.json",
+  "title": "Testable hypothesis",
+  "allOf": [
+    { "$ref": "../common/artifact.schema.json" },
+    {
+      "type": "object",
+      "required": ["observation", "statement", "intervention", "expected_mechanism", "primary_metric", "guardrails", "quality_gate", "falsification_conditions"],
+      "properties": {
+        "kind": { "const": "Hypothesis" },
+        "id": { "pattern": "^HYP[0-9]{3,4}$" },
+        "observation": { "type": "string" },
+        "statement": { "type": "string" },
+        "intervention": { "type": "string" },
+        "expected_mechanism": { "type": "string" },
+        "primary_metric": { "$ref": "../common/reference.schema.json" },
+        "guardrails": { "type": "array", "items": { "$ref": "../common/reference.schema.json" } },
+        "quality_gate": { "enum": ["Q0", "Q1", "Q2"] },
+        "falsification_conditions": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "background_sources": { "type": "array", "items": { "$ref": "../common/reference.schema.json" } }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

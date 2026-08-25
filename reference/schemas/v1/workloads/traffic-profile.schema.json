@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/workloads/traffic-profile.schema.json",
+  "title": "Traffic profile",
+  "allOf": [
+    { "$ref": "../common/artifact.schema.json" },
+    {
+      "type": "object",
+      "required": ["mode", "arrival_process", "concurrency", "burstiness", "session_behavior", "primary_objective"],
+      "properties": {
+        "kind": { "const": "TrafficProfile" },
+        "id": { "pattern": "^T[0-9]{3}$" },
+        "mode": { "enum": ["open_loop", "closed_loop", "offline"] },
+        "arrival_process": { "type": "object", "required": ["type"], "properties": { "type": { "enum": ["trace", "poisson", "deterministic", "bursty", "session_driven"] }, "rate_per_second": { "type": "number", "minimum": 0 }, "trace": { "type": "string" } }, "additionalProperties": false },
+        "concurrency": { "type": "object" },
+        "burstiness": { "enum": ["none", "low", "moderate", "high", "extreme"] },
+        "session_behavior": { "type": "object" },
+        "primary_objective": { "enum": ["latency", "throughput", "goodput", "cost", "fairness", "task_completion", "resilience"] }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

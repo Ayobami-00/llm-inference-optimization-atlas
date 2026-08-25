@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/contributions/contribution-manifest.schema.json",
+  "title": "Contribution approval manifest",
+  "type": "object",
+  "required": ["proposal", "issue_url", "approval_label", "contribution_type", "artifacts", "closes_issue"],
+  "properties": {
+    "proposal": { "$ref": "../common/reference.schema.json" },
+    "issue_url": { "type": "string", "format": "uri" },
+    "approval_label": { "const": "proposal:approved" },
+    "contribution_type": { "enum": ["study", "experiment", "replication", "finding_challenge", "methodology", "tooling"] },
+    "artifacts": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "closes_issue": { "type": "boolean" }
+  },
+  "additionalProperties": false
+}
