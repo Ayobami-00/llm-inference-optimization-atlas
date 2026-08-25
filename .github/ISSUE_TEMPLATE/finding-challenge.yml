@@ -1,0 +1,89 @@
+name: Finding challenge
+description: Challenge evidence, scope, method, or interpretation in an Atlas finding.
+title: "[Challenge]: "
+labels:
+  - proposal:needs-triage
+  - proposal:type:challenge
+body:
+  - type: markdown
+    attributes:
+      value: |
+        <!-- atlas-proposal-form:v1:finding-challenge -->
+        A challenge is a scientific contribution. Identify the precise disputed claim and remedy.
+  - type: input
+    id: proposal-title
+    attributes:
+      label: Proposal title
+      placeholder: Narrow the transfer scope of F0001
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Identify the finding and the precise disputed claim or evidence.
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Explain the consequence and evidence for the concern.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      render: yaml
+      placeholder: |
+        finding: atlas://finding/F0001@v1
+        challenge_type: interpretation
+        requested_resolution: Narrow, reanalyse, replicate, supersede, or invalidate.
+    validations:
+      required: true
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Planned artifacts
+      render: yaml
+      placeholder: |
+        - challenge
+        - analysis
+    validations:
+      required: true
+  - type: textarea
+    id: resources
+    attributes:
+      label: Resources
+      render: yaml
+      placeholder: |
+        compute: No rerun initially
+        downloads: None
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks
+      render: yaml
+      placeholder: |
+        - Reanalysis may reveal an invalid accepted finding.
+    validations:
+      required: true
+  - type: input
+    id: conflicts
+    attributes:
+      label: Conflict disclosure
+      placeholder: None declared
+    validations:
+      required: true
+  - type: checkboxes
+    id: agreement
+    attributes:
+      label: Contributor agreement
+      options:
+        - label: I distinguish methodological critique from personal criticism.
+          required: true
+        - label: I will wait for `proposal:approved` before implementation.
+          required: true

@@ -1,0 +1,101 @@
+name: New study proposal
+description: Propose a bounded workload study and its evidence plan.
+title: "[Study]: "
+labels:
+  - proposal:needs-triage
+  - proposal:type:study
+body:
+  - type: markdown
+    attributes:
+      value: |
+        <!-- atlas-proposal-form:v1:study -->
+        A study proposal is reviewed before implementation. Keep scope falsifiable and explicit.
+  - type: input
+    id: proposal-title
+    attributes:
+      label: Proposal title
+      placeholder: CPU interactive chat batching on Apple silicon
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Name the workload, environment, interventions, and intended evidence.
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Explain the unanswered deployment decision or evidence gap.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Supply a YAML mapping with the archetype, questions, inclusions, and exclusions.
+      render: yaml
+      placeholder: |
+        archetype: atlas://workload/W001@v1
+        research_questions:
+          - When does batching improve SLO goodput?
+        included:
+          - CPU inference
+        excluded:
+          - GPU inference
+    validations:
+      required: true
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Planned artifacts
+      description: Supply a YAML list of canonical artifacts the contribution will add.
+      render: yaml
+      placeholder: |
+        - study
+        - workload
+        - experiments
+        - findings
+        - decision
+    validations:
+      required: true
+  - type: textarea
+    id: resources
+    attributes:
+      label: Resources
+      description: Supply a YAML mapping of compute, time, download, and storage requirements.
+      render: yaml
+      placeholder: |
+        compute: 8-core CPU for 4 hours
+        downloads: 300 MB model
+        storage: 1 GB drafts and cache
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks
+      description: Supply a YAML list covering feasibility, licensing, safety, and bias.
+      render: yaml
+      placeholder: |
+        - Findings may transfer only to the measured hardware.
+    validations:
+      required: true
+  - type: input
+    id: conflicts
+    attributes:
+      label: Conflict disclosure
+      placeholder: None declared
+    validations:
+      required: true
+  - type: checkboxes
+    id: agreement
+    attributes:
+      label: Contributor agreement
+      options:
+        - label: I will wait for `proposal:approved` before opening the implementation pull request.
+          required: true
+        - label: I will retain negative or inconclusive evidence and disclose failed runs.
+          required: true

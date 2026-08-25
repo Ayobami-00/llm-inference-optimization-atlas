@@ -1,0 +1,43 @@
+name: Validate proposal issue
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  validate:
+    name: Validate schema-backed proposal
+    if: contains(join(github.event.issue.labels.*.name, ','), 'proposal:type:')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out trusted default branch
+        uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@v9
+        with:
+          version: 0.11.31
+      - name: Install validation dependencies
+        run: uv sync --frozen
+      - name: Validate proposal
+        id: validation
+        continue-on-error: true
+        run: uv run atlas proposal validate-issue "$GITHUB_EVENT_PATH"
+      - name: Mark valid proposal
+        if: steps.validation.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+        run: gh issue edit "$ISSUE_URL" --add-label proposal:valid --remove-label proposal:needs-triage --remove-label proposal:needs-revision
+      - name: Request proposal revision
+        if: steps.validation.outcome != 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+        run: gh issue edit "$ISSUE_URL" --add-label proposal:needs-revision --remove-label proposal:needs-triage --remove-label proposal:valid
+      - name: Enforce validation result
+        if: steps.validation.outcome != 'success'
+        run: exit 1

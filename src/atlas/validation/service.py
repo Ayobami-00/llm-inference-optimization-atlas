@@ -153,6 +153,23 @@ class Validator:
                 )
             known[reference] = path
 
+        # GitHub issues are the canonical proposal records. A validated contribution
+        # manifest acts as their repository-local identity proxy for strict resolution.
+        for artifact in report.artifacts:
+            data = artifact.data
+            schema = data.get("$schema")
+            proposal = data.get("proposal")
+            issue_url = data.get("issue_url")
+            if (
+                isinstance(schema, str)
+                and schema.endswith("/contributions/contribution-manifest.schema.json")
+                and isinstance(proposal, str)
+                and proposal.startswith("atlas://proposal/")
+                and isinstance(issue_url, str)
+                and issue_url.startswith("https://github.com/")
+            ):
+                known.setdefault(proposal, artifact.path)
+
         for artifact in report.artifacts:
             for location, reference in iter_references(artifact.data):
                 if reference not in known:

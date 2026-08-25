@@ -1,0 +1,101 @@
+name: New experiment proposal
+description: Propose a controlled experiment inside an approved study.
+title: "[Experiment]: "
+labels:
+  - proposal:needs-triage
+  - proposal:type:experiment
+body:
+  - type: markdown
+    attributes:
+      value: |
+        <!-- atlas-proposal-form:v1:experiment -->
+        Pre-register the intervention, primary metric, quality gate, and stopping rule.
+  - type: input
+    id: proposal-title
+    attributes:
+      label: Proposal title
+      placeholder: Compare one and four CPU inference threads
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: State the baseline, intervention, primary metric, and expected mechanism.
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Explain which approved study question this experiment answers.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Supply a YAML mapping of controlled design choices.
+      render: yaml
+      placeholder: |
+        study: atlas://study/S001@v1
+        hypothesis: Four threads improve goodput without violating p95 TTFT.
+        changed_factors:
+          - inference thread budget
+        frozen_factors:
+          - model revision
+          - request trace
+        quality_gate: Q1
+        replicates: 3
+    validations:
+      required: true
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Planned artifacts
+      render: yaml
+      placeholder: |
+        - hypothesis
+        - configurations
+        - experiment
+        - runs
+        - comparison
+        - finding
+    validations:
+      required: true
+  - type: textarea
+    id: resources
+    attributes:
+      label: Resources
+      render: yaml
+      placeholder: |
+        compute: Local CPU for 90 minutes
+        downloads: Uses study cache
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks
+      render: yaml
+      placeholder: |
+        - Thermal drift may confound execution order.
+        - Too few successful requests may invalidate p99.
+    validations:
+      required: true
+  - type: input
+    id: conflicts
+    attributes:
+      label: Conflict disclosure
+      placeholder: None declared
+    validations:
+      required: true
+  - type: checkboxes
+    id: agreement
+    attributes:
+      label: Contributor agreement
+      options:
+        - label: I will not inspect results before fixing thresholds and stopping rules.
+          required: true
+        - label: I will wait for `proposal:approved` before implementation.
+          required: true

@@ -33,6 +33,7 @@ site:
 frontend:
 	npm run typecheck --prefix site
 	npm run test --prefix site
+	uv run atlas graph build --all
 	npm run build --prefix site
 
 check: lint type test validate frontend

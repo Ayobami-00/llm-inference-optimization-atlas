@@ -1,0 +1,92 @@
+name: Methodology or tooling proposal
+description: Change schemas, protocols, ontology, validation, execution, graph, or site behavior.
+title: "[Methodology]: "
+labels:
+  - proposal:needs-triage
+  - proposal:type:methodology
+body:
+  - type: markdown
+    attributes:
+      value: |
+        <!-- atlas-proposal-form:v1:methodology -->
+        Explain compatibility and scientific-integrity consequences before implementation.
+  - type: input
+    id: proposal-title
+    attributes:
+      label: Proposal title
+      placeholder: Add paired drift diagnostics to comparison validation
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Describe the contract, protocol, vocabulary, or tool behavior to change.
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Explain the current limitation and desired invariant.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      render: yaml
+      placeholder: |
+        subsystem: comparisons
+        breaking_change: false
+        migration: Existing comparisons remain valid.
+        acceptance_tests:
+          - Drift-sensitive comparisons expose A-B-A diagnostics.
+    validations:
+      required: true
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Planned artifacts
+      render: yaml
+      placeholder: |
+        - methodology_change
+        - tests
+        - documentation
+    validations:
+      required: true
+  - type: textarea
+    id: resources
+    attributes:
+      label: Resources
+      render: yaml
+      placeholder: |
+        implementation: Two contributor-days
+        compute: Existing fixtures only
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks
+      render: yaml
+      placeholder: |
+        - A schema change may require a migration or schemas/v2.
+    validations:
+      required: true
+  - type: input
+    id: conflicts
+    attributes:
+      label: Conflict disclosure
+      placeholder: None declared
+    validations:
+      required: true
+  - type: checkboxes
+    id: agreement
+    attributes:
+      label: Contributor agreement
+      options:
+        - label: I have identified backward-compatibility and evidence-integrity effects.
+          required: true
+        - label: I will wait for `proposal:approved` before implementation.
+          required: true

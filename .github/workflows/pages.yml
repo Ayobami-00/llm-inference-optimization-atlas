@@ -1,0 +1,68 @@
+name: Publish Atlas Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - reference/**
+      - registry/**
+      - studies/**
+      - src/atlas/graph/**
+      - src/atlas/site/**
+      - site/**
+      - pyproject.toml
+      - uv.lock
+      - .github/workflows/pages.yml
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build static evidence explorer
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@v9
+        with:
+          version: 0.11.31
+          enable-cache: true
+      - name: Install Python dependencies
+        run: uv sync --frozen
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - name: Install frontend dependencies
+        run: npm ci --prefix site
+      - name: Validate and build site
+        run: |
+          uv run atlas validate --all --strict --github
+          uv run atlas site build
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: build/site
+
+  deploy:
+    name: Deploy Pages
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy static site
+        id: deployment
+        uses: actions/deploy-pages@v5

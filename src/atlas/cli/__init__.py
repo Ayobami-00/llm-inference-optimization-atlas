@@ -34,9 +34,11 @@ from atlas.graph import GraphCompiler, GraphError
 from atlas.graph.server import serve_site
 from atlas.ontology import check_ontology
 from atlas.proposals import (
+    check_pull_request_approval,
     create_github_issue,
     new_proposal,
     render_proposal,
+    validate_issue_event,
     validate_proposal,
 )
 from atlas.proposals.service import ProposalError
@@ -115,9 +117,7 @@ def _emit(ctx: typer.Context, payload: dict[str, Any], *, title: str) -> None:
         if key in {"ok", "issues"}:
             continue
         rendered = (
-            json.dumps(value, sort_keys=True)
-            if isinstance(value, (dict, list))
-            else str(value)
+            json.dumps(value, sort_keys=True) if isinstance(value, (dict, list)) else str(value)
         )
         table.add_row(key.replace("_", " "), rendered)
     console.print(table)
@@ -305,6 +305,29 @@ def proposal_validate(
     report = validate_proposal(find_repository_root(), path)
     _emit(ctx, report.as_dict(), title="Proposal validation")
     _exit_for_report(report.ok)
+
+
+@proposal_app.command("validate-issue")
+def proposal_validate_issue(
+    ctx: typer.Context,
+    event: Annotated[Path, typer.Argument(exists=True, dir_okay=False)],
+) -> None:
+    """Validate a GitHub issue-form event as a V1 proposal."""
+    result = validate_issue_event(find_repository_root(), event)
+    _emit(ctx, result.as_dict(), title="Proposal issue validation")
+    _exit_for_report(result.ok)
+
+
+@proposal_app.command("check-approval")
+def proposal_check_approval(
+    ctx: typer.Context,
+    event: Annotated[Path, typer.Argument(exists=True, dir_okay=False)],
+    token: Annotated[str, typer.Option("--token", envvar="GITHUB_TOKEN", help="GitHub API token.")],
+) -> None:
+    """Check a pull request against its approved proposal issue."""
+    result = check_pull_request_approval(find_repository_root(), event, token)
+    _emit(ctx, result.as_dict(), title="Proposal approval")
+    _exit_for_report(result.ok)
 
 
 @proposal_app.command("render")
@@ -539,9 +562,7 @@ def compare(
     root = find_repository_root()
     try:
         outputs = (
-            compare_all(root)
-            if all_experiments
-            else compare_experiment(root, str(experiment))
+            compare_all(root) if all_experiments else compare_experiment(root, str(experiment))
         )
     except ComparisonError as error:
         Console(stderr=True).print(f"[red]{error}[/]")

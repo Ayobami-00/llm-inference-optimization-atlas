@@ -21,6 +21,14 @@ PROPOSAL_TYPES = {
     "methodology": "methodology.yaml",
 }
 
+PROPOSAL_LABELS = {
+    "study": "proposal:type:study",
+    "experiment": "proposal:type:experiment",
+    "replication": "proposal:type:replication",
+    "finding_challenge": "proposal:type:challenge",
+    "methodology": "proposal:type:methodology",
+}
+
 
 class ProposalError(RuntimeError):
     """A proposal operation could not be completed."""
@@ -120,7 +128,10 @@ def create_github_issue(path: Path, data: dict[str, Any], repository: str | None
         "--body-file",
         str(body_path),
         "--label",
-        f"proposal:type:{data.get('proposal_type', 'methodology')}",
+        PROPOSAL_LABELS.get(
+            str(data.get("proposal_type", "methodology")),
+            "proposal:type:methodology",
+        ),
         "--label",
         "proposal:needs-triage",
     ]
