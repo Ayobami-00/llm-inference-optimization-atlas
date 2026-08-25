@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/workloads/dataset-revision.schema.json",
+  "title": "Immutable dataset revision",
+  "allOf": [
+    { "$ref": "../common/artifact.schema.json" },
+    {
+      "type": "object",
+      "required": ["dataset_type", "tasks", "modalities", "languages", "terms", "composition", "sampling", "transformations", "fingerprint", "files", "sensitive_data", "limitations"],
+      "properties": {
+        "kind": { "const": "DatasetRevision" },
+        "id": { "pattern": "^DS[0-9]{3}$" },
+        "dataset_type": { "enum": ["repository_fixture", "public_dataset", "private_dataset", "generated"] },
+        "upstream": {
+          "type": "object",
+          "required": ["name", "revision"],
+          "properties": {
+            "name": { "type": "string" },
+            "revision": { "type": "string" },
+            "source": { "$ref": "../common/reference.schema.json" },
+            "retrieved_at": { "type": "string", "format": "date" }
+          },
+          "additionalProperties": false
+        },
+        "tasks": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+        "modalities": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+        "languages": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+        "terms": {
+          "type": "object",
+          "required": ["license", "redistribution", "commercial_use", "attribution"],
+          "properties": {
+            "license": { "type": "string" },
+            "redistribution": { "type": "boolean" },
+            "commercial_use": { "type": "boolean" },
+            "attribution": { "type": "string" },
+            "restrictions": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": false
+        },
+        "composition": {
+          "type": "object",
+          "required": ["records", "units"],
+          "properties": {
+            "records": { "type": "integer", "minimum": 1 },
+            "units": { "type": "string" },
+            "splits": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } },
+            "statistics": { "type": "object" }
+          },
+          "additionalProperties": false
+        },
+        "sampling": { "type": "object" },
+        "transformations": { "type": "array", "items": { "type": "object" } },
+        "fingerprint": {
+          "type": "object",
+          "required": ["algorithm", "value"],
+          "properties": {
+            "algorithm": { "const": "sha256" },
+            "value": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+          },
+          "additionalProperties": false
+        },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["path", "media_type", "sha256", "size_bytes"],
+            "properties": {
+              "path": { "type": "string" },
+              "media_type": { "type": "string" },
+              "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+              "size_bytes": { "type": "integer", "minimum": 1 }
+            },
+            "additionalProperties": false
+          }
+        },
+        "sensitive_data": {
+          "type": "object",
+          "required": ["contains_personal_data", "contains_secrets", "review_method"],
+          "properties": {
+            "contains_personal_data": { "type": "boolean" },
+            "contains_secrets": { "type": "boolean" },
+            "review_method": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

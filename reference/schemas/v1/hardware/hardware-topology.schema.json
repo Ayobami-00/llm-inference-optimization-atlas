@@ -10,8 +10,8 @@
       "properties": {
         "kind": { "const": "HardwareTopology" },
         "id": { "pattern": "^HW[0-9]{3}$" },
-        "nodes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/node" } },
-        "topology_edges": { "type": "array", "items": { "$ref": "#/$defs/edge" } },
+        "nodes": { "type": "array", "minItems": 1, "items": { "$ref": "#/allOf/1/$defs/node" } },
+        "topology_edges": { "type": "array", "items": { "$ref": "#/allOf/1/$defs/edge" } },
         "network": { "type": "array", "items": { "type": "object" } },
         "storage": { "type": "array", "items": { "type": "object" } },
         "software": { "type": "object", "required": ["os", "kernel", "architecture"], "properties": { "os": { "type": "string" }, "kernel": { "type": "string" }, "architecture": { "type": "string" }, "drivers": { "type": "array", "items": { "type": "object" } }, "firmware": { "type": "array", "items": { "type": "object" } } }, "additionalProperties": false },
@@ -25,9 +25,9 @@
           "required": ["id", "cpus", "accelerators", "memory_domains"],
           "properties": {
             "id": { "type": "string" },
-            "cpus": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/cpu" } },
-            "accelerators": { "type": "array", "items": { "$ref": "#/$defs/accelerator" } },
-            "memory_domains": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/memory" } },
+            "cpus": { "type": "array", "minItems": 1, "items": { "$ref": "#/allOf/1/$defs/cpu" } },
+            "accelerators": { "type": "array", "items": { "$ref": "#/allOf/1/$defs/accelerator" } },
+            "memory_domains": { "type": "array", "minItems": 1, "items": { "$ref": "#/allOf/1/$defs/memory" } },
             "power": { "type": "object" },
             "thermal": { "type": "object" }
           },
@@ -66,7 +66,7 @@
             "model": { "type": "string" },
             "architecture": { "type": "string" },
             "compute_units": { "type": "integer", "minimum": 1 },
-            "memory": { "$ref": "#/$defs/memory" },
+            "memory": { "$ref": "#/allOf/1/$defs/memory" },
             "supported_dtypes": { "type": "array", "items": { "type": "string" } },
             "backends": { "type": "array", "items": { "type": "string" } },
             "partitioning": { "type": "object" },

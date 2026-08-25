@@ -1,0 +1,38 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/runtimes/runtime-build.schema.json
+schema_version: 1
+kind: RuntimeBuild
+id: RT003
+version: 1
+slug: onnxruntime-1290-cpu
+title: ONNX Runtime 1.29.0 CPU
+description: Locked ONNX Runtime CPU stack used for FP32 and INT8 sentence embeddings.
+status: active
+authors: [{name: Atlas maintainers, roles: [curator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: MIT
+citations: [atlas://source/SRC0065@v1, atlas://source/SRC0082@v1, atlas://source/SRC0108@v1]
+provenance:
+  method: uv lock, PyPI wheel metadata, and official release tag
+  source_paths: [uv.lock]
+  generated: false
+extensions: {}
+runtime: onnxruntime-cpu
+upstream:
+  repository: https://github.com/microsoft/onnxruntime
+  version: 1.29.0
+  commit: 2e2543fbe9fae542f921d47a72d21d5a4ef0b710
+language: {name: Python, version: '3.12'}
+frameworks:
+  - {name: onnxruntime, version: 1.29.0, macos_arm64_wheel_sha256: 3a3814c041251d6a77fdf513fb282056538ee826d2f1178a0df3c549d3fff6ba}
+  - {name: sentence-transformers, version: 5.7.0, wheel_sha256: b78141da3d8137e70d965866e2ca43190b9266f3d4d8752e250ded75e7136730}
+backends: [{name: CPUExecutionProvider, selected: true}]
+collectives: []
+kernels: [{name: MLAS, precision: [float32, int8]}]
+build:
+  compiler: upstream PyPI wheel toolchain
+  flags: [CPUExecutionProvider]
+  patches: []
+  artifact_sha256: 3a3814c041251d6a77fdf513fb282056538ee826d2f1178a0df3c549d3fff6ba
+capabilities: [ONNX, dynamic-int8, intra-op-thread-control, inter-op-thread-control]
+limitations: [Execution-provider kernels vary by architecture., Container image digest is recorded by the study execution bundle.]

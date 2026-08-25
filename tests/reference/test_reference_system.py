@@ -85,9 +85,9 @@ def test_ontology_catalogs_validate(path: Path, catalog: dict[str, Any]) -> None
 
 def test_source_ids_are_complete_and_unique() -> None:
     identifiers = [record["id"] for _, record in source_records()]
-    assert len(identifiers) == 100
+    assert len(identifiers) >= 100
     assert len(identifiers) == len(set(identifiers))
-    assert sorted(identifiers) == [f"SRC{number:04d}" for number in range(1, 101)]
+    assert sorted(identifiers) == [f"SRC{number:04d}" for number in range(1, len(identifiers) + 1)]
 
 
 def test_ontology_ids_are_globally_unique() -> None:

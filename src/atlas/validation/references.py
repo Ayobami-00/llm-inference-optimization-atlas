@@ -10,8 +10,11 @@ ATLAS_REFERENCE_PATTERN = re.compile(
 
 ID_KIND_PREFIXES: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"^SRC\d{4}$"), "source"),
+    (re.compile(r"^DS\d{3}$"), "dataset"),
+    (re.compile(r"^EV\d{3}$"), "evaluator"),
     (re.compile(r"^WC\d{3}$"), "workload-characteristic"),
     (re.compile(r"^W\d{3}$"), "workload"),
+    (re.compile(r"^WS\d{3}$"), "workload-spec"),
     (re.compile(r"^T\d{3}$"), "traffic"),
     (re.compile(r"^MET\d{3}$"), "metric"),
     (re.compile(r"^OPT\d{3}$"), "optimization"),
@@ -22,6 +25,7 @@ ID_KIND_PREFIXES: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"^M\d{3}$"), "model"),
     (re.compile(r"^HW\d{3}$"), "hardware"),
     (re.compile(r"^RT\d{3}$"), "runtime"),
+    (re.compile(r"^RTCFG\d{3}$"), "runtime-configuration"),
     (re.compile(r"^CFG\d{3}$"), "configuration"),
     (re.compile(r"^HYP\d{3}$"), "hypothesis"),
     (re.compile(r"^E\d{4}$"), "experiment"),
@@ -35,6 +39,8 @@ ID_KIND_PREFIXES: tuple[tuple[re.Pattern[str], str], ...] = (
 
 KIND_NAMES = {
     "Source": "source",
+    "DatasetRevision": "dataset",
+    "Evaluator": "evaluator",
     "WorkloadArchetype": "workload",
     "WorkloadSpec": "workload-spec",
     "TrafficProfile": "traffic",

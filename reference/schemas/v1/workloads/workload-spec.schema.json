@@ -9,6 +9,7 @@
       "required": ["archetype", "product_brief", "semantic", "traffic", "request_shape", "locality", "replay", "load_generation", "server_state", "quality_contract", "slo_profile"],
       "properties": {
         "kind": { "const": "WorkloadSpec" },
+        "id": { "pattern": "^WS[0-9]{3}$" },
         "archetype": { "$ref": "../common/reference.schema.json" },
         "product_brief": { "type": "string", "minLength": 1 },
         "semantic": { "type": "object", "required": ["source_type", "license", "fingerprint", "sampling", "transformations"], "properties": { "source_type": { "enum": ["repository_fixture", "public_dataset", "private_dataset", "generated"] }, "source": { "$ref": "../common/reference.schema.json" }, "license": { "type": "string" }, "fingerprint": { "type": "string" }, "sampling": { "type": "object" }, "filters": { "type": "array", "items": { "type": "string" } }, "transformations": { "type": "array", "items": { "type": "string" } } }, "additionalProperties": false },

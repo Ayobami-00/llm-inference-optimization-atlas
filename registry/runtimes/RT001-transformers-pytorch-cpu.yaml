@@ -1,0 +1,40 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/runtimes/runtime-build.schema.json
+schema_version: 1
+kind: RuntimeBuild
+id: RT001
+version: 1
+slug: transformers-4576-pytorch-2130-cpu
+title: Transformers 4.57.6 with PyTorch 2.13.0 CPU
+description: Locked Python CPU inference stack used by native SmolLM2 execution.
+status: active
+authors: [{name: Atlas maintainers, roles: [curator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0-and-BSD-3-Clause
+citations: [atlas://source/SRC0066@v1, atlas://source/SRC0067@v1, atlas://source/SRC0105@v1, atlas://source/SRC0106@v1]
+provenance:
+  method: uv lock, PyPI wheel metadata, and official release tags
+  source_paths: [uv.lock]
+  generated: false
+extensions: {}
+runtime: transformers-pytorch-cpu
+upstream:
+  repository: https://github.com/huggingface/transformers
+  version: 4.57.6
+  commit: 753d61104116eefc8ffc977327b441ee0c8d599f
+language: {name: Python, version: '3.12'}
+frameworks:
+  - {name: transformers, version: 4.57.6, wheel_sha256: 4c9e9de11333ddfe5114bc872c9f370509198acf0b87a832a0ab9458e2bd0550}
+  - {name: PyTorch, version: 2.13.0, macos_arm64_wheel_sha256: 2fe228aba290d14b9f31b049be550dbd469c3fd3013d7a19705b30454da97027}
+backends:
+  - {name: CPU, implementation: PyTorch ATen}
+  - {name: Accelerate, availability: macOS}
+collectives: []
+kernels: [{name: scaled-dot-product-attention, selection: automatic}]
+build:
+  compiler: upstream PyPI wheel toolchain
+  flags: [cpu-only-study-selection, trust-remote-code-disabled]
+  patches: []
+  artifact_sha256: 4c9e9de11333ddfe5114bc872c9f370509198acf0b87a832a0ab9458e2bd0550
+capabilities: [causal-text-generation, greedy-decoding, seeded-sampling, CPU-thread-control]
+limitations: [Wheel internals differ by operating system and architecture., MPS is available but excluded from bootstrap CPU configurations.]

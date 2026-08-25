@@ -9,7 +9,7 @@
       "required": ["runtime_build", "model", "hardware", "scheduling", "batching", "cache", "precision", "decoding", "parallelism", "memory", "threads", "environment"],
       "properties": {
         "kind": { "const": "RuntimeConfiguration" },
-        "id": { "pattern": "^CFG[0-9]{3}$" },
+        "id": { "pattern": "^RTCFG[0-9]{3}$" },
         "runtime_build": { "$ref": "../common/reference.schema.json" },
         "model": { "$ref": "../common/reference.schema.json" },
         "hardware": { "$ref": "../common/reference.schema.json" },

@@ -20,6 +20,14 @@
         "caveats": { "type": "array", "minItems": 1, "items": { "type": "string" } },
         "revisit_conditions": { "type": "array", "minItems": 1, "items": { "type": "string" } }
       }
+    },
+    {
+      "if": {
+        "required": ["outcome"],
+        "properties": { "outcome": { "const": "recommended" } }
+      },
+      "then": { "required": ["selected_configuration"] },
+      "else": { "not": { "required": ["selected_configuration"] } }
     }
   ],
   "unevaluatedProperties": false

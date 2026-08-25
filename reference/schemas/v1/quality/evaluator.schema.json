@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/quality/evaluator.schema.json",
+  "title": "Quality evaluator",
+  "allOf": [
+    { "$ref": "../common/artifact.schema.json" },
+    {
+      "type": "object",
+      "required": ["evaluator_type", "implementation", "datasets", "inputs", "outputs", "determinism", "pass_criteria", "sandbox", "limitations"],
+      "properties": {
+        "kind": { "const": "Evaluator" },
+        "id": { "pattern": "^EV[0-9]{3}$" },
+        "evaluator_type": { "enum": ["deterministic_rules", "unit_tests", "retrieval", "model_metric", "llm_judge", "human_review"] },
+        "implementation": {
+          "type": "object",
+          "required": ["repository_path", "entrypoint", "revision", "sha256"],
+          "properties": {
+            "repository_path": { "type": "string" },
+            "entrypoint": { "type": "string" },
+            "revision": { "type": "string" },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "runtime": { "$ref": "../common/reference.schema.json" }
+          },
+          "additionalProperties": false
+        },
+        "datasets": { "type": "array", "minItems": 1, "items": { "$ref": "../common/reference.schema.json" } },
+        "inputs": { "type": "object" },
+        "outputs": { "type": "object" },
+        "metrics": { "type": "array", "uniqueItems": true, "items": { "$ref": "../common/reference.schema.json" } },
+        "determinism": {
+          "type": "object",
+          "required": ["level", "seeds", "tolerance"],
+          "properties": {
+            "level": { "enum": ["exact", "seeded", "statistical", "subjective"] },
+            "seeds": { "type": "array", "items": { "type": "integer" } },
+            "tolerance": { "type": "number", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "pass_criteria": { "type": "object" },
+        "sandbox": {
+          "type": "object",
+          "required": ["executes_untrusted_code", "network"],
+          "properties": {
+            "executes_untrusted_code": { "type": "boolean" },
+            "network": { "enum": ["disabled", "restricted", "allowed"] },
+            "controls": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": false
+        },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}
