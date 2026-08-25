@@ -60,12 +60,14 @@ def run_id(experiment: str, configuration: str, replicate: int) -> str:
 def _load_model(model_dir: Path) -> tuple[Any, Any]:
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
-    tokenizer = AutoTokenizer.from_pretrained(model_dir, local_files_only=True)
+    tokenizer = AutoTokenizer.from_pretrained(  # type: ignore[no-untyped-call]
+        model_dir, local_files_only=True
+    )
     tokenizer.padding_side = "left"
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
     model = AutoModelForCausalLM.from_pretrained(model_dir, local_files_only=True)
-    model.eval()
+    model.eval()  # type: ignore[no-untyped-call]
     return tokenizer, model
 
 

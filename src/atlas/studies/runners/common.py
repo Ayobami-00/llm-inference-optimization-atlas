@@ -48,7 +48,9 @@ def artifact_path(name: str) -> Path:
     artifact = artifact_manifest().get(name)
     if artifact is None:
         raise RuntimeError(f"Execution manifest has no artifact named {name}")
-    path = cache_root() / "artifacts" / artifact["sha256"] / artifact["name"]
+    digest = str(artifact["sha256"])
+    filename = str(artifact["name"])
+    path = cache_root() / "artifacts" / digest / filename
     if not path.is_file():
         raise RuntimeError(f"Artifact is not prepared: {name}; run atlas execution prepare")
     return path
