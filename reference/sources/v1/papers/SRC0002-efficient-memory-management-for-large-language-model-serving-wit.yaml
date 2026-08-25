@@ -1,0 +1,35 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0002
+version: 1
+slug: "efficient-memory-management-for-large-language-model-serving-wit"
+title: "Efficient Memory Management for Large Language Model Serving with PagedAttention"
+description: "Authoritative external source for paged-kv-cache, continuous-batching."
+status: active
+authors:
+  - name: Atlas maintainers
+    roles: [curator]
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the primary or official source
+  source_paths: []
+  generated: false
+extensions: {}
+type: paper
+source_authors:
+  - "Kwon et al."
+url: "https://arxiv.org/abs/2309.06180"
+identifiers:
+  arxiv: "2309.06180"
+published:
+  year: 2023
+topics:
+  - "paged-kv-cache"
+  - "continuous-batching"
+relevance: "Provides external grounding for Atlas concepts related to paged-kv-cache and continuous-batching."
+

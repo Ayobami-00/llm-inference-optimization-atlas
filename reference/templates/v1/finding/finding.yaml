@@ -1,0 +1,46 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/finding.schema.json
+schema_version: 1
+kind: Finding
+id: F0000
+version: 1
+slug: replace-with-finding-slug
+title: "Replace with evidence-scoped finding title"
+description: "A finding supported only after eligible comparisons exist."
+status: draft
+authors:
+  - name: "Replace with contributor name"
+    roles: [analysis]
+    conflicts: []
+created_at: '1970-01-01T00:00:00Z'
+updated_at: '1970-01-01T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: contributor-authored from accepted comparisons
+  source_paths: []
+  generated: false
+extensions: {}
+statement: "State the direction, effect, and exact tested scope."
+scope:
+  workload: atlas://workload-spec/WS000@v1
+  model: atlas://model/M000@v1
+  runtime: atlas://runtime/RT000@v1
+  hardware: atlas://hardware/HW000@v1
+  traffic: [atlas://traffic/T001@v1]
+observation: "Summarize the measured comparison."
+mechanism: "Relate diagnostic evidence to the preregistered mechanism."
+baseline: atlas://configuration/CFG000@v1
+intervention: atlas://configuration/CFG001@v1
+effects:
+  - {metric: atlas://metric/MET001@v1, absolute: 0.0, relative: 0.0, unit: ms}
+works_when: ["List measured conditions."]
+stops_working_when: []
+interactions: []
+limitations: ["Do not generalize beyond this exact setup without replication."]
+evidence:
+  comparisons: [atlas://comparison/CMP0000@v1]
+  runs: [atlas://run/R0000@v1, atlas://run/R0001@v1]
+mechanism_sources: []
+evidence_confidence: low
+transferability: exact_setup
+claim_status: proposed

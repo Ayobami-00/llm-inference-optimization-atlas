@@ -1,0 +1,201 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: RELATIONS
+version: 1
+title: "Graph relations"
+description: "Relations allowed in the canonical evidence graph."
+entries:
+  - id: REL-001
+    name: INSTANCE_OF
+    definition: "Canonical graph relation INSTANCE_OF."
+    status: active
+    aliases: []
+    relation: INSTANCE_OF
+  - id: REL-002
+    name: HAS_CHARACTERISTIC
+    definition: "Canonical graph relation HAS_CHARACTERISTIC."
+    status: active
+    aliases: []
+    relation: HAS_CHARACTERISTIC
+  - id: REL-003
+    name: USES_TRAFFIC_REGIME
+    definition: "Canonical graph relation USES_TRAFFIC_REGIME."
+    status: active
+    aliases: []
+    relation: USES_TRAFFIC_REGIME
+  - id: REL-004
+    name: HAS_QUALITY_CONTRACT
+    definition: "Canonical graph relation HAS_QUALITY_CONTRACT."
+    status: active
+    aliases: []
+    relation: HAS_QUALITY_CONTRACT
+  - id: REL-005
+    name: HAS_SLO
+    definition: "Canonical graph relation HAS_SLO."
+    status: active
+    aliases: []
+    relation: HAS_SLO
+  - id: REL-006
+    name: USES_MODEL
+    definition: "Canonical graph relation USES_MODEL."
+    status: active
+    aliases: []
+    relation: USES_MODEL
+  - id: REL-007
+    name: EXECUTED_ON
+    definition: "Canonical graph relation EXECUTED_ON."
+    status: active
+    aliases: []
+    relation: EXECUTED_ON
+  - id: REL-008
+    name: USES_RUNTIME
+    definition: "Canonical graph relation USES_RUNTIME."
+    status: active
+    aliases: []
+    relation: USES_RUNTIME
+  - id: REL-009
+    name: USES_CONFIGURATION
+    definition: "Canonical graph relation USES_CONFIGURATION."
+    status: active
+    aliases: []
+    relation: USES_CONFIGURATION
+  - id: REL-010
+    name: SUGGESTS
+    definition: "Canonical graph relation SUGGESTS."
+    status: active
+    aliases: []
+    relation: SUGGESTS
+  - id: REL-011
+    name: ASSOCIATED_WITH
+    definition: "Canonical graph relation ASSOCIATED_WITH."
+    status: active
+    aliases: []
+    relation: ASSOCIATED_WITH
+  - id: REL-012
+    name: HYPOTHESIZED_TO_CAUSE
+    definition: "Canonical graph relation HYPOTHESIZED_TO_CAUSE."
+    status: active
+    aliases: []
+    relation: HYPOTHESIZED_TO_CAUSE
+  - id: REL-013
+    name: VALIDATED_AS_BOTTLENECK
+    definition: "Canonical graph relation VALIDATED_AS_BOTTLENECK."
+    status: active
+    aliases: []
+    relation: VALIDATED_AS_BOTTLENECK
+  - id: REL-014
+    name: TARGETS
+    definition: "Canonical graph relation TARGETS."
+    status: active
+    aliases: []
+    relation: TARGETS
+  - id: REL-015
+    name: TESTS
+    definition: "Canonical graph relation TESTS."
+    status: active
+    aliases: []
+    relation: TESTS
+  - id: REL-016
+    name: HAS_RUN
+    definition: "Canonical graph relation HAS_RUN."
+    status: active
+    aliases: []
+    relation: HAS_RUN
+  - id: REL-017
+    name: COMPARES
+    definition: "Canonical graph relation COMPARES."
+    status: active
+    aliases: []
+    relation: COMPARES
+  - id: REL-018
+    name: PRODUCES
+    definition: "Canonical graph relation PRODUCES."
+    status: active
+    aliases: []
+    relation: PRODUCES
+  - id: REL-019
+    name: SUPPORTS
+    definition: "Canonical graph relation SUPPORTS."
+    status: active
+    aliases: []
+    relation: SUPPORTS
+  - id: REL-020
+    name: CONTRADICTS
+    definition: "Canonical graph relation CONTRADICTS."
+    status: active
+    aliases: []
+    relation: CONTRADICTS
+  - id: REL-021
+    name: REPLICATES
+    definition: "Canonical graph relation REPLICATES."
+    status: active
+    aliases: []
+    relation: REPLICATES
+  - id: REL-022
+    name: IMPROVES
+    definition: "Canonical graph relation IMPROVES."
+    status: active
+    aliases: []
+    relation: IMPROVES
+  - id: REL-023
+    name: DEGRADES
+    definition: "Canonical graph relation DEGRADES."
+    status: active
+    aliases: []
+    relation: DEGRADES
+  - id: REL-024
+    name: NO_SIGNIFICANT_EFFECT
+    definition: "Canonical graph relation NO_SIGNIFICANT_EFFECT."
+    status: active
+    aliases: []
+    relation: NO_SIGNIFICANT_EFFECT
+  - id: REL-025
+    name: INTERACTS_WITH
+    definition: "Canonical graph relation INTERACTS_WITH."
+    status: active
+    aliases: []
+    relation: INTERACTS_WITH
+  - id: REL-026
+    name: APPLIES_UNDER
+    definition: "Canonical graph relation APPLIES_UNDER."
+    status: active
+    aliases: []
+    relation: APPLIES_UNDER
+  - id: REL-027
+    name: LIMITED_BY
+    definition: "Canonical graph relation LIMITED_BY."
+    status: active
+    aliases: []
+    relation: LIMITED_BY
+  - id: REL-028
+    name: JUSTIFIES
+    definition: "Canonical graph relation JUSTIFIES."
+    status: active
+    aliases: []
+    relation: JUSTIFIES
+  - id: REL-029
+    name: REJECTS
+    definition: "Canonical graph relation REJECTS."
+    status: active
+    aliases: []
+    relation: REJECTS
+  - id: REL-030
+    name: CITES
+    definition: "Canonical graph relation CITES."
+    status: active
+    aliases: []
+    relation: CITES
+  - id: REL-031
+    name: SUPERSEDES
+    definition: "Canonical graph relation SUPERSEDES."
+    status: active
+    aliases: []
+    relation: SUPERSEDES
+  - id: REL-032
+    name: DERIVED_FROM
+    definition: "Canonical graph relation DERIVED_FROM."
+    status: active
+    aliases: []
+    relation: DERIVED_FROM
+

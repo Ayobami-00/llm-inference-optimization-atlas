@@ -1,0 +1,84 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: STATUSES
+version: 1
+title: "Artifact statuses"
+description: "Lifecycle and evidence statuses used throughout Atlas."
+entries:
+  - id: STATUS-001
+    name: draft
+    definition: "Artifact is being authored and cannot support accepted claims."
+    status: active
+    aliases: []
+  - id: STATUS-002
+    name: planned
+    definition: "Experiment or study is approved but not executed."
+    status: active
+    aliases: []
+  - id: STATUS-003
+    name: running
+    definition: "Execution is currently in progress."
+    status: active
+    aliases: []
+  - id: STATUS-004
+    name: complete
+    definition: "Execution completed and awaits or passed validation."
+    status: active
+    aliases: []
+  - id: STATUS-005
+    name: failed
+    definition: "Execution failed and remains preserved for diagnosis."
+    status: active
+    aliases: []
+  - id: STATUS-006
+    name: proposed
+    definition: "Artifact awaits review."
+    status: active
+    aliases: []
+  - id: STATUS-007
+    name: reviewed
+    definition: "Artifact received human review."
+    status: active
+    aliases: []
+  - id: STATUS-008
+    name: accepted
+    definition: "Artifact satisfies repository acceptance requirements."
+    status: active
+    aliases: []
+  - id: STATUS-009
+    name: supported
+    definition: "Finding is supported within its declared scope."
+    status: active
+    aliases: []
+  - id: STATUS-010
+    name: inconclusive
+    definition: "Evidence does not justify a directional claim."
+    status: active
+    aliases: []
+  - id: STATUS-011
+    name: contradicted
+    definition: "Later evidence contradicts the finding within an overlapping scope."
+    status: active
+    aliases: []
+  - id: STATUS-012
+    name: superseded
+    definition: "A newer artifact replaces this one without deleting history."
+    status: active
+    aliases: []
+  - id: STATUS-013
+    name: invalidated
+    definition: "Artifact is retained but excluded from accepted evidence."
+    status: active
+    aliases: []
+  - id: STATUS-014
+    name: retracted
+    definition: "External source or claim has been withdrawn."
+    status: active
+    aliases: []
+  - id: STATUS-015
+    name: generalized
+    definition: "Finding synthesizes multiple narrower findings."
+    status: active
+    aliases: []
+

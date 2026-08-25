@@ -1,0 +1,75 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: METRICS-M5
+version: 1
+title: "M5 metrics"
+description: "Canonical M5 metric definitions."
+entries:
+  - id: MET085
+    name: "Energy per request"
+    definition: "Energy per request measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M5
+    category: energy
+    unit: "J/request"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET086
+    name: "Energy per input token"
+    definition: "Energy per input token measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M5
+    category: energy
+    unit: "J/token"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET087
+    name: "Energy per output token"
+    definition: "Energy per output token measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M5
+    category: energy
+    unit: "J/token"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET088
+    name: "Energy per successful task"
+    definition: "Energy per successful task measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M5
+    category: energy
+    unit: "J/task"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET089
+    name: "Goodput per watt"
+    definition: "Goodput per watt measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M5
+    category: energy
+    unit: "request/s/W"
+    direction: higher_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET090
+    name: "Carbon estimate"
+    definition: "Carbon estimate measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M5
+    category: energy
+    unit: "gCO2e"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+

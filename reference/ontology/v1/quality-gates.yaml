@@ -1,0 +1,24 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: QUALITY-GATES
+version: 1
+title: "Quality gates"
+description: "Quality evaluation gates selected by intervention risk."
+entries:
+  - id: Q0
+    name: "Correctness gate"
+    definition: "Cheap checks for crashes, malformed behavior, tokenizer mismatches, and severe numerical divergence."
+    status: active
+    aliases: []
+  - id: Q1
+    name: "Regression gate"
+    definition: "Compact workload-specific evaluation after meaningful but nominally behavior-preserving changes."
+    status: active
+    aliases: []
+  - id: Q2
+    name: "Full quality gate"
+    definition: "Full evaluation after lossy precision, model changes, routing, pruning, distillation, or context reduction."
+    status: active
+    aliases: []
+

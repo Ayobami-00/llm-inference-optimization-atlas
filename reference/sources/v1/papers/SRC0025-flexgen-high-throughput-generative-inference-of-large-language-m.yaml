@@ -1,0 +1,35 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0025
+version: 1
+slug: "flexgen-high-throughput-generative-inference-of-large-language-m"
+title: "FlexGen: High-Throughput Generative Inference of Large Language Models with a Single GPU"
+description: "Authoritative external source for offload, throughput."
+status: active
+authors:
+  - name: Atlas maintainers
+    roles: [curator]
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the primary or official source
+  source_paths: []
+  generated: false
+extensions: {}
+type: paper
+source_authors:
+  - "Sheng et al."
+url: "https://arxiv.org/abs/2303.06865"
+identifiers:
+  arxiv: "2303.06865"
+published:
+  year: 2023
+topics:
+  - "offload"
+  - "throughput"
+relevance: "Provides external grounding for Atlas concepts related to offload and throughput."
+

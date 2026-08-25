@@ -1,0 +1,65 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: TRAFFIC-REGIMES
+version: 1
+title: "Traffic regimes"
+description: "Service regimes kept orthogonal to semantic workload archetypes."
+entries:
+  - id: T001
+    name: "Interactive low concurrency"
+    definition: "Latency-sensitive interactive traffic with few simultaneous requests."
+    status: active
+    aliases: []
+    mode: open_loop
+    primary_objective: latency
+  - id: T002
+    name: "Production steady state"
+    definition: "Stationary production-shaped traffic below saturation."
+    status: active
+    aliases: []
+    mode: open_loop
+    primary_objective: goodput
+  - id: T003
+    name: "Bursty production"
+    definition: "Traffic with short offered-load spikes and tail-latency pressure."
+    status: active
+    aliases: []
+    mode: open_loop
+    primary_objective: goodput
+  - id: T004
+    name: "Overloaded service"
+    definition: "Offered load intentionally exceeds sustainable capacity."
+    status: active
+    aliases: []
+    mode: open_loop
+    primary_objective: resilience
+  - id: T005
+    name: "Offline batch"
+    definition: "Queued work with no interactive first-token objective."
+    status: active
+    aliases: []
+    mode: offline
+    primary_objective: throughput
+  - id: T006
+    name: "Closed-loop agent"
+    definition: "Session requests depend on prior outputs and tool completion."
+    status: active
+    aliases: []
+    mode: closed_loop
+    primary_objective: task_completion
+  - id: T007
+    name: "Multi-tenant"
+    definition: "Multiple tenants share workers, caches, and scheduling."
+    status: active
+    aliases: []
+    mode: open_loop
+    primary_objective: fairness
+  - id: T008
+    name: "Mixed-SLO service"
+    definition: "Requests from several SLO classes share one deployment."
+    status: active
+    aliases: []
+    mode: open_loop
+    primary_objective: goodput
+

@@ -1,0 +1,36 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0067
+version: 1
+slug: "transformers-documentation"
+title: "Transformers Documentation"
+description: "Authoritative external source for framework, models."
+status: active
+authors:
+  - name: Atlas maintainers
+    roles: [curator]
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the primary or official source
+  source_paths: []
+  generated: false
+extensions: {}
+type: official_documentation
+source_authors:
+  - "Hugging Face"
+url: "https://huggingface.co/docs/transformers/"
+published:
+  year: 2026
+upstream:
+  product: "Transformers Documentation"
+  retrieved_at: '2026-08-25'
+topics:
+  - "framework"
+  - "models"
+relevance: "Provides external grounding for Atlas concepts related to framework and models."
+

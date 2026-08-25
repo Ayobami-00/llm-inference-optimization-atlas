@@ -1,0 +1,69 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: OPTIMIZATIONS-O10
+version: 1
+title: "Communication and topology optimizations"
+description: "Collectives, placement, affinity, and overlap."
+entries:
+  - id: OPT076
+    name: "Collective algorithm selection"
+    definition: "Collective algorithm selection is a controlled intervention in the communication and topology layer."
+    status: active
+    aliases: []
+    parent: O10
+    target_bottlenecks: ["atlas://bottleneck/B015@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0068@v1"]
+  - id: OPT077
+    name: "Topology-aware rank placement"
+    definition: "Topology-aware rank placement is a controlled intervention in the communication and topology layer."
+    status: active
+    aliases: []
+    parent: O10
+    target_bottlenecks: ["atlas://bottleneck/B015@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0068@v1"]
+  - id: OPT078
+    name: "Hierarchical collectives"
+    definition: "Hierarchical collectives is a controlled intervention in the communication and topology layer."
+    status: active
+    aliases: []
+    parent: O10
+    target_bottlenecks: ["atlas://bottleneck/B015@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0068@v1"]
+  - id: OPT079
+    name: "NIC affinity"
+    definition: "NIC affinity is a controlled intervention in the communication and topology layer."
+    status: active
+    aliases: []
+    parent: O10
+    target_bottlenecks: ["atlas://bottleneck/B015@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0068@v1"]
+  - id: OPT080
+    name: "GPUDirect RDMA"
+    definition: "GPUDirect RDMA is a controlled intervention in the communication and topology layer."
+    status: active
+    aliases: []
+    parent: O10
+    target_bottlenecks: ["atlas://bottleneck/B015@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0068@v1"]
+  - id: OPT081
+    name: "Compute-communication overlap"
+    definition: "Compute-communication overlap is a controlled intervention in the communication and topology layer."
+    status: active
+    aliases: []
+    parent: O10
+    target_bottlenecks: ["atlas://bottleneck/B015@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0068@v1"]
+

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json",
+  "title": "Atlas ontology catalog",
+  "type": "object",
+  "required": ["$schema", "schema_version", "kind", "id", "version", "title", "description", "entries"],
+  "properties": {
+    "$schema": { "const": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json" },
+    "schema_version": { "const": 1 },
+    "kind": { "const": "OntologyCatalog" },
+    "id": { "type": "string", "pattern": "^[A-Z][A-Z0-9-]+$" },
+    "version": { "const": 1 },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "definition", "status"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "definition": { "type": "string" },
+          "status": { "enum": ["active", "deprecated", "superseded"] },
+          "aliases": { "type": "array", "items": { "type": "string" } },
+          "parent": { "type": "string" },
+          "sources": { "type": "array", "items": { "$ref": "reference.schema.json" } }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,49 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: OPTIMIZATIONS-O15
+version: 1
+title: "Multi-tenancy and LoRA optimizations"
+description: "Adapter and tenant-aware memory, batching, and isolation."
+entries:
+  - id: OPT104
+    name: "Dynamic adapter loading"
+    definition: "Dynamic adapter loading is a controlled intervention in the multi-tenancy and lora layer."
+    status: active
+    aliases: []
+    parent: O15
+    target_bottlenecks: ["atlas://bottleneck/B023@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0044@v1"]
+  - id: OPT105
+    name: "Adapter cache"
+    definition: "Adapter cache is a controlled intervention in the multi-tenancy and lora layer."
+    status: active
+    aliases: []
+    parent: O15
+    target_bottlenecks: ["atlas://bottleneck/B023@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0044@v1"]
+  - id: OPT106
+    name: "Adapter-aware batching"
+    definition: "Adapter-aware batching is a controlled intervention in the multi-tenancy and lora layer."
+    status: active
+    aliases: []
+    parent: O15
+    target_bottlenecks: ["atlas://bottleneck/B023@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0044@v1"]
+  - id: OPT107
+    name: "Tenant isolation"
+    definition: "Tenant isolation is a controlled intervention in the multi-tenancy and lora layer."
+    status: active
+    aliases: []
+    parent: O15
+    target_bottlenecks: ["atlas://bottleneck/B023@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0044@v1"]
+

@@ -1,0 +1,49 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/experiment.schema.json
+schema_version: 1
+kind: Experiment
+id: E0000
+version: 1
+slug: replace-with-experiment-slug
+title: "Replace with experiment title"
+description: "Describe one controlled intervention and its intended evidence."
+status: draft
+authors:
+  - name: "Replace with contributor name"
+    roles: [investigator]
+    conflicts: []
+created_at: '1970-01-01T00:00:00Z'
+updated_at: '1970-01-01T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: contributor-authored
+  source_paths: []
+  generated: false
+extensions: {}
+study: atlas://study/S000@v1
+question: "How does the changed factor affect the primary metric under the frozen conditions?"
+hypothesis: atlas://hypothesis/HYP000@v1
+design: ablation
+baseline: atlas://configuration/CFG000@v1
+candidates: [atlas://configuration/CFG001@v1]
+changed_factors: ["Name the one deliberate intervention."]
+frozen_factors: ["Workload trace", "model revision", "hardware topology", "runtime build"]
+protocol:
+  warmup: {requests: 3, excluded: true}
+  measurement: {requests: 12}
+  replicates: 3
+  seeds: [101, 202, 303]
+  ordering: randomized
+metrics:
+  primary: [atlas://metric/MET001@v1]
+  secondary: [atlas://metric/MET002@v1]
+  guardrails: [atlas://metric/MET015@v1]
+quality_gate: Q1
+expected_mechanism: "Explain the resource or scheduling mechanism expected to change."
+analysis:
+  method: paired_bootstrap
+  resamples: 10000
+  confidence_level: 0.95
+stopping_rule: "Complete all planned replicates unless Q0 fails or a safety limit is reached."
+failure_policy: "Retain failed attempts as drafts; exclude invalid runs from claims without deleting them."
+background_sources: []

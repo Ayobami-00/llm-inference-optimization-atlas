@@ -1,0 +1,30 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/decision.schema.json
+schema_version: 1
+kind: DeploymentDecision
+id: DEC0000
+version: 1
+slug: replace-with-decision-slug
+title: "Replace with deployment decision title"
+description: "Select a configuration, defer, or explicitly make no recommendation."
+status: draft
+authors:
+  - name: "Replace with decision owner"
+    roles: [decision]
+    conflicts: []
+created_at: '1970-01-01T00:00:00Z'
+updated_at: '1970-01-01T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: contributor-authored from accepted findings
+  source_paths: []
+  generated: false
+extensions: {}
+study: atlas://study/S000@v1
+outcome: no_recommendation
+pareto_rationale: "Explain quality, latency, goodput, cost, energy, and resource trade-offs."
+operating_envelope: {}
+supporting_findings: []
+rejected_alternatives: []
+caveats: ["Evidence is not yet sufficient for a recommendation."]
+revisit_conditions: ["Revisit after the preregistered experiments and replications are accepted."]

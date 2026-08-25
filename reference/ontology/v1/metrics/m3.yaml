@@ -1,0 +1,141 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: METRICS-M3
+version: 1
+title: "M3 metrics"
+description: "Canonical M3 metric definitions."
+entries:
+  - id: MET067
+    name: "Kernel calls"
+    definition: "Kernel calls measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M3
+    category: kernel
+    unit: "count"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET068
+    name: "Kernel total duration"
+    definition: "Kernel total duration measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M3
+    category: kernel
+    unit: "ms"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET069
+    name: "Kernel mean duration"
+    definition: "Kernel mean duration measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M3
+    category: kernel
+    unit: "ms"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET070
+    name: "Kernel launch gap"
+    definition: "Kernel launch gap measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M3
+    category: kernel
+    unit: "us"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET071
+    name: "Kernel occupancy"
+    definition: "Kernel occupancy measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M3
+    category: kernel
+    unit: "ratio"
+    direction: higher_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET072
+    name: "Kernel memory throughput"
+    definition: "Kernel memory throughput measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M3
+    category: kernel
+    unit: "byte/s"
+    direction: higher_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET073
+    name: "Collective calls"
+    definition: "Collective calls measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M3
+    category: communication
+    unit: "count"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET074
+    name: "Collective bytes"
+    definition: "Collective bytes measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M3
+    category: communication
+    unit: "byte"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET075
+    name: "Collective duration"
+    definition: "Collective duration measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M3
+    category: communication
+    unit: "ms"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET076
+    name: "Synchronization duration"
+    definition: "Synchronization duration measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M3
+    category: communication
+    unit: "ms"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET077
+    name: "Communication overlap"
+    definition: "Communication overlap measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M3
+    category: communication
+    unit: "ratio"
+    direction: higher_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET078
+    name: "KV transfer latency"
+    definition: "KV transfer latency measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M3
+    category: communication
+    unit: "ms"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+

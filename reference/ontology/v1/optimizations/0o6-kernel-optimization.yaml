@@ -1,0 +1,89 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: OPTIMIZATIONS-O6
+version: 1
+title: "Kernel optimization optimizations"
+description: "Attention, matrix, normalization, sampling, and fused kernels."
+entries:
+  - id: OPT042
+    name: "Attention backend selection"
+    definition: "Attention backend selection is a controlled intervention in the kernel optimization layer."
+    status: active
+    aliases: []
+    parent: O6
+    target_bottlenecks: ["atlas://bottleneck/B001@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0011@v1"]
+  - id: OPT043
+    name: "FlashAttention"
+    definition: "FlashAttention is a controlled intervention in the kernel optimization layer."
+    status: active
+    aliases: []
+    parent: O6
+    target_bottlenecks: ["atlas://bottleneck/B001@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0011@v1"]
+  - id: OPT044
+    name: "FlashInfer"
+    definition: "FlashInfer is a controlled intervention in the kernel optimization layer."
+    status: active
+    aliases: []
+    parent: O6
+    target_bottlenecks: ["atlas://bottleneck/B001@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0011@v1"]
+  - id: OPT045
+    name: "GEMM autotuning"
+    definition: "GEMM autotuning is a controlled intervention in the kernel optimization layer."
+    status: active
+    aliases: []
+    parent: O6
+    target_bottlenecks: ["atlas://bottleneck/B001@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0011@v1"]
+  - id: OPT046
+    name: "GEMV optimization"
+    definition: "GEMV optimization is a controlled intervention in the kernel optimization layer."
+    status: active
+    aliases: []
+    parent: O6
+    target_bottlenecks: ["atlas://bottleneck/B001@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0011@v1"]
+  - id: OPT047
+    name: "Grouped GEMM"
+    definition: "Grouped GEMM is a controlled intervention in the kernel optimization layer."
+    status: active
+    aliases: []
+    parent: O6
+    target_bottlenecks: ["atlas://bottleneck/B001@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0011@v1"]
+  - id: OPT048
+    name: "Fused normalization and RoPE"
+    definition: "Fused normalization and RoPE is a controlled intervention in the kernel optimization layer."
+    status: active
+    aliases: []
+    parent: O6
+    target_bottlenecks: ["atlas://bottleneck/B001@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0011@v1"]
+  - id: OPT049
+    name: "Sampling kernel fusion"
+    definition: "Sampling kernel fusion is a controlled intervention in the kernel optimization layer."
+    status: active
+    aliases: []
+    parent: O6
+    target_bottlenecks: ["atlas://bottleneck/B001@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0011@v1"]
+

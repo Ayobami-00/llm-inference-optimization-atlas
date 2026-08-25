@@ -1,0 +1,111 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: LIFECYCLE
+version: 1
+title: "Study lifecycle"
+description: "The fixed Day in the Life research lifecycle."
+entries:
+  - id: PHASE-0
+    name: "Product and workload brief"
+    definition: "Phase 0 produces or validates the product and workload brief artifact boundary."
+    status: active
+    aliases: []
+    order: 0
+  - id: PHASE-1
+    name: "Workload characterization"
+    definition: "Phase 1 produces or validates the workload characterization artifact boundary."
+    status: active
+    aliases: []
+    order: 1
+  - id: PHASE-2
+    name: "Capacity model"
+    definition: "Phase 2 produces or validates the capacity model artifact boundary."
+    status: active
+    aliases: []
+    order: 2
+  - id: PHASE-3
+    name: "Model quality screening"
+    definition: "Phase 3 produces or validates the model quality screening artifact boundary."
+    status: active
+    aliases: []
+    order: 3
+  - id: PHASE-4
+    name: "Correctness baseline B0"
+    definition: "Phase 4 produces or validates the correctness baseline b0 artifact boundary."
+    status: active
+    aliases: []
+    order: 4
+  - id: PHASE-5
+    name: "Production baseline B1"
+    definition: "Phase 5 produces or validates the production baseline b1 artifact boundary."
+    status: active
+    aliases: []
+    order: 5
+  - id: PHASE-6
+    name: "Saturation characterization"
+    definition: "Phase 6 produces or validates the saturation characterization artifact boundary."
+    status: active
+    aliases: []
+    order: 6
+  - id: PHASE-7
+    name: "Baseline profiling"
+    definition: "Phase 7 produces or validates the baseline profiling artifact boundary."
+    status: active
+    aliases: []
+    order: 7
+  - id: PHASE-8
+    name: "Hypothesis formation"
+    definition: "Phase 8 produces or validates the hypothesis formation artifact boundary."
+    status: active
+    aliases: []
+    order: 8
+  - id: PHASE-9
+    name: "Single-axis ablation"
+    definition: "Phase 9 produces or validates the single-axis ablation artifact boundary."
+    status: active
+    aliases: []
+    order: 9
+  - id: PHASE-10
+    name: "Mechanism validation"
+    definition: "Phase 10 produces or validates the mechanism validation artifact boundary."
+    status: active
+    aliases: []
+    order: 10
+  - id: PHASE-11
+    name: "Quality gate"
+    definition: "Phase 11 produces or validates the quality gate artifact boundary."
+    status: active
+    aliases: []
+    order: 11
+  - id: PHASE-12
+    name: "Interaction sweep"
+    definition: "Phase 12 produces or validates the interaction sweep artifact boundary."
+    status: active
+    aliases: []
+    order: 12
+  - id: PHASE-13
+    name: "Composition"
+    definition: "Phase 13 produces or validates the composition artifact boundary."
+    status: active
+    aliases: []
+    order: 13
+  - id: PHASE-14
+    name: "Pareto frontier"
+    definition: "Phase 14 produces or validates the pareto frontier artifact boundary."
+    status: active
+    aliases: []
+    order: 14
+  - id: PHASE-15
+    name: "Production decision"
+    definition: "Phase 15 produces or validates the production decision artifact boundary."
+    status: active
+    aliases: []
+    order: 15
+  - id: PHASE-16
+    name: "Transferability"
+    definition: "Phase 16 produces or validates the transferability artifact boundary."
+    status: active
+    aliases: []
+    order: 16
+

@@ -1,0 +1,109 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: OPTIMIZATIONS-O2
+version: 1
+title: "Admission, scheduling, and batching optimizations"
+description: "Queueing, admission, and batch formation."
+entries:
+  - id: OPT007
+    name: "Static batching"
+    definition: "Static batching is a controlled intervention in the admission, scheduling, and batching layer."
+    status: active
+    aliases: []
+    parent: O2
+    target_bottlenecks: ["atlas://bottleneck/B008@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0001@v1"]
+  - id: OPT008
+    name: "Continuous batching"
+    definition: "Continuous batching is a controlled intervention in the admission, scheduling, and batching layer."
+    status: active
+    aliases: []
+    parent: O2
+    target_bottlenecks: ["atlas://bottleneck/B008@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0001@v1"]
+  - id: OPT009
+    name: "Maximum sequence tuning"
+    definition: "Maximum sequence tuning is a controlled intervention in the admission, scheduling, and batching layer."
+    status: active
+    aliases: []
+    parent: O2
+    target_bottlenecks: ["atlas://bottleneck/B008@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0001@v1"]
+  - id: OPT010
+    name: "Maximum batched-token tuning"
+    definition: "Maximum batched-token tuning is a controlled intervention in the admission, scheduling, and batching layer."
+    status: active
+    aliases: []
+    parent: O2
+    target_bottlenecks: ["atlas://bottleneck/B008@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0001@v1"]
+  - id: OPT011
+    name: "Chunked prefill"
+    definition: "Chunked prefill is a controlled intervention in the admission, scheduling, and batching layer."
+    status: active
+    aliases: []
+    parent: O2
+    target_bottlenecks: ["atlas://bottleneck/B008@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0001@v1"]
+  - id: OPT012
+    name: "Prefill prioritization"
+    definition: "Prefill prioritization is a controlled intervention in the admission, scheduling, and batching layer."
+    status: active
+    aliases: []
+    parent: O2
+    target_bottlenecks: ["atlas://bottleneck/B008@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0001@v1"]
+  - id: OPT013
+    name: "Decode prioritization"
+    definition: "Decode prioritization is a controlled intervention in the admission, scheduling, and batching layer."
+    status: active
+    aliases: []
+    parent: O2
+    target_bottlenecks: ["atlas://bottleneck/B008@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0001@v1"]
+  - id: OPT014
+    name: "Deadline-aware scheduling"
+    definition: "Deadline-aware scheduling is a controlled intervention in the admission, scheduling, and batching layer."
+    status: active
+    aliases: []
+    parent: O2
+    target_bottlenecks: ["atlas://bottleneck/B008@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0001@v1"]
+  - id: OPT015
+    name: "Admission control"
+    definition: "Admission control is a controlled intervention in the admission, scheduling, and batching layer."
+    status: active
+    aliases: []
+    parent: O2
+    target_bottlenecks: ["atlas://bottleneck/B008@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0001@v1"]
+  - id: OPT016
+    name: "Request preemption"
+    definition: "Request preemption is a controlled intervention in the admission, scheduling, and batching layer."
+    status: active
+    aliases: []
+    parent: O2
+    target_bottlenecks: ["atlas://bottleneck/B008@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0001@v1"]
+

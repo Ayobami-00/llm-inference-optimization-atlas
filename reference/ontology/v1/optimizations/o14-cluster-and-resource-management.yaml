@@ -1,0 +1,59 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: OPTIMIZATIONS-O14
+version: 1
+title: "Cluster and resource management optimizations"
+description: "Replica lifecycle, placement, scaling, and fleet scheduling."
+entries:
+  - id: OPT099
+    name: "Replica-count tuning"
+    definition: "Replica-count tuning is a controlled intervention in the cluster and resource management layer."
+    status: active
+    aliases: []
+    parent: O14
+    target_bottlenecks: ["atlas://bottleneck/B023@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0037@v1"]
+  - id: OPT100
+    name: "Autoscaling"
+    definition: "Autoscaling is a controlled intervention in the cluster and resource management layer."
+    status: active
+    aliases: []
+    parent: O14
+    target_bottlenecks: ["atlas://bottleneck/B023@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0037@v1"]
+  - id: OPT101
+    name: "Scale-to-zero"
+    definition: "Scale-to-zero is a controlled intervention in the cluster and resource management layer."
+    status: active
+    aliases: []
+    parent: O14
+    target_bottlenecks: ["atlas://bottleneck/B023@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0037@v1"]
+  - id: OPT102
+    name: "Topology-aware placement"
+    definition: "Topology-aware placement is a controlled intervention in the cluster and resource management layer."
+    status: active
+    aliases: []
+    parent: O14
+    target_bottlenecks: ["atlas://bottleneck/B023@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0037@v1"]
+  - id: OPT103
+    name: "Worker draining and migration"
+    definition: "Worker draining and migration is a controlled intervention in the cluster and resource management layer."
+    status: active
+    aliases: []
+    parent: O14
+    target_bottlenecks: ["atlas://bottleneck/B023@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0037@v1"]
+

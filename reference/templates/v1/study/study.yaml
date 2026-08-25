@@ -1,0 +1,49 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/study.schema.json
+schema_version: 1
+kind: Study
+id: S000
+version: 1
+slug: replace-with-study-slug
+title: "Replace with study title"
+description: "Replace with the study objective and empirical scope."
+status: draft
+authors:
+  - name: "Replace with contributor name"
+    roles: [investigator]
+    conflicts: []
+created_at: '1970-01-01T00:00:00Z'
+updated_at: '1970-01-01T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: contributor-authored
+  source_paths: []
+  generated: false
+extensions: {}
+archetype: atlas://workload/W001@v1
+proposal:
+  id: atlas://proposal/P0000@v1
+  issue_url: https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/0
+  approval: pending
+product_brief: "Describe the product behavior, users, and operating constraints."
+research_questions:
+  - "State a bounded, answerable research question."
+boundaries:
+  included: ["State included workload, system, and outcome dimensions."]
+  excluded: ["State what this study will not establish."]
+contracts:
+  workload: atlas://workload-spec/WS000@v1
+  quality: atlas://quality-contract/QC000@v1
+  slo: atlas://slo/SLO000@v1
+candidate_space:
+  models: [atlas://model/M000@v1]
+  hardware: [atlas://hardware/HW000@v1]
+  runtimes: [atlas://runtime/RT000@v1]
+maintainers: ["Replace with maintainer"]
+lifecycle:
+  phase: PHASE-0
+  phase_status: pending
+completion_criteria:
+  - "All preregistered experiments have three valid full-profile replicates."
+  - "Every finding is supported by eligible comparisons and has an explicit scope."
+  - "A deployment decision or no-recommendation artifact is reviewed."

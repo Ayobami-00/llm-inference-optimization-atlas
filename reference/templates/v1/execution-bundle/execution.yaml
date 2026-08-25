@@ -1,0 +1,42 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/execution/execution-bundle.schema.json
+schema_version: 1
+kind: ExecutionBundle
+id: XB000
+version: 1
+slug: replace-with-bundle-slug
+title: "Replace with execution bundle title"
+description: "Reproducible implementation of one study execution environment."
+status: draft
+authors:
+  - name: "Replace with contributor name"
+    roles: [software]
+    conflicts: []
+created_at: '1970-01-01T00:00:00Z'
+updated_at: '1970-01-01T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: contributor-authored
+  source_paths: []
+  generated: false
+extensions: {}
+platforms:
+  - {os: macos, architecture: aarch64}
+  - {os: linux, architecture: x86_64}
+backend: cpu
+requirements:
+  - {name: python, version: '>=3.12,<3.14'}
+artifacts: []
+entrypoints:
+  run: ./run.sh
+inputs: {trace: config/requests.jsonl}
+outputs:
+  draft_directory: .atlas/work
+  required_files: [run.yaml, environment.json, artifacts.yaml, metrics/summary.json]
+profiles:
+  quick: {replicates: 1, max_requests: 3}
+  full: {replicates: 3, max_requests: 12}
+resources: {minimum_memory_bytes: 1073741824, network_during_run: false}
+timeouts: {run_seconds: 1800, cleanup_seconds: 60}
+cleanup: {required: false, idempotent: true}
+limitations: ["Replace with environment-specific limitations."]

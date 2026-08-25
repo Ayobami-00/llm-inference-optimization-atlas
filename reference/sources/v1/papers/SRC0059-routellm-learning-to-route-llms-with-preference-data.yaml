@@ -1,0 +1,35 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0059
+version: 1
+slug: "routellm-learning-to-route-llms-with-preference-data"
+title: "RouteLLM: Learning to Route LLMs with Preference Data"
+description: "Authoritative external source for routing, model-selection."
+status: active
+authors:
+  - name: Atlas maintainers
+    roles: [curator]
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the primary or official source
+  source_paths: []
+  generated: false
+extensions: {}
+type: paper
+source_authors:
+  - "Ong et al."
+url: "https://arxiv.org/abs/2406.18665"
+identifiers:
+  arxiv: "2406.18665"
+published:
+  year: 2024
+topics:
+  - "routing"
+  - "model-selection"
+relevance: "Provides external grounding for Atlas concepts related to routing and model-selection."
+

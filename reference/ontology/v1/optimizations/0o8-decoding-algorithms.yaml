@@ -1,0 +1,89 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: OPTIMIZATIONS-O8
+version: 1
+title: "Decoding algorithms optimizations"
+description: "Algorithms that reduce or restructure sequential decoding."
+entries:
+  - id: OPT060
+    name: "Greedy decoding"
+    definition: "Greedy decoding is a controlled intervention in the decoding algorithms layer."
+    status: active
+    aliases: []
+    parent: O8
+    target_bottlenecks: ["atlas://bottleneck/B006@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0019@v1"]
+  - id: OPT061
+    name: "Sampling configuration"
+    definition: "Sampling configuration is a controlled intervention in the decoding algorithms layer."
+    status: active
+    aliases: []
+    parent: O8
+    target_bottlenecks: ["atlas://bottleneck/B006@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0019@v1"]
+  - id: OPT062
+    name: "Draft-model speculative decoding"
+    definition: "Draft-model speculative decoding is a controlled intervention in the decoding algorithms layer."
+    status: active
+    aliases: []
+    parent: O8
+    target_bottlenecks: ["atlas://bottleneck/B006@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0019@v1"]
+  - id: OPT063
+    name: "N-gram speculation"
+    definition: "N-gram speculation is a controlled intervention in the decoding algorithms layer."
+    status: active
+    aliases: []
+    parent: O8
+    target_bottlenecks: ["atlas://bottleneck/B006@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0019@v1"]
+  - id: OPT064
+    name: "Medusa-style decoding"
+    definition: "Medusa-style decoding is a controlled intervention in the decoding algorithms layer."
+    status: active
+    aliases: []
+    parent: O8
+    target_bottlenecks: ["atlas://bottleneck/B006@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0019@v1"]
+  - id: OPT065
+    name: "EAGLE-style drafting"
+    definition: "EAGLE-style drafting is a controlled intervention in the decoding algorithms layer."
+    status: active
+    aliases: []
+    parent: O8
+    target_bottlenecks: ["atlas://bottleneck/B006@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0019@v1"]
+  - id: OPT066
+    name: "Lookahead decoding"
+    definition: "Lookahead decoding is a controlled intervention in the decoding algorithms layer."
+    status: active
+    aliases: []
+    parent: O8
+    target_bottlenecks: ["atlas://bottleneck/B006@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0019@v1"]
+  - id: OPT067
+    name: "Verification-batch tuning"
+    definition: "Verification-batch tuning is a controlled intervention in the decoding algorithms layer."
+    status: active
+    aliases: []
+    parent: O8
+    target_bottlenecks: ["atlas://bottleneck/B006@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0019@v1"]
+

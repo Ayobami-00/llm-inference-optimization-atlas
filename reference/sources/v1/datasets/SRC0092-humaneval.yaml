@@ -1,0 +1,36 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0092
+version: 1
+slug: "humaneval"
+title: "HumanEval"
+description: "Authoritative external source for coding, quality."
+status: active
+authors:
+  - name: Atlas maintainers
+    roles: [curator]
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the primary or official source
+  source_paths: []
+  generated: false
+extensions: {}
+type: benchmark
+source_authors:
+  - "OpenAI"
+url: "https://github.com/openai/human-eval"
+published:
+  year: 2021
+upstream:
+  product: "HumanEval"
+  retrieved_at: '2026-08-25'
+topics:
+  - "coding"
+  - "quality"
+relevance: "Provides external grounding for Atlas concepts related to coding and quality."
+

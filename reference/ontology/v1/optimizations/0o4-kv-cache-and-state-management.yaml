@@ -1,0 +1,129 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: OPTIMIZATIONS-O4
+version: 1
+title: "KV-cache and state management optimizations"
+description: "Allocation, reuse, movement, compression, and eviction of state."
+entries:
+  - id: OPT023
+    name: "Paged KV cache"
+    definition: "Paged KV cache is a controlled intervention in the kv-cache and state management layer."
+    status: active
+    aliases: []
+    parent: O4
+    target_bottlenecks: ["atlas://bottleneck/B004@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0002@v1"]
+  - id: OPT024
+    name: "KV block-size tuning"
+    definition: "KV block-size tuning is a controlled intervention in the kv-cache and state management layer."
+    status: active
+    aliases: []
+    parent: O4
+    target_bottlenecks: ["atlas://bottleneck/B004@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0002@v1"]
+  - id: OPT025
+    name: "Prefix caching"
+    definition: "Prefix caching is a controlled intervention in the kv-cache and state management layer."
+    status: active
+    aliases: []
+    parent: O4
+    target_bottlenecks: ["atlas://bottleneck/B004@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0002@v1"]
+  - id: OPT026
+    name: "Radix caching"
+    definition: "Radix caching is a controlled intervention in the kv-cache and state management layer."
+    status: active
+    aliases: []
+    parent: O4
+    target_bottlenecks: ["atlas://bottleneck/B004@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0002@v1"]
+  - id: OPT027
+    name: "Session cache retention"
+    definition: "Session cache retention is a controlled intervention in the kv-cache and state management layer."
+    status: active
+    aliases: []
+    parent: O4
+    target_bottlenecks: ["atlas://bottleneck/B004@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0002@v1"]
+  - id: OPT028
+    name: "LRU KV eviction"
+    definition: "LRU KV eviction is a controlled intervention in the kv-cache and state management layer."
+    status: active
+    aliases: []
+    parent: O4
+    target_bottlenecks: ["atlas://bottleneck/B004@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0002@v1"]
+  - id: OPT029
+    name: "Cost-aware KV eviction"
+    definition: "Cost-aware KV eviction is a controlled intervention in the kv-cache and state management layer."
+    status: active
+    aliases: []
+    parent: O4
+    target_bottlenecks: ["atlas://bottleneck/B004@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0002@v1"]
+  - id: OPT030
+    name: "KV reservation"
+    definition: "KV reservation is a controlled intervention in the kv-cache and state management layer."
+    status: active
+    aliases: []
+    parent: O4
+    target_bottlenecks: ["atlas://bottleneck/B004@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0002@v1"]
+  - id: OPT031
+    name: "KV precision reduction"
+    definition: "KV precision reduction is a controlled intervention in the kv-cache and state management layer."
+    status: active
+    aliases: []
+    parent: O4
+    target_bottlenecks: ["atlas://bottleneck/B004@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0002@v1"]
+  - id: OPT032
+    name: "CPU KV offload"
+    definition: "CPU KV offload is a controlled intervention in the kv-cache and state management layer."
+    status: active
+    aliases: []
+    parent: O4
+    target_bottlenecks: ["atlas://bottleneck/B004@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0002@v1"]
+  - id: OPT033
+    name: "Remote KV cache"
+    definition: "Remote KV cache is a controlled intervention in the kv-cache and state management layer."
+    status: active
+    aliases: []
+    parent: O4
+    target_bottlenecks: ["atlas://bottleneck/B004@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0002@v1"]
+  - id: OPT034
+    name: "KV cache migration"
+    definition: "KV cache migration is a controlled intervention in the kv-cache and state management layer."
+    status: active
+    aliases: []
+    parent: O4
+    target_bottlenecks: ["atlas://bottleneck/B004@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0002@v1"]
+

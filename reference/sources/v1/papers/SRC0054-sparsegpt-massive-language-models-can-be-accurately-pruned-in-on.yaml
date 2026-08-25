@@ -1,0 +1,35 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0054
+version: 1
+slug: "sparsegpt-massive-language-models-can-be-accurately-pruned-in-on"
+title: "SparseGPT: Massive Language Models Can Be Accurately Pruned in One-Shot"
+description: "Authoritative external source for pruning, sparsity."
+status: active
+authors:
+  - name: Atlas maintainers
+    roles: [curator]
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the primary or official source
+  source_paths: []
+  generated: false
+extensions: {}
+type: paper
+source_authors:
+  - "Frantar and Alistarh"
+url: "https://arxiv.org/abs/2301.00774"
+identifiers:
+  arxiv: "2301.00774"
+published:
+  year: 2023
+topics:
+  - "pruning"
+  - "sparsity"
+relevance: "Provides external grounding for Atlas concepts related to pruning and sparsity."
+
