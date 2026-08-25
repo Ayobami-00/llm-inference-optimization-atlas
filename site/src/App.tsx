@@ -18,6 +18,11 @@ function titleCase(value: string): string {
   return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
+function relationLabel(value: string): string {
+  if (value === "USES_CONFIGURATION") return "selects / uses";
+  return value.replaceAll("_", " ").toLowerCase();
+}
+
 function initialView(): GraphView["id"] {
   const value = new URLSearchParams(window.location.search).get("view");
   return viewOrder.includes(value as GraphView["id"])
@@ -193,8 +198,16 @@ export function App() {
   const selectNode = useCallback(
     (node: GraphNode) => {
       setSelected(node);
+      setQuery("");
       setHighlighted(new Set());
       setDeepLink(node, viewId);
+      window.requestAnimationFrame(() => {
+        const element = core.current?.getElementById(node.id);
+        if (!element?.length) return;
+        core.current?.elements().unselect();
+        element.select();
+        core.current?.center(element);
+      });
     },
     [viewId],
   );
@@ -210,6 +223,7 @@ export function App() {
   };
 
   const activeView = atlas?.views[viewId];
+  const presentation = activeView?.filters.presentation;
   const typeCounts = useMemo(() => {
     if (!atlas || !activeView) return [];
     const ids = new Set(activeView.node_ids);
@@ -237,16 +251,22 @@ export function App() {
     });
   };
 
-  const highlightDecisionPath = () => {
-    if (!atlas || !selected) return;
-    const included = new Set<string>([selected.id]);
-    const allowed = new Set(["JUSTIFIES", "SUPPORTS", "COMPARES", "IMPROVES", "DEGRADES"]);
+  const highlightDecisionPath = (decision = selected) => {
+    if (!atlas || !decision) return;
+    const included = new Set<string>([decision.id]);
+    const allowedIncoming = new Set(["JUSTIFIES", "SUPPORTS", "COMPARES", "PRODUCES"]);
     for (let pass = 0; pass < 4; pass += 1) {
       for (const edge of atlas.graph.edges) {
-        if (!allowed.has(edge.relation)) continue;
-        if (included.has(edge.target) || included.has(edge.source)) {
+        if (allowedIncoming.has(edge.relation) && included.has(edge.target)) {
           included.add(edge.id);
           included.add(edge.source);
+          included.add(edge.target);
+        }
+        if (
+          edge.source === decision.id &&
+          ["USES_CONFIGURATION", "REJECTS"].includes(edge.relation)
+        ) {
+          included.add(edge.id);
           included.add(edge.target);
         }
       }
@@ -269,6 +289,11 @@ export function App() {
   if (!atlas || !activeView) {
     return <main className="loading-state">Compiling the map…</main>;
   }
+
+  const decisionNodes = atlas.graph.nodes.filter(
+    (node) => node.type === "decision" && activeView.node_ids.includes(node.id),
+  );
+  const decisionNode = decisionNodes.length === 1 ? decisionNodes[0] : undefined;
 
   return (
     <div className="atlas-shell">
@@ -368,18 +393,57 @@ export function App() {
               <strong>{activeView.edge_ids.length}</strong> explicit relations
             </p>
           </div>
-          <div className="zoom-controls" aria-label="Zoom controls">
-            <button onClick={() => core.current?.zoom(core.current.zoom() * 1.2)} aria-label="Zoom in">
-              +
-            </button>
-            <button onClick={() => core.current?.fit(undefined, 50)} aria-label="Fit graph">
-              Fit
-            </button>
-            <button onClick={() => core.current?.zoom(core.current.zoom() / 1.2)} aria-label="Zoom out">
-              −
-            </button>
+          <div className="stage-actions">
+            {decisionNode && ["story", "deployment"].includes(viewId) && (
+              <button
+                className="why-control"
+                onClick={() => {
+                  selectNode(decisionNode);
+                  window.requestAnimationFrame(() => highlightDecisionPath(decisionNode));
+                }}
+              >
+                Why this decision?
+              </button>
+            )}
+            <div className="zoom-controls" aria-label="Zoom controls">
+              <button
+                onClick={() => core.current?.zoom(core.current.zoom() * 1.2)}
+                aria-label="Zoom in"
+              >
+                +
+              </button>
+              <button
+                onClick={() => {
+                  core.current?.fit(undefined, presentation ? 76 : 50);
+                  if (presentation) core.current?.panBy({ x: 0, y: 24 });
+                }}
+                aria-label="Fit graph"
+              >
+                Fit
+              </button>
+              <button
+                onClick={() => core.current?.zoom(core.current.zoom() / 1.2)}
+                aria-label="Zoom out"
+              >
+                −
+              </button>
+            </div>
           </div>
         </div>
+        {presentation && (
+          <div className="reading-guide" aria-label="Graph reading order">
+            <div className="stage-flow">
+              <span className="guide-start">Start</span>
+              {presentation.stages.map((stage, index) => (
+                <span key={stage.label}>
+                  {stage.label}
+                  {index < presentation.stages.length - 1 && <i aria-hidden="true">→</i>}
+                </span>
+              ))}
+            </div>
+            <p>{presentation.intro}</p>
+          </div>
+        )}
         <GraphCanvas
           graph={atlas.graph}
           view={activeView}
@@ -390,6 +454,20 @@ export function App() {
           onSelect={selectNode}
           onReady={graphReady}
         />
+        {presentation && (
+          <div className="relation-legend" aria-label="Relation legend">
+            <span>Hover a card to name its links</span>
+            {presentation.relations.map((relation) => (
+              <span key={relation}>
+                <i
+                  className={`relation-${relation.toLowerCase().replaceAll("_", "-")}`}
+                  aria-hidden="true"
+                />{" "}
+                {relationLabel(relation)}
+              </span>
+            ))}
+          </div>
+        )}
         <div className="canvas-note">
           <span>Drag to pan · scroll to zoom · select an entity to inspect evidence</span>
           <span>Generated {atlas.manifest.generated_at.slice(0, 10)}</span>

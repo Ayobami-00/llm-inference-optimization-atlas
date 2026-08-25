@@ -49,6 +49,51 @@ def test_views_are_subsets_and_story_hides_sources() -> None:
     assert all(nodes[identifier]["type"] != "source" for identifier in story["node_ids"])
 
 
+def test_study_story_has_an_explicit_evidence_chain() -> None:
+    output = GraphCompiler(ROOT).build("S003-cpu-enterprise-rag").root
+    projection = output / "studies" / "S003-cpu-enterprise-rag" / "v1"
+    graph = _load(projection / "graph.json")
+    edges = {
+        (edge["source"], edge["relation"], edge["target"])
+        for edge in graph["edges"]
+    }
+
+    assert (
+        "atlas://study/S003@v1",
+        "PRODUCES",
+        "atlas://experiment/E0009@v1",
+    ) in edges
+    assert (
+        "atlas://experiment/E0009@v1",
+        "PRODUCES",
+        "atlas://comparison/CMP0013@v1",
+    ) in edges
+    assert (
+        "atlas://finding/F0013@v1",
+        "JUSTIFIES",
+        "atlas://decision/DEC0003@v1",
+    ) in edges
+    assert (
+        "atlas://decision/DEC0003@v1",
+        "USES_CONFIGURATION",
+        "atlas://configuration/CFG020@v1",
+    ) in edges
+
+    story = _load(projection / "views" / "story.json")
+    story_types = {
+        node["type"] for node in graph["nodes"] if node["id"] in story["node_ids"]
+    }
+    assert story_types == {
+        "workload",
+        "study",
+        "experiment",
+        "comparison",
+        "finding",
+        "decision",
+    }
+    assert story["filters"]["presentation"]["stages"][0]["label"] == "Workload"
+
+
 def test_study_projection_accepts_directory_slug() -> None:
     result = GraphCompiler(ROOT).build("S001-cpu-interactive-chat")
 

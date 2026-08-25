@@ -25,6 +25,22 @@ const view = {
   filters: {},
 };
 
+const storyView = {
+  ...view,
+  id: "story" as const,
+  name: "Story",
+  filters: {
+    presentation: {
+      stages: [
+        { label: "Workload", types: ["workload" as const] },
+        { label: "Decision", types: ["decision" as const] },
+      ],
+      intro: "Read the columns from workload to decision.",
+      relations: ["PRODUCES", "JUSTIFIES"],
+    },
+  },
+};
+
 const atlas: AtlasData = {
   root: "/data",
   manifest: {
@@ -38,7 +54,7 @@ const atlas: AtlasData = {
   graph: { graph_version: 1, nodes: [node], edges: [] },
   indexes: { by_type: {}, by_status: {}, by_study: {}, by_tag: {}, referenced_by: {} },
   views: {
-    story: { ...view, id: "story", name: "Story" },
+    story: storyView,
     bottleneck: view,
     optimization: { ...view, id: "optimization", name: "Optimization" },
     evidence: { ...view, id: "evidence", name: "Evidence" },
@@ -76,6 +92,12 @@ describe("Atlas explorer", () => {
   it("switches graph views and opens entity evidence", async () => {
     render(<App />);
     expect(await screen.findByRole("heading", { name: "Story" })).toBeInTheDocument();
+    expect(screen.getByRole("generic", { name: "Graph reading order" })).toHaveTextContent(
+      "StartWorkload→Decision",
+    );
+    expect(screen.getByRole("generic", { name: "Relation legend" })).toHaveTextContent(
+      "produces",
+    );
     fireEvent.click(screen.getByRole("button", { name: /Bottleneck/ }));
     expect(screen.getByRole("heading", { name: "Bottleneck" })).toBeInTheDocument();
 

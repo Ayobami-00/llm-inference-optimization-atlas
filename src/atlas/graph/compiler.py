@@ -366,6 +366,14 @@ class GraphCompiler:
                 output.append(self._spec(entity, data[key], relation))
         elif kind == "Experiment":
             output.append(
+                EdgeSpec(
+                    data["study"],
+                    entity.reference,
+                    "PRODUCES",
+                    source_path=entity.node["source_path"],
+                )
+            )
+            output.append(
                 self._spec(
                     entity,
                     data["hypothesis"],
@@ -389,6 +397,14 @@ class GraphCompiler:
             )
             output.append(self._spec(entity, data["configuration"], "USES_CONFIGURATION"))
         elif kind == "Comparison":
+            output.append(
+                EdgeSpec(
+                    data["experiment"],
+                    entity.reference,
+                    "PRODUCES",
+                    source_path=entity.node["source_path"],
+                )
+            )
             output.extend(
                 self._spec(entity, target, "COMPARES") for target in data["baseline_runs"]
             )
@@ -433,6 +449,18 @@ class GraphCompiler:
                     )
                 )
         elif kind == "DeploymentDecision":
+            output.append(
+                EdgeSpec(
+                    data["study"],
+                    entity.reference,
+                    "PRODUCES",
+                    source_path=entity.node["source_path"],
+                )
+            )
+            if isinstance(data.get("selected_configuration"), str):
+                output.append(
+                    self._spec(entity, data["selected_configuration"], "USES_CONFIGURATION")
+                )
             for target in data.get("supporting_findings", []):
                 output.append(
                     EdgeSpec(
@@ -544,7 +572,7 @@ class GraphCompiler:
         indexes = self._indexes(nodes, edges)
         self._validate_object(indexes, "graph-indexes")
         dump_json(indexes, output / "indexes.json")
-        views = compile_views(nodes, edges)
+        views = compile_views(nodes, edges, scope)
         view_root = output / "views"
         for identifier, view in views.items():
             self._validate_object(view, "graph-view")

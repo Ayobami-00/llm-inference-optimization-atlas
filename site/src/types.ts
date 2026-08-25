@@ -52,6 +52,18 @@ export interface GraphData {
   edges: GraphEdge[];
 }
 
+export interface GraphStage {
+  label: string;
+  types: NodeType[];
+}
+
+export interface GraphPresentation {
+  stages: GraphStage[];
+  intro: string;
+  relations: string[];
+  compact_runs?: boolean;
+}
+
 export interface GraphView {
   id: "story" | "bottleneck" | "optimization" | "evidence" | "deployment" | "all";
   name: string;
@@ -59,7 +71,12 @@ export interface GraphView {
   node_ids: string[];
   edge_ids: string[];
   default_layout: string;
-  filters: Record<string, unknown>;
+  filters: {
+    include_statuses?: string[];
+    include_negative_evidence?: boolean;
+    presentation?: GraphPresentation;
+    [key: string]: unknown;
+  };
 }
 
 export interface GraphManifest {

@@ -5,6 +5,7 @@ test("navigates views, searches, and resolves source details", async ({ page }) 
   await page.goto("./");
   await expect(page.getByRole("link", { name: "Atlas home" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Story" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Why this decision?" })).toHaveCount(0);
   await page.getByRole("navigation", { name: "Graph views" }).getByRole("button", { name: /Optimization/ }).click();
   await expect(page.getByRole("heading", { name: "Optimization" })).toBeVisible();
 
@@ -21,4 +22,28 @@ test("has no automatically detectable serious accessibility violations", async (
   await expect(page.getByRole("heading", { name: "Story" })).toBeVisible();
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact ?? ""))).toEqual([]);
+});
+
+test("presents a study as a guided story and groups replicate runs", async ({ page }) => {
+  await page.goto("./studies/S003-cpu-enterprise-rag/v1/");
+  await expect(page.getByRole("heading", { name: "Story" })).toBeVisible();
+  await expect(page.getByLabel("Graph reading order")).toContainText(
+    "Workload→Study→Experiments→Comparisons→Findings→Decision",
+  );
+  await expect(page.getByRole("button", { name: "Why this decision?" })).toBeVisible();
+  await expect(page.getByLabel("Relation legend")).toContainText("supports");
+
+  await page
+    .getByRole("navigation", { name: "Graph views" })
+    .getByRole("button", { name: /Evidence/ })
+    .click();
+  await expect(page.getByLabel("Graph reading order")).toContainText("Replicate groups");
+  await expect(page.getByLabel("Interactive evidence graph")).toHaveAttribute(
+    "data-run-groups",
+    "9",
+  );
+  await expect(page.getByLabel("Interactive evidence graph")).toHaveAttribute(
+    "data-rendered-nodes",
+    "27",
+  );
 });
