@@ -1,0 +1,48 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/decision.schema.json
+schema_version: 1
+kind: DeploymentDecision
+id: DEC0001
+version: 1
+slug: select-one-thread-warm-chat-configuration
+title: Select warm batch-one one-thread execution for the measured chat envelope
+description: Exact-setup deployment decision grounded in the accepted S001 findings.
+status: accepted
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [decision], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: Pareto judgment over accepted S001 findings and quality/SLO-eligible comparisons
+  source_paths: [studies/S001-cpu-interactive-chat/v1/findings/F0001.yaml, studies/S001-cpu-interactive-chat/v1/findings/F0002.yaml, studies/S001-cpu-interactive-chat/v1/findings/F0003.yaml, studies/S001-cpu-interactive-chat/v1/findings/F0004.yaml, studies/S001-cpu-interactive-chat/v1/findings/F0005.yaml, studies/S001-cpu-interactive-chat/v1/findings/F0006.yaml]
+  generated: false
+extensions: {}
+study: atlas://study/S001@v1
+outcome: recommended
+selected_configuration: atlas://configuration/CFG005@v1
+pareto_rationale: CFG005 preserved Q1 and SLO001 while improving TPOT by 7.52% versus the four-thread baseline. Larger batches sharply reduced SLO goodput, eight threads had no significant TPOT benefit, cold loading increased TTFT, and unmanaged bursts exceeded the tested service envelope.
+operating_envelope:
+  workload: interactive SmolLM2 chat using WS001
+  hardware: Apple M3 CPU topology HW001
+  traffic: steady low concurrency without four-request microbursts
+  state: model and tokenizer resident before measurement
+  batch_size: 1
+  inference_threads: 1
+  quality_gate: Q1
+  slo_profile: atlas://slo/SLO001@v1
+supporting_findings: [atlas://finding/F0001@v1, atlas://finding/F0002@v1, atlas://finding/F0003@v1, atlas://finding/F0004@v1, atlas://finding/F0005@v1, atlas://finding/F0006@v1]
+rejected_alternatives:
+  - {configuration: atlas://configuration/CFG002@v1, reason: Cold request-path loading significantly increased TTFT.}
+  - {configuration: atlas://configuration/CFG003@v1, reason: Batch size two reduced SLO goodput and was not SLO eligible.}
+  - {configuration: atlas://configuration/CFG004@v1, reason: Batch size four reduced SLO goodput and was not SLO eligible.}
+  - {configuration: atlas://configuration/CFG001@v1, reason: Four threads had significantly worse TPOT than CFG005.}
+  - {configuration: atlas://configuration/CFG006@v1, reason: Eight threads produced no significant TPOT improvement and used more measured CPU.}
+  - {configuration: atlas://configuration/CFG007@v1, reason: The burst trace accumulated multi-second queue delay and was not SLO eligible.}
+caveats:
+  - This recommendation applies only to the exact model, runtime, hardware, workload fixture, and traffic envelope tested.
+  - The compact keyword quality gate is not a substitute for a production assistant evaluation.
+  - Queue delay in the burst experiment is modeled from measured service time rather than captured from a networked production server.
+revisit_conditions:
+  - Replication on another CPU or with a larger model changes the one-thread TPOT effect.
+  - Expected concurrency or burst size exceeds the measured steady low-concurrency envelope.
+  - A runtime with continuous batching, multiple workers, or explicit admission control is introduced.

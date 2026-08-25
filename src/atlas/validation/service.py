@@ -120,10 +120,28 @@ class Validator:
             self._validate_ids_and_references(report)
         return report
 
+    def _repository_identity_artifacts(self) -> list[LoadedArtifact]:
+        artifacts = []
+        for path in discover_data_files(self.root, self.root, include_templates=False):
+            try:
+                data = load_data(path)
+            except Exception:
+                continue
+            if not isinstance(data, dict):
+                continue
+            schema_identifier = data.get("$schema")
+            if not isinstance(schema_identifier, str) or schema_identifier == (
+                "https://json-schema.org/draft/2020-12/schema"
+            ):
+                continue
+            artifacts.append(LoadedArtifact(path, data))
+        return artifacts
+
     def _validate_ids_and_references(self, report: ValidationReport) -> None:
         known: dict[str, Path] = {}
         identifiers: list[tuple[str, Path]] = []
-        for artifact in report.artifacts:
+        repository_artifacts = self._repository_identity_artifacts()
+        for artifact in repository_artifacts:
             data = artifact.data
             identifier = data.get("id")
             version = data.get("version")
@@ -140,8 +158,9 @@ class Validator:
                         identifiers.append((reference, artifact.path))
 
         counts = Counter(reference for reference, _ in identifiers)
+        checked_paths = {artifact.path for artifact in report.artifacts}
         for reference, path in identifiers:
-            if counts[reference] > 1:
+            if counts[reference] > 1 and path in checked_paths:
                 report.issues.append(
                     ValidationIssue(
                         "error",
@@ -155,7 +174,7 @@ class Validator:
 
         # GitHub issues are the canonical proposal records. A validated contribution
         # manifest acts as their repository-local identity proxy for strict resolution.
-        for artifact in report.artifacts:
+        for artifact in repository_artifacts:
             data = artifact.data
             schema = data.get("$schema")
             proposal = data.get("proposal")

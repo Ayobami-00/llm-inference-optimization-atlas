@@ -49,6 +49,13 @@ def test_views_are_subsets_and_story_hides_sources() -> None:
     assert all(nodes[identifier]["type"] != "source" for identifier in story["node_ids"])
 
 
+def test_study_projection_accepts_directory_slug() -> None:
+    result = GraphCompiler(ROOT).build("S001-cpu-interactive-chat")
+
+    assert result.studies == ("atlas://study/S001@v1",)
+    assert (result.root / "studies" / "S001-cpu-interactive-chat" / "v1" / "graph.json").is_file()
+
+
 def test_source_reverse_references_are_generated() -> None:
     output = GraphCompiler(ROOT).build().root
     indexes = _load(output / "indexes.json")

@@ -16,6 +16,7 @@ def yaml_loader() -> YAML:
 def yaml_writer() -> YAML:
     writer = YAML()
     writer.version = (1, 2)
+    writer.width = 4096
     writer.default_flow_style = False
     writer.indent(mapping=2, sequence=4, offset=2)
     return writer

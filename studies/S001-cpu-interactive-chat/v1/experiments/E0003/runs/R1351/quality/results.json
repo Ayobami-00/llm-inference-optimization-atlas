@@ -1,0 +1,70 @@
+{
+  "details": [
+    {
+      "request_id": "CHAT011",
+      "topic_keyword_recall": 1.0,
+      "valid_output": true
+    },
+    {
+      "request_id": "CHAT007",
+      "topic_keyword_recall": 0.5,
+      "valid_output": true
+    },
+    {
+      "request_id": "CHAT003",
+      "topic_keyword_recall": 1.0,
+      "valid_output": true
+    },
+    {
+      "request_id": "CHAT002",
+      "topic_keyword_recall": 1.0,
+      "valid_output": true
+    },
+    {
+      "request_id": "CHAT005",
+      "topic_keyword_recall": 0.0,
+      "valid_output": true
+    },
+    {
+      "request_id": "CHAT012",
+      "topic_keyword_recall": 1.0,
+      "valid_output": true
+    },
+    {
+      "request_id": "CHAT001",
+      "topic_keyword_recall": 1.0,
+      "valid_output": true
+    },
+    {
+      "request_id": "CHAT008",
+      "topic_keyword_recall": 1.0,
+      "valid_output": true
+    },
+    {
+      "request_id": "CHAT006",
+      "topic_keyword_recall": 1.0,
+      "valid_output": true
+    },
+    {
+      "request_id": "CHAT009",
+      "topic_keyword_recall": 1.0,
+      "valid_output": true
+    },
+    {
+      "request_id": "CHAT004",
+      "topic_keyword_recall": 1.0,
+      "valid_output": true
+    },
+    {
+      "request_id": "CHAT010",
+      "topic_keyword_recall": 0.5,
+      "valid_output": true
+    }
+  ],
+  "dimensions": {
+    "topic_keyword_recall": 0.8333333333333334,
+    "valid_output": 1.0
+  },
+  "gate": "Q1",
+  "passed": true
+}

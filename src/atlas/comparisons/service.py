@@ -144,6 +144,23 @@ def _compatibility(
     return checks
 
 
+def _existing_comparison(
+    experiment_root: Path,
+    baseline_runs: list[str],
+    candidate_runs: list[str],
+) -> Path | None:
+    for path in sorted((experiment_root / "comparisons").glob("CMP*.yaml")):
+        comparison = load_data(path)
+        if not isinstance(comparison, dict):
+            continue
+        if (
+            comparison.get("baseline_runs") == baseline_runs
+            and comparison.get("candidate_runs") == candidate_runs
+        ):
+            return path
+    return None
+
+
 def compare_experiment(root: Path, value: str) -> list[Path]:
     experiment_root = _find_experiment(root, value)
     experiment = load_data(experiment_root / "experiment.yaml")
@@ -181,6 +198,21 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
         else:
             selected_baseline = baseline_runs
             selected_candidate = candidate_runs
+
+        baseline_references = [
+            f"atlas://run/{run['id']}@v{run['version']}" for run, _ in selected_baseline
+        ]
+        candidate_references = [
+            f"atlas://run/{run['id']}@v{run['version']}" for run, _ in selected_candidate
+        ]
+        existing = _existing_comparison(
+            experiment_root,
+            baseline_references,
+            candidate_references,
+        )
+        if existing is not None:
+            outputs.append(existing)
+            continue
 
         effects = []
         results = []
@@ -259,12 +291,8 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
             },
             "extensions": {},
             "experiment": f"atlas://experiment/{experiment['id']}@v{experiment['version']}",
-            "baseline_runs": [
-                f"atlas://run/{run['id']}@v{run['version']}" for run, _ in selected_baseline
-            ],
-            "candidate_runs": [
-                f"atlas://run/{run['id']}@v{run['version']}" for run, _ in selected_candidate
-            ],
+            "baseline_runs": baseline_references,
+            "candidate_runs": candidate_references,
             "changed_axes": experiment["changed_factors"],
             "compatibility": {"passed": True, "checks": checks},
             "method": {
@@ -290,5 +318,7 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
 def compare_all(root: Path) -> list[Path]:
     outputs = []
     for path in sorted((root / "studies").glob("S*-*/v*/experiments/E*/experiment.yaml")):
+        if not any((path.parent / "runs").glob("R*/run.yaml")):
+            continue
         outputs.extend(compare_experiment(root, path.parent.name))
     return outputs

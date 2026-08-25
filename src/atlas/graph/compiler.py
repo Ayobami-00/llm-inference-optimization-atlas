@@ -107,12 +107,24 @@ class GraphCompiler:
         output.mkdir(parents=True)
         self._write_projection(output, nodes, edges, entities, {"type": "global"})
 
-        studies = sorted(
-            entity.reference for entity in entities.values() if entity.node["type"] == "study"
+        study_entities = sorted(
+            (entity for entity in entities.values() if entity.node["type"] == "study"),
+            key=lambda entity: entity.reference,
         )
+        studies = [entity.reference for entity in study_entities]
         selected = studies
         if study is not None:
-            selected = [reference for reference in studies if study in reference]
+            selected = [
+                entity.reference
+                for entity in study_entities
+                if study
+                in {
+                    entity.reference,
+                    str(entity.artifact.get("id", "")),
+                    str(entity.artifact.get("slug", "")),
+                    self._study_directory(entity),
+                }
+            ]
             if len(selected) != 1:
                 raise GraphError(f"Expected one study matching {study!r}; found {len(selected)}")
         for study_reference in selected:
