@@ -7,9 +7,7 @@ from typing import Any
 
 def inspect_cache(cache_root: Path) -> dict[str, Any]:
     files = (
-        [path for path in cache_root.rglob("*") if path.is_file()]
-        if cache_root.exists()
-        else []
+        [path for path in cache_root.rglob("*") if path.is_file()] if cache_root.exists() else []
     )
     by_area: dict[str, dict[str, int]] = {}
     for path in files:

@@ -57,9 +57,7 @@ def check_ontology(root: Path) -> OntologyReport:
     strict_report = validator.validate_path(root, strict=True)
     issues = list(local_report.issues)
     issues.extend(
-        issue
-        for issue in strict_report.issues
-        if issue.path.startswith("reference/ontology/")
+        issue for issue in strict_report.issues if issue.path.startswith("reference/ontology/")
     )
 
     identifiers: list[tuple[str, Path]] = []
@@ -87,9 +85,7 @@ def check_ontology(root: Path) -> OntologyReport:
     for identifier in duplicates:
         path = next(path for candidate, path in identifiers if candidate == identifier)
         issues.append(
-            ValidationIssue(
-                "error", "duplicate-ontology-id", str(path), "/entries", identifier
-            )
+            ValidationIssue("error", "duplicate-ontology-id", str(path), "/entries", identifier)
         )
 
     minimums = {

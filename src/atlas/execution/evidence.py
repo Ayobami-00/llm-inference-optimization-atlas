@@ -85,9 +85,7 @@ def validate_evidence(root: Path, draft: Path) -> EvidenceReport:
     run_path = draft / "run.yaml"
     if run_path.is_file():
         report = Validator(root).validate_path(run_path)
-        errors.extend(
-            f"{issue.path}{issue.location}: {issue.message}" for issue in report.errors
-        )
+        errors.extend(f"{issue.path}{issue.location}: {issue.message}" for issue in report.errors)
         run = load_data(run_path)
         if isinstance(run, dict):
             run_id = run.get("id") if isinstance(run.get("id"), str) else None

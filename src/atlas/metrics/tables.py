@@ -37,9 +37,7 @@ EVENT_COLUMNS: dict[str, tuple[pa.DataType, str | None]] = {
 }
 
 
-def _validate_table(
-    path: Path, expected: dict[str, tuple[pa.DataType, str | None]]
-) -> list[str]:
+def _validate_table(path: Path, expected: dict[str, tuple[pa.DataType, str | None]]) -> list[str]:
     if not path.is_file():
         return [f"Missing table: {path}"]
     try:

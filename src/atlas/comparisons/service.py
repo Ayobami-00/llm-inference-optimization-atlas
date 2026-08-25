@@ -161,9 +161,7 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
     outputs = []
     for candidate_reference in experiment.get("candidates", []):
         candidate_runs = [
-            (run, path)
-            for run, path in runs
-            if run.get("configuration") == candidate_reference
+            (run, path) for run, path in runs if run.get("configuration") == candidate_reference
         ]
         if len(candidate_runs) < 3:
             raise ComparisonError(

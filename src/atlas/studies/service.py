@@ -159,9 +159,7 @@ def new_experiment(root: Path, study: str) -> Path:
     experiment_root = study_root / "experiments" / identifier
     for name in ("runs", "comparisons"):
         (experiment_root / name).mkdir(parents=True, exist_ok=True)
-    template = load_data(
-        root / "reference" / "templates" / "v1" / "experiment" / "experiment.yaml"
-    )
+    template = load_data(root / "reference" / "templates" / "v1" / "experiment" / "experiment.yaml")
     if not isinstance(template, dict):
         raise StudyError("Invalid experiment template")
     now = _timestamp()

@@ -9,9 +9,7 @@ class RepositoryNotFoundError(RuntimeError):
 
 
 def is_repository_root(path: Path) -> bool:
-    return (path / "pyproject.toml").is_file() and (
-        path / "reference" / "schemas" / "v1"
-    ).is_dir()
+    return (path / "pyproject.toml").is_file() and (path / "reference" / "schemas" / "v1").is_dir()
 
 
 def find_repository_root(start: Path | None = None) -> Path:

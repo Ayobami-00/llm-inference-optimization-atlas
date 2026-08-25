@@ -108,9 +108,7 @@ class GraphCompiler:
         self._write_projection(output, nodes, edges, entities, {"type": "global"})
 
         studies = sorted(
-            entity.reference
-            for entity in entities.values()
-            if entity.node["type"] == "study"
+            entity.reference for entity in entities.values() if entity.node["type"] == "study"
         )
         selected = studies
         if study is not None:
@@ -121,9 +119,7 @@ class GraphCompiler:
             study_nodes, study_edges = self._study_projection(study_reference, nodes, edges)
             study_entity = entities[study_reference]
             directory = self._study_directory(study_entity)
-            destination = (
-                output / "studies" / directory / f"v{study_entity.artifact['version']}"
-            )
+            destination = output / "studies" / directory / f"v{study_entity.artifact['version']}"
             self._write_projection(
                 destination,
                 study_nodes,
@@ -170,9 +166,7 @@ class GraphCompiler:
                 return node_type
         return None
 
-    def _entity(
-        self, artifact: dict[str, Any], path: Path, node_type: str, version: int
-    ) -> Entity:
+    def _entity(self, artifact: dict[str, Any], path: Path, node_type: str, version: int) -> Entity:
         identifier = str(artifact["id"])
         reference = canonical_reference(identifier, version, str(artifact.get("kind", "")))
         if reference is None:
@@ -195,9 +189,7 @@ class GraphCompiler:
             node["study"] = study
         return Entity(reference, node, artifact, path)
 
-    def _ontology_reference(
-        self, identifier: str, version: int, node_type: str
-    ) -> str | None:
+    def _ontology_reference(self, identifier: str, version: int, node_type: str) -> str | None:
         kind = {
             "workload_archetype": "workload",
             "characteristic": "workload-characteristic",
@@ -243,9 +235,7 @@ class GraphCompiler:
         identifier_match = re.match(r"^(S\d{3})-", relative.parts[0])
         version_match = re.match(r"^v(\d+)$", relative.parts[1])
         if identifier_match and version_match:
-            return (
-                f"atlas://study/{identifier_match.group(1)}@v{int(version_match.group(1))}"
-            )
+            return f"atlas://study/{identifier_match.group(1)}@v{int(version_match.group(1))}"
         return None
 
     def _edges(self, entities: dict[str, Entity]) -> list[dict[str, Any]]:
@@ -300,9 +290,7 @@ class GraphCompiler:
             entity.node["source_path"],
         )
 
-    def _artifact_edges(
-        self, entity: Entity, entities: dict[str, Entity]
-    ) -> list[EdgeSpec]:
+    def _artifact_edges(self, entity: Entity, entities: dict[str, Entity]) -> list[EdgeSpec]:
         data = entity.artifact
         kind = str(data.get("kind", ""))
         output: list[EdgeSpec] = []
@@ -350,9 +338,7 @@ class GraphCompiler:
             if isinstance(data.get("traffic"), str):
                 output.append(self._spec(entity, data["traffic"], "USES_TRAFFIC_REGIME"))
             if isinstance(data.get("quality_contract"), str):
-                output.append(
-                    self._spec(entity, data["quality_contract"], "HAS_QUALITY_CONTRACT")
-                )
+                output.append(self._spec(entity, data["quality_contract"], "HAS_QUALITY_CONTRACT"))
             if isinstance(data.get("slo"), str):
                 output.append(self._spec(entity, data["slo"], "HAS_SLO"))
         elif kind == "Configuration":
@@ -377,8 +363,7 @@ class GraphCompiler:
             )
             output.append(self._spec(entity, data["baseline"], "USES_CONFIGURATION"))
             output.extend(
-                self._spec(entity, target, "USES_CONFIGURATION")
-                for target in data["candidates"]
+                self._spec(entity, target, "USES_CONFIGURATION") for target in data["candidates"]
             )
         elif kind == "RunRecord":
             output.append(
@@ -513,9 +498,7 @@ class GraphCompiler:
             identifier for identifier in self.catalog.identifiers if identifier.endswith(suffix)
         )
 
-    def _validate_graph(
-        self, nodes: list[dict[str, Any]], edges: list[dict[str, Any]]
-    ) -> None:
+    def _validate_graph(self, nodes: list[dict[str, Any]], edges: list[dict[str, Any]]) -> None:
         node_schema = self._schema_id("graph-node")
         edge_schema = self._schema_id("graph-edge")
         errors: list[str] = []
@@ -658,10 +641,7 @@ class GraphCompiler:
         if commit_time:
             parsed = datetime.fromisoformat(commit_time.replace("Z", "+00:00"))
             generated = (
-                parsed.astimezone(UTC)
-                .replace(microsecond=0)
-                .isoformat()
-                .replace("+00:00", "Z")
+                parsed.astimezone(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
             )
         else:
             generated = "1970-01-01T00:00:00Z"

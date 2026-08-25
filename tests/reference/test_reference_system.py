@@ -79,9 +79,7 @@ def test_source_records_validate(path: Path, record: dict[str, Any]) -> None:
 @pytest.mark.parametrize(("path", "catalog"), ontology_catalogs(), ids=lambda value: str(value))
 def test_ontology_catalogs_validate(path: Path, catalog: dict[str, Any]) -> None:
     schema = json.loads((SCHEMA_ROOT / "common" / "ontology-catalog.schema.json").read_text())
-    errors = list(
-        Draft202012Validator(schema, registry=schema_registry()).iter_errors(catalog)
-    )
+    errors = list(Draft202012Validator(schema, registry=schema_registry()).iter_errors(catalog))
     assert errors == [], f"{path}: {errors}"
 
 
@@ -94,9 +92,7 @@ def test_source_ids_are_complete_and_unique() -> None:
 
 def test_ontology_ids_are_globally_unique() -> None:
     identifiers = [
-        entry["id"]
-        for _, catalog in ontology_catalogs()
-        for entry in catalog["entries"]
+        entry["id"] for _, catalog in ontology_catalogs() for entry in catalog["entries"]
     ]
     duplicates = [identifier for identifier, count in Counter(identifiers).items() if count > 1]
     assert duplicates == []
@@ -131,9 +127,7 @@ def test_v1_ontology_meets_minimum_coverage() -> None:
 def test_all_ontology_references_resolve() -> None:
     known_ids = {record["id"] for _, record in source_records()}
     known_ids.update(
-        entry["id"]
-        for _, catalog in ontology_catalogs()
-        for entry in catalog["entries"]
+        entry["id"] for _, catalog in ontology_catalogs() for entry in catalog["entries"]
     )
 
     unresolved: list[tuple[Path, str]] = []

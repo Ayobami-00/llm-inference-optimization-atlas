@@ -16,9 +16,9 @@ def test_cleanup_runs_after_execution_failure(tmp_path: Path) -> None:
     study_root = tmp_path / "studies" / "S001-test" / "v1"
     bundle_root = study_root / "execution" / "fake"
     bundle_root.mkdir(parents=True)
-    _script(bundle_root / "start.sh", "touch \"$ATLAS_WORK_DIR/started\"\n")
+    _script(bundle_root / "start.sh", 'touch "$ATLAS_WORK_DIR/started"\n')
     _script(bundle_root / "run.sh", "exit 17\n")
-    _script(bundle_root / "destroy.sh", "touch \"$ATLAS_WORK_DIR/destroyed\"\n")
+    _script(bundle_root / "destroy.sh", 'touch "$ATLAS_WORK_DIR/destroyed"\n')
     bundle = Bundle(
         study_root,
         bundle_root,
