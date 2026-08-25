@@ -58,3 +58,10 @@ def test_existing_comparison_matches_exact_run_sets(tmp_path: Path) -> None:
         )
         is None
     )
+
+
+def test_comparison_output_path_creates_generated_directory(tmp_path: Path) -> None:
+    output = service._comparison_output_path(tmp_path, "CMP0001")
+
+    assert output == tmp_path / "comparisons" / "CMP0001.yaml"
+    assert output.parent.is_dir()

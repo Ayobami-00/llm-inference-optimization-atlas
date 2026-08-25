@@ -161,6 +161,12 @@ def _existing_comparison(
     return None
 
 
+def _comparison_output_path(experiment_root: Path, comparison_id: str) -> Path:
+    output = experiment_root / "comparisons" / f"{comparison_id}.yaml"
+    output.parent.mkdir(parents=True, exist_ok=True)
+    return output
+
+
 def compare_experiment(root: Path, value: str) -> list[Path]:
     experiment_root = _find_experiment(root, value)
     experiment = load_data(experiment_root / "experiment.yaml")
@@ -308,7 +314,7 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
             ),
             "result": overall,
         }
-        output = experiment_root / "comparisons" / f"{comparison_id}.yaml"
+        output = _comparison_output_path(experiment_root, comparison_id)
         with output.open("w") as stream:
             yaml_writer().dump(comparison, stream)
         outputs.append(output)
