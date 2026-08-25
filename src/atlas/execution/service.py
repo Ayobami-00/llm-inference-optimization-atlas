@@ -157,6 +157,8 @@ def _entrypoint(bundle: Bundle, name: str, work_dir: Path, profile: str) -> int:
             "ATLAS_PROFILE": profile,
             "ATLAS_WORK_DIR": str(work_dir),
             "ATLAS_BUNDLE_DIR": str(bundle.root),
+            "ATLAS_CACHE_DIR": str(bundle.study_root.parents[2] / ".atlas" / "cache"),
+            "ATLAS_REPOSITORY_ROOT": str(bundle.study_root.parents[2]),
         }
     )
     command = [str(script)] if os.access(script, os.X_OK) else ["bash", str(script)]

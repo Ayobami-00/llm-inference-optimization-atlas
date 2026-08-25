@@ -1,0 +1,47 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/quality/evaluator.schema.json
+schema_version: 1
+kind: Evaluator
+id: EV003
+version: 1
+slug: enterprise-rag-rules
+title: Enterprise RAG deterministic evaluator
+description: Measures retrieval recall, frozen answer concepts, citation precision and recall, and response format.
+status: active
+authors: [{name: Atlas maintainers, roles: [evaluator-author], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: repository-authored deterministic evaluator
+  source_paths: [src/atlas/studies/evaluators.py]
+  generated: false
+extensions: {}
+evaluator_type: retrieval
+implementation:
+  repository_path: src/atlas/studies/evaluators.py
+  entrypoint: atlas.studies.evaluators:evaluate_rag_records
+  revision: v1
+  sha256: e06af008f26e29cf7d22484e0f49b145087398ef570a8bf2a277ecd6dae66d36
+datasets: [atlas://dataset/DS003@v1]
+inputs:
+  responses: generated text, retrieved documents, relevant documents, and frozen answer keywords
+outputs:
+  dimensions: retrieval recall, answer keyword recall, citation precision, citation recall, and format pass rate
+  details: per-question deterministic results
+metrics:
+  - atlas://metric/MET092@v1
+  - atlas://metric/MET093@v1
+  - atlas://metric/MET094@v1
+  - atlas://metric/MET095@v1
+  - atlas://metric/MET096@v1
+determinism: {level: exact, seeds: [], tolerance: 0}
+pass_criteria:
+  retrieval_recall_minimum: 0.9
+  answer_keyword_recall_minimum: 0.7
+  citation_precision_minimum: 0.8
+  format_pass_rate: 1.0
+sandbox: {executes_untrusted_code: false, network: disabled, controls: []}
+limitations:
+  - Frozen keyword matching does not capture every semantically correct paraphrase.
+  - The small fictional corpus is designed for reproducibility rather than domain coverage.

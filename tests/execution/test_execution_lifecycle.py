@@ -40,3 +40,25 @@ def test_cleanup_runs_after_execution_failure(tmp_path: Path) -> None:
     assert len(work_dirs) == 1
     assert (work_dirs[0] / "started").exists()
     assert (work_dirs[0] / "destroyed").exists()
+
+
+def test_entrypoint_receives_repository_and_cache_roots(tmp_path: Path) -> None:
+    study_root = tmp_path / "studies" / "S001-test" / "v1"
+    bundle_root = study_root / "execution" / "fake"
+    bundle_root.mkdir(parents=True)
+    _script(
+        bundle_root / "run.sh",
+        'test "$ATLAS_REPOSITORY_ROOT" = "' + str(tmp_path) + '"\n'
+        'test "$ATLAS_CACHE_DIR" = "' + str(tmp_path / ".atlas" / "cache") + '"\n',
+    )
+    bundle = Bundle(
+        study_root,
+        bundle_root,
+        {
+            "entrypoints": {"run": "run.sh"},
+            "timeouts": {"run_seconds": 10},
+            "cleanup": {"required": False, "idempotent": True},
+        },
+    )
+
+    run_bundle(tmp_path, bundle, "quick")

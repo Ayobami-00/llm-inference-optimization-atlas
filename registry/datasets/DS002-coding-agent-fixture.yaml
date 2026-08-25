@@ -1,0 +1,52 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/workloads/dataset-revision.schema.json
+schema_version: 1
+kind: DatasetRevision
+id: DS002
+version: 1
+slug: coding-agent-fixture
+title: Atlas coding-agent fixture
+description: Six compact repository-owned Python implementation tasks with deterministic assertions.
+status: active
+authors: [{name: Atlas maintainers, roles: [dataset-author], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: repository-authored synthetic fixture
+  source_paths: [studies/S002-cpu-coding-agent/v1/inputs/tasks.jsonl]
+  generated: false
+extensions: {}
+dataset_type: repository_fixture
+tasks: [code-generation, function-completion, unit-test-repair]
+modalities: [text, code]
+languages: [en, python]
+terms:
+  license: Apache-2.0
+  redistribution: true
+  commercial_use: true
+  attribution: Retain the repository license and provenance.
+  restrictions: []
+composition:
+  records: 6
+  units: programming tasks
+  splits: {measurement: 6}
+  statistics: {language: python, assertions: 19}
+sampling: {method: exhaustive, replacement: false}
+transformations: []
+fingerprint:
+  algorithm: sha256
+  value: e1b2c3465af6dec750fd68904ed959ff30a6d424ef9cec0c2ac269795f8f41d9
+files:
+  - path: studies/S002-cpu-coding-agent/v1/inputs/tasks.jsonl
+    media_type: application/x-ndjson
+    sha256: e1b2c3465af6dec750fd68904ed959ff30a6d424ef9cec0c2ac269795f8f41d9
+    size_bytes: 2058
+sensitive_data:
+  contains_personal_data: false
+  contains_secrets: false
+  review_method: Manual line-by-line review of tasks and assertions.
+limitations:
+  - Tasks are far smaller than production repositories.
+  - The fixture emphasizes deterministic correctness over open-ended software design.
+  - Success rates from six tasks have wide uncertainty and must be reported as counts.

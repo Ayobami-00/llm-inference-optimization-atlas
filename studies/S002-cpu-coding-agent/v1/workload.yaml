@@ -1,0 +1,54 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/workloads/workload-spec.schema.json
+schema_version: 1
+kind: WorkloadSpec
+id: WS002
+version: 1
+slug: cpu-coding-agent-workload
+title: CPU coding-agent workload
+description: Six deterministic Python tasks with repeated agent prefixes and controlled context growth.
+status: active
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [investigator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered study workload
+  source_paths: [studies/S002-cpu-coding-agent/v1/inputs/tasks.jsonl]
+  generated: false
+  parent_artifacts: [atlas://dataset/DS002@v1, atlas://proposal/P0003@v1]
+extensions: {}
+archetype: atlas://workload/W002@v1
+product_brief: A local closed-loop coding agent generates small Python functions and checks them safely.
+semantic:
+  source_type: repository_fixture
+  source: atlas://dataset/DS002@v1
+  license: Apache-2.0
+  fingerprint: e1b2c3465af6dec750fd68904ed959ff30a6d424ef9cec0c2ac269795f8f41d9
+  sampling: {method: exhaustive, unit: task}
+  filters: []
+  transformations:
+    - Prepend the frozen coding-agent system instruction.
+    - Add deterministic neutral context padding for the 256, 512, and 1024-token conditions.
+traffic: {profiles: [atlas://traffic/T006@v1]}
+request_shape:
+  classes:
+    - name: coding-task
+      weight: 1
+      input_tokens: {controlled_targets: [256, 512, 1024]}
+      output_tokens: {maximum: 160}
+      context_tokens: {controlled_targets: [256, 512, 1024]}
+locality:
+  prefix_reuse: 1
+  session_reuse: 1
+  document_reuse: 0.8333333333
+  temporal_locality: Each task is issued cold and then with the same warm agent prefix.
+  popularity_skew: Uniform across six tasks.
+replay: {mode: semantic, output_control: natural}
+load_generation:
+  warmup_requests: 1
+  measurement_requests: 6
+  seeds: [101, 202, 303]
+server_state: warm_preloaded_cache
+quality_contract: atlas://quality-contract/QC002@v1
+slo_profile: atlas://slo/SLO002@v1

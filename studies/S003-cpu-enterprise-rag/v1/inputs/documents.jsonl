@@ -1,0 +1,24 @@
+{"id":"DOC001","title":"Password reset policy","text":"Support agents may initiate a password reset only after two approved identity checks. Reset links expire after 20 minutes and may be used once."}
+{"id":"DOC002","title":"Production access","text":"Production access requires a named account, phishing-resistant multi-factor authentication, manager approval, and a ticket linked to the access grant."}
+{"id":"DOC003","title":"Incident severity","text":"Severity 1 incidents cause a complete critical-service outage or confirmed material data exposure. The incident commander must be assigned within 10 minutes."}
+{"id":"DOC004","title":"Incident communications","text":"For Severity 1 incidents, publish an internal update every 30 minutes and a customer status update at least hourly until mitigation."}
+{"id":"DOC005","title":"Backup retention","text":"Daily encrypted backups are retained for 35 days. Monthly recovery points are retained for 12 months and tested quarterly."}
+{"id":"DOC006","title":"Restore testing","text":"A quarterly restore exercise must recover one application database and verify record counts, checksums, and application-level reads."}
+{"id":"DOC007","title":"Laptop encryption","text":"Company laptops must use full-disk encryption with recovery keys escrowed in the approved device-management service."}
+{"id":"DOC008","title":"Lost device response","text":"Report a lost company device to Security within one hour. Security may remotely lock or erase the device after confirming ownership."}
+{"id":"DOC009","title":"Data classification","text":"Customer contracts and support exports are Confidential. Credentials, private keys, and authentication secrets are Restricted."}
+{"id":"DOC010","title":"Restricted data sharing","text":"Restricted data must not be sent through email or public chat. Use the approved secrets manager or encrypted transfer service."}
+{"id":"DOC011","title":"Vendor review","text":"A vendor handling Confidential data requires security review, a data-processing agreement, and an identified service owner before onboarding."}
+{"id":"DOC012","title":"Vendor offboarding","text":"Vendor offboarding removes accounts within 24 hours, exports required records, and obtains written confirmation of data deletion."}
+{"id":"DOC013","title":"Change windows","text":"Routine production changes occur Tuesday through Thursday between 09:00 and 15:00 UTC. Emergency changes follow the incident process."}
+{"id":"DOC014","title":"Change rollback","text":"Every production change requires tested rollback steps, an owner, success checks, and a maximum decision time for rollback."}
+{"id":"DOC015","title":"Support response targets","text":"Priority 1 support requests receive an initial human response within 15 minutes. Priority 2 requests receive a response within four business hours."}
+{"id":"DOC016","title":"Support escalation","text":"Escalate a request when the response target is at risk, the customer reports data loss, or two troubleshooting attempts fail."}
+{"id":"DOC017","title":"Expense approval","text":"Expenses above 500 GBP require manager approval before purchase. Expenses above 5,000 GBP also require Finance approval."}
+{"id":"DOC018","title":"Travel booking","text":"Book standard rail and economy air travel through the approved portal. Exceptions require written director approval."}
+{"id":"DOC019","title":"New employee access","text":"People Operations supplies the start date and role. Managers request least-privilege access at least three business days before the start date."}
+{"id":"DOC020","title":"Departure checklist","text":"For departures, disable interactive accounts by the effective time, transfer owned documents, revoke tokens, and record completion in the offboarding ticket."}
+{"id":"DOC021","title":"Customer data deletion","text":"Verified customer deletion requests are completed within 30 days unless a documented legal hold applies. Completion must be auditable."}
+{"id":"DOC022","title":"Log retention","text":"Security audit logs are retained online for 90 days and archived for one year. Access to archived logs is recorded."}
+{"id":"DOC023","title":"Service ownership","text":"Every production service has one accountable owner, an on-call rotation, a runbook, an SLO, and a documented dependency map."}
+{"id":"DOC024","title":"Post-incident review","text":"A blameless post-incident review is required within five business days for Severity 1 and Severity 2 incidents. Actions need owners and due dates."}

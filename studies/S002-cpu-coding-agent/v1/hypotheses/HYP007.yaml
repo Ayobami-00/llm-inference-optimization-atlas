@@ -1,0 +1,42 @@
+%YAML 1.2
+---
+schema_version: 1
+kind: Hypothesis
+id: HYP007
+version: 1
+slug: coding-server-slots
+title: Two server slots improve offered-task goodput only when queueing 
+  dominates per-slot contention.
+description: Two server slots improve offered-task goodput only when queueing 
+  dominates per-slot contention.
+status: active
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered-configuration-matrix
+  source_paths: []
+  generated: true
+extensions: {}
+$schema: 
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/optimizations/hypothesis.schema.json
+observation: Does a second server slot improve task goodput?
+statement: Two server slots improve offered-task goodput only when queueing 
+  dominates per-slot contention.
+intervention: Change server parallel slots from one to two.
+expected_mechanism: Change server parallel slots from one to two.
+primary_metric: atlas://metric/MET021@v1
+guardrails:
+  - atlas://metric/MET015@v1
+  - atlas://metric/MET091@v1
+quality_gate: Q1
+falsification_conditions:
+  - Two slots do not improve SLO goodput.
+background_sources: []

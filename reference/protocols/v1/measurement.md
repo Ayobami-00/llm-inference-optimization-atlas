@@ -11,7 +11,9 @@ Collect the least expensive tier that can answer the question and diagnose the e
 - M4: accelerator-seconds and monetary cost.
 - M5: energy and efficiency.
 
-The exact 90 V1 metric definitions live in `reference/ontology/v1/metrics/`.
+The 96 initial V1 metric definitions live in `reference/ontology/v1/metrics/`. The set may grow
+compatibly within V1 as studies introduce a measurement that is both externally meaningful and
+not already represented; existing IDs and semantics remain stable.
 
 ## Request table
 

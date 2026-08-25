@@ -1,0 +1,63 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/workloads/workload-spec.schema.json
+schema_version: 1
+kind: WorkloadSpec
+id: WS003
+version: 1
+slug: cpu-enterprise-rag-workload
+title: CPU enterprise RAG workload
+description: Frozen 24-document, 12-question dense-retrieval and grounded-generation replay.
+status: active
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [investigator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered study workload
+  source_paths:
+    - studies/S003-cpu-enterprise-rag/v1/inputs/documents.jsonl
+    - studies/S003-cpu-enterprise-rag/v1/inputs/questions.jsonl
+  generated: false
+  parent_artifacts: [atlas://dataset/DS003@v1, atlas://proposal/P0004@v1]
+extensions: {}
+archetype: atlas://workload/W003@v1
+product_brief: A local enterprise assistant retrieves fictional policies and answers with citations.
+semantic:
+  source_type: repository_fixture
+  source: atlas://dataset/DS003@v1
+  license: Apache-2.0
+  fingerprint: 3941c5a37a350ad21dc18f4c796d4a4f660100113b28dc6b07f8c27158ea713b
+  sampling: {method: exhaustive, unit: grounded question}
+  filters: []
+  transformations:
+    - Prefix each document with its frozen identity and title.
+    - Normalize embeddings with L2 norm before cosine ranking.
+traffic:
+  profiles: [atlas://traffic/T001@v1, atlas://traffic/T002@v1]
+request_shape:
+  classes:
+    - name: grounded-question
+      weight: 1
+      input_tokens: {expected_range: [18, 420], controlled_by: retrieval_top_k}
+      output_tokens: {maximum: 96}
+      context_tokens: {expected_range: [18, 640]}
+locality:
+  prefix_reuse: 0.5
+  session_reuse: 0
+  document_reuse: 0.75
+  temporal_locality: Questions are replayed in seeded randomized order.
+  popularity_skew: Frozen relevant-document distribution.
+retrieval:
+  corpus: atlas://dataset/DS003@v1
+  method: dense_cosine
+  top_k: [1, 3, 5]
+  embedding_modes: [online, precomputed]
+  representations: [fp32, int8]
+replay: {mode: semantic, output_control: natural}
+load_generation:
+  warmup_requests: 2
+  measurement_requests: 12
+  seeds: [101, 202, 303]
+server_state: warm_preloaded_cache
+quality_contract: atlas://quality-contract/QC003@v1
+slo_profile: atlas://slo/SLO003@v1

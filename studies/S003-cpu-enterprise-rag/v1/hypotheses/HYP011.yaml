@@ -1,0 +1,43 @@
+%YAML 1.2
+---
+schema_version: 1
+kind: Hypothesis
+id: HYP011
+version: 1
+slug: precomputed-embedding-benefit
+title: Precomputed document embeddings reduce request latency at fixed retrieval
+  results.
+description: Precomputed document embeddings reduce request latency at fixed 
+  retrieval results.
+status: active
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered-configuration-matrix
+  source_paths: []
+  generated: true
+extensions: {}
+$schema: 
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/optimizations/hypothesis.schema.json
+observation: When do precomputed document embeddings outperform online 
+  embedding?
+statement: Precomputed document embeddings reduce request latency at fixed 
+  retrieval results.
+intervention: Move document embedding outside the request boundary.
+expected_mechanism: Move document embedding outside the request boundary.
+primary_metric: atlas://metric/MET015@v1
+guardrails:
+  - atlas://metric/MET092@v1
+  - atlas://metric/MET093@v1
+quality_gate: Q1
+falsification_conditions:
+  - Online embedding is not slower than precomputed embedding.
+background_sources: []

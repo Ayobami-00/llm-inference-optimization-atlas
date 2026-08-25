@@ -117,6 +117,7 @@ def new_study(root: Path, proposal_or_id: str) -> Path:
         "configurations",
         "experiments",
         "execution",
+        "hypotheses",
         "findings",
         "decisions",
         "inputs",

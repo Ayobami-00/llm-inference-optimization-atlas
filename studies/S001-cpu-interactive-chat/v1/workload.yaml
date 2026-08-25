@@ -1,0 +1,68 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/workloads/workload-spec.schema.json
+schema_version: 1
+kind: WorkloadSpec
+id: WS001
+version: 1
+slug: cpu-interactive-chat-workload
+title: CPU interactive chat workload
+description: Frozen twelve-conversation semantic replay with low, steady, and bursty microtraces.
+status: active
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [investigator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered study workload
+  source_paths: [studies/S001-cpu-interactive-chat/v1/inputs/conversations.jsonl]
+  generated: false
+  parent_artifacts: [atlas://dataset/DS001@v1, atlas://proposal/P0002@v1]
+extensions: {}
+archetype: atlas://workload/W001@v1
+product_brief: A single-user local assistant with interactive first-token and streaming latency needs.
+semantic:
+  source_type: repository_fixture
+  source: atlas://dataset/DS001@v1
+  license: Apache-2.0
+  fingerprint: b4a52af5acaf12393f7b31d1bba06fd0b4188ed6fa9283fd529d8a2cbba11ec8
+  sampling: {method: exhaustive, unit: conversation}
+  filters: []
+  transformations:
+    - Apply the pinned SmolLM2 chat template.
+    - Preserve turn order and exact user text.
+traffic:
+  profiles:
+    - atlas://traffic/T001@v1
+    - atlas://traffic/T002@v1
+    - atlas://traffic/T003@v1
+request_shape:
+  classes:
+    - name: short
+      weight: 0.3333333333
+      input_tokens: {expected_range: [12, 96]}
+      output_tokens: {maximum: 48}
+      context_tokens: {expected_range: [12, 192]}
+    - name: medium
+      weight: 0.5
+      input_tokens: {expected_range: [32, 180]}
+      output_tokens: {maximum: 64}
+      context_tokens: {expected_range: [32, 320]}
+    - name: long
+      weight: 0.1666666667
+      input_tokens: {expected_range: [80, 320]}
+      output_tokens: {maximum: 80}
+      context_tokens: {expected_range: [80, 512]}
+locality:
+  prefix_reuse: 0.25
+  session_reuse: 0.6666666667
+  document_reuse: 0
+  temporal_locality: Follow-up turns immediately follow their parent turn.
+  popularity_skew: Uniform across the twelve conversations.
+replay: {mode: semantic, output_control: natural}
+load_generation:
+  warmup_requests: 3
+  measurement_requests: 12
+  seeds: [101, 202, 303]
+server_state: steady_state
+quality_contract: atlas://quality-contract/QC001@v1
+slo_profile: atlas://slo/SLO001@v1

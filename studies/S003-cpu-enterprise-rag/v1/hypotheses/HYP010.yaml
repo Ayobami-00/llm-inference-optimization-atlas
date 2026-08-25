@@ -1,0 +1,44 @@
+%YAML 1.2
+---
+schema_version: 1
+kind: Hypothesis
+id: HYP010
+version: 1
+slug: rag-top-k-boundary
+title: Increasing top_k improves recall until additional context increases 
+  end-to-end latency without useful quality gain.
+description: Increasing top_k improves recall until additional context increases
+  end-to-end latency without useful quality gain.
+status: active
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered-configuration-matrix
+  source_paths: []
+  generated: true
+extensions: {}
+$schema: 
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/optimizations/hypothesis.schema.json
+observation: How do top_k values one, three, and five affect retrieval and 
+  generation?
+statement: Increasing top_k improves recall until additional context increases 
+  end-to-end latency without useful quality gain.
+intervention: Sweep retrieval top_k through one, three, and five.
+expected_mechanism: Sweep retrieval top_k through one, three, and five.
+primary_metric: atlas://metric/MET092@v1
+guardrails:
+  - atlas://metric/MET015@v1
+  - atlas://metric/MET093@v1
+  - atlas://metric/MET094@v1
+quality_gate: Q1
+falsification_conditions:
+  - Top_k does not change recall or the quality/latency boundary.
+background_sources: []

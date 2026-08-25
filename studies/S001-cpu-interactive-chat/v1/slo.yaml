@@ -1,0 +1,27 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/slo/slo-profile.schema.json
+schema_version: 1
+kind: SLOProfile
+id: SLO001
+version: 1
+slug: laptop-interactive-chat-slo
+title: Laptop interactive chat SLO
+description: Research SLO for useful interactive CPU inference, not a production commitment.
+status: active
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [investigator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance: {method: preregistered research SLO, source_paths: [], generated: false}
+extensions: {}
+request_classes:
+  - name: interactive
+    constraints:
+      - {metric: client_ttft, percentile: p95, operator: lte, threshold: 2500, unit: ms}
+      - {metric: tpot, percentile: p95, operator: lte, threshold: 175, unit: ms}
+      - {metric: e2e, percentile: p95, operator: lte, threshold: 15000, unit: ms}
+reliability: {minimum_success_rate: 0.99, maximum_error_rate: 0.01, maximum_timeout_rate: 0.01}
+capacity: {minimum_slo_goodput: 0.05, unit: request/s}
+economics: {maximum_incremental_cost: 0, currency: GBP}
+energy: {measurement: optional_on_macos, decision_role: informational}
+frozen_before_experiment: true

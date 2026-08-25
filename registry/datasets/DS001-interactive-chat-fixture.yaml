@@ -1,0 +1,52 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/workloads/dataset-revision.schema.json
+schema_version: 1
+kind: DatasetRevision
+id: DS001
+version: 1
+slug: interactive-chat-fixture
+title: Atlas interactive chat fixture
+description: Twelve repository-owned synthetic multi-turn conversations for compact CPU inference.
+status: active
+authors: [{name: Atlas maintainers, roles: [dataset-author], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: repository-authored synthetic fixture
+  source_paths: [studies/S001-cpu-interactive-chat/v1/inputs/conversations.jsonl]
+  generated: false
+extensions: {}
+dataset_type: repository_fixture
+tasks: [multi-turn-chat, instruction-following, summarization, explanation]
+modalities: [text]
+languages: [en]
+terms:
+  license: Apache-2.0
+  redistribution: true
+  commercial_use: true
+  attribution: Retain the repository license and provenance.
+  restrictions: []
+composition:
+  records: 12
+  units: conversations
+  splits: {measurement: 12}
+  statistics: {short: 4, medium: 6, long: 2, multi_turn: 8}
+sampling: {method: exhaustive, replacement: false}
+transformations: []
+fingerprint:
+  algorithm: sha256
+  value: b4a52af5acaf12393f7b31d1bba06fd0b4188ed6fa9283fd529d8a2cbba11ec8
+files:
+  - path: studies/S001-cpu-interactive-chat/v1/inputs/conversations.jsonl
+    media_type: application/x-ndjson
+    sha256: b4a52af5acaf12393f7b31d1bba06fd0b4188ed6fa9283fd529d8a2cbba11ec8
+    size_bytes: 2596
+sensitive_data:
+  contains_personal_data: false
+  contains_secrets: false
+  review_method: Manual line-by-line review of the repository-authored fixture.
+limitations:
+  - The fixture is English-only and intentionally small.
+  - Topic-keyword checks measure basic relevance, not comprehensive conversational quality.
+  - Synthetic prompts do not reproduce a production user's full request distribution.

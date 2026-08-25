@@ -1,0 +1,40 @@
+%YAML 1.2
+---
+schema_version: 1
+kind: Hypothesis
+id: HYP001
+version: 1
+slug: cold-start-latency
+title: Cold startup increases first-token latency relative to a warmed process.
+description: Cold startup increases first-token latency relative to a warmed 
+  process.
+status: active
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered-configuration-matrix
+  source_paths: []
+  generated: true
+extensions: {}
+$schema: 
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/optimizations/hypothesis.schema.json
+observation: How much does cold process startup increase TTFT?
+statement: Cold startup increases first-token latency relative to a warmed 
+  process.
+intervention: Include model load and first request in the cold condition.
+expected_mechanism: Include model load and first request in the cold condition.
+primary_metric: atlas://metric/MET010@v1
+guardrails:
+  - atlas://metric/MET030@v1
+quality_gate: Q1
+falsification_conditions:
+  - Cold p95 TTFT is not greater than warm p95 TTFT.
+background_sources: []

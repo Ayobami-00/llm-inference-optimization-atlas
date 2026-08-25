@@ -1,0 +1,74 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: METRICS-QUALITY
+version: 1
+title: Workload quality metrics
+description: Deterministic task, retrieval, grounding, citation, and format quality metrics.
+entries:
+  - id: MET091
+    name: Task correctness rate
+    definition: Fraction of measured tasks that satisfy every frozen deterministic correctness check.
+    status: active
+    aliases: [task pass rate]
+    level: M0
+    category: quality
+    unit: ratio
+    direction: higher_is_better
+    mandatory: false
+    aggregation: [mean]
+  - id: MET092
+    name: Retrieval recall at k
+    definition: Fraction of frozen relevant document identities present in the first k retrieved results.
+    status: active
+    aliases: [recall at k, retrieval recall]
+    level: M0
+    category: quality
+    unit: ratio
+    direction: higher_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET093
+    name: Answer keyword recall
+    definition: Fraction of frozen normalized answer concepts found in the generated grounded answer.
+    status: active
+    aliases: [answer concept recall]
+    level: M0
+    category: quality
+    unit: ratio
+    direction: higher_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET094
+    name: Citation precision
+    definition: Fraction of cited document identities that belong to the frozen relevant-document set.
+    status: active
+    aliases: [grounded citation precision]
+    level: M0
+    category: quality
+    unit: ratio
+    direction: higher_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET095
+    name: Citation recall
+    definition: Fraction of frozen relevant document identities included in the answer citations.
+    status: active
+    aliases: [grounded citation recall]
+    level: M0
+    category: quality
+    unit: ratio
+    direction: higher_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET096
+    name: Response format pass rate
+    definition: Fraction of outputs satisfying the preregistered parse, schema, and required-field checks.
+    status: active
+    aliases: [format compliance]
+    level: M0
+    category: quality
+    unit: ratio
+    direction: higher_is_better
+    mandatory: false
+    aggregation: [mean]

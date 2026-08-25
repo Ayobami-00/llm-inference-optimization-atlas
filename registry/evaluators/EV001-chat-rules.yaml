@@ -1,0 +1,41 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/quality/evaluator.schema.json
+schema_version: 1
+kind: Evaluator
+id: EV001
+version: 1
+slug: interactive-chat-rules
+title: Interactive chat deterministic evaluator
+description: Applies frozen non-empty-output and topic-keyword checks to the repository-owned chat fixture.
+status: active
+authors: [{name: Atlas maintainers, roles: [evaluator-author], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: repository-authored deterministic evaluator
+  source_paths: [src/atlas/studies/evaluators.py]
+  generated: false
+extensions: {}
+evaluator_type: deterministic_rules
+implementation:
+  repository_path: src/atlas/studies/evaluators.py
+  entrypoint: atlas.studies.evaluators:evaluate_chat_records
+  revision: v1
+  sha256: e06af008f26e29cf7d22484e0f49b145087398ef570a8bf2a277ecd6dae66d36
+datasets: [atlas://dataset/DS001@v1]
+inputs:
+  responses: request identity, generated text, and optional error
+  records: frozen expected topic keywords by request identity
+outputs:
+  dimensions: valid_output and topic_keyword_recall
+  details: per-request deterministic results
+metrics: [atlas://metric/MET096@v1, atlas://metric/MET093@v1]
+determinism: {level: exact, seeds: [], tolerance: 0}
+pass_criteria:
+  valid_output: 1.0
+  topic_keyword_recall_minimum: 0.75
+sandbox: {executes_untrusted_code: false, network: disabled, controls: []}
+limitations:
+  - Keyword recall measures basic topical relevance rather than comprehensive answer quality.
+  - English normalization is intentionally simple and fixture-specific.
