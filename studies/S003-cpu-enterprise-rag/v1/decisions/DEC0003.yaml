@@ -1,0 +1,53 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/decision.schema.json
+schema_version: 1
+kind: DeploymentDecision
+id: DEC0003
+version: 1
+slug: select-native-fp32-top3-precomputed-rag
+title: Select native FP32 top_k 3 precomputed execution for the RAG fixture
+description: Exact-setup RAG deployment decision grounded in accepted S003 evidence.
+status: accepted
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [decision], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: Pareto judgment over accepted S003 findings and quality/SLO-eligible comparisons
+  source_paths: [studies/S003-cpu-enterprise-rag/v1/findings/F0013.yaml, studies/S003-cpu-enterprise-rag/v1/findings/F0014.yaml, studies/S003-cpu-enterprise-rag/v1/findings/F0015.yaml, studies/S003-cpu-enterprise-rag/v1/findings/F0016.yaml, studies/S003-cpu-enterprise-rag/v1/findings/F0017.yaml]
+  generated: false
+extensions: {}
+study: atlas://study/S003@v1
+outcome: recommended
+selected_configuration: atlas://configuration/CFG020@v1
+pareto_rationale: CFG020 preserves FP32 embedding behavior because INT8 did not establish a significant E2E benefit, uses top_k 3 because it recovered all expected records without the unnecessary context of top_k 5, precomputes the stable corpus despite the compact experiment being inconclusive, and avoids the measured cold per-run container launch penalty. All contributing runs passed Q1 and SLO003.
+operating_envelope:
+  workload: twelve grounded questions over the repository-owned 24-document WS003 corpus
+  hardware: Apple M3 CPU topology HW001
+  runtime: pinned ONNX Runtime and Transformers CPU pipeline RT003
+  embedding_model: all-MiniLM-L6-v2 FP32 M004
+  generation_model: SmolLM2-135M-Instruct M001
+  retrieval_top_k: 3
+  document_embeddings: precomputed once per run
+  execution_environment: native host
+  intra_op_threads: 4
+  inter_op_threads: 1
+  quality_gate: Q1 retrieval, answer-keyword, citation, grounding, and format checks
+  slo_profile: atlas://slo/SLO003@v1
+supporting_findings: [atlas://finding/F0013@v1, atlas://finding/F0014@v1, atlas://finding/F0015@v1, atlas://finding/F0016@v1, atlas://finding/F0017@v1]
+rejected_alternatives:
+  - {configuration: atlas://configuration/CFG016@v1, reason: INT8 preserved Q1 but its 3.5% mean E2E reduction was not statistically resolved.}
+  - {configuration: atlas://configuration/CFG017@v1, reason: top_k 1 missed an expected record and reduced retrieval recall from 1.0 to 0.9583.}
+  - {configuration: atlas://configuration/CFG018@v1, reason: top_k 5 reached the same observed recall as top_k 3 while adding context that was not required by this fixture.}
+  - {configuration: atlas://configuration/CFG019@v1, reason: Per-request full-corpus embedding added work without a significant measured benefit and weakens operational efficiency as corpus size grows.}
+  - {configuration: atlas://configuration/CFG015@v1, reason: Fresh per-run Docker execution increased mean E2E latency by 255.0% under the measured startup-inclusive protocol.}
+caveats:
+  - The recommendation is limited to the exact models, revisions, Apple M3 topology, 24-document corpus, 12-question trace, and four-thread budget tested.
+  - The RAG response stores raw model synthesis and appends a deterministic retrieved evidence excerpt; Q1 evaluates the complete transparent output, not unconstrained generative factuality.
+  - The container comparison measures fresh per-run startup and model loading, not a persistent warmed service.
+  - No direct top_k 3 versus top_k 5 causal comparison was preregistered; their equal recall is a cross-comparison observation.
+revisit_conditions:
+  - The corpus, relevance multiplicity, update rate, request volume, or generator context changes materially.
+  - A persistent container service moves launch and model loading outside the request measurement window.
+  - A larger embedding workload or newer ARM64 INT8 kernel makes representation cost measurable.
+  - Replication on Linux CPU, another hardware class, model, or enterprise workload changes any boundary.

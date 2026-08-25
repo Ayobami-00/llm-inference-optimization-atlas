@@ -1,0 +1,47 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/finding.schema.json
+schema_version: 1
+kind: Finding
+id: F0014
+version: 1
+slug: top3-recovers-compact-rag-relevance
+title: Retrieval top_k 3 recovered all expected compact-corpus documents
+description: Accepted exact-setup retrieval finding from three paired full-profile replicates.
+status: supported
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [analysis], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: contributor interpretation of accepted paired-bootstrap comparison CMP0014
+  source_paths: [studies/S003-cpu-enterprise-rag/v1/experiments/E0010/comparisons/CMP0014.yaml]
+  generated: false
+extensions: {}
+statement: Increasing retrieval top_k from 1 to 3 improved expected-document recall from 0.9583 to 1.0 for the repository-owned RAG fixture.
+scope:
+  workload: atlas://workload-spec/WS003@v1
+  model: atlas://model/M004@v1
+  runtime: atlas://runtime/RT003@v1
+  hardware: atlas://hardware/HW001@v1
+  traffic: [atlas://traffic/T001@v1, atlas://traffic/T002@v1]
+observation: Retrieval recall increased by 0.04167 absolute (4.35% relative) in every paired replicate, and all baseline and intervention runs passed Q1 and SLO003.
+mechanism: Some questions identify more than one relevant enterprise record, so a one-document retrieval boundary omits an expected record that top_k 3 retains.
+baseline: atlas://configuration/CFG017@v1
+intervention: atlas://configuration/CFG015@v1
+effects:
+  - metric: atlas://metric/MET092@v1
+    absolute: 0.04166666666666663
+    relative: 0.043478260869565175
+    confidence_interval: {lower: 0.04166666666666663, upper: 0.04166666666666663, level: 0.95}
+    unit: ratio
+works_when: [Questions and relevance labels follow the 12-question, 24-document repository-owned fixture.]
+stops_working_when: [A corpus has single-document answers, retrieval rankings change, or added context harms downstream generation.]
+interactions: [The useful top_k boundary depends on relevance multiplicity, ranking quality, prompt capacity, and generation grounding.]
+limitations: [The deterministic compact fixture is too small to establish a universal enterprise RAG top_k value.]
+evidence:
+  comparisons: [atlas://comparison/CMP0014@v1]
+  runs: [atlas://run/R3231@v1, atlas://run/R3232@v1, atlas://run/R3233@v1, atlas://run/R3211@v1, atlas://run/R3212@v1, atlas://run/R3213@v1]
+mechanism_sources: []
+evidence_confidence: high
+transferability: exact_setup
+claim_status: supported

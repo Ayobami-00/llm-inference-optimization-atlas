@@ -1,0 +1,97 @@
+%YAML 1.2
+---
+$schema: https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/run-record.schema.json
+schema_version: 1
+kind: RunRecord
+id: R3122
+version: 1
+slug: run-r3122
+title: Run R3122
+description: Replicate 2 for atlas://experiment/E0009@v1.
+status: complete
+authors:
+  - name: Atlas study runner
+    roles:
+      - software
+    conflicts: []
+created_at: '2026-08-25T16:47:12Z'
+updated_at: '2026-08-25T16:47:45Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: reproducible-execution-bundle
+  source_paths:
+    - execution.yaml
+  generated: true
+  parent_artifacts:
+    - atlas://experiment/E0009@v1
+    - atlas://configuration/CFG016@v1
+extensions: {}
+experiment: atlas://experiment/E0009@v1
+configuration: atlas://configuration/CFG016@v1
+replicate: 2
+seed: 202
+started_at: '2026-08-25T16:47:12Z'
+ended_at: '2026-08-25T16:47:45Z'
+outcome: complete
+hardware_snapshot: atlas://hardware/HW001@v1
+runtime_snapshot: atlas://runtime/RT003@v1
+input_fingerprints:
+  documents.jsonl: 03988b4e0a95723b4fb26a3202d9438dc092ccc0fb09b8016f6c2e383d39ecdc
+  questions.jsonl: e12e294be9ea339e53d6f4b2f0b58da699ffc5b2518c79b19c6722c99d8bb0b2
+command:
+  - atlas
+  - execution
+  - run
+  - S003-cpu-enterprise-rag
+  - docker-cpu-pipeline
+environment:
+  - name: execution_environment
+    value: container
+    redacted: false
+  - name: embedding_representation
+    value: int8
+    redacted: false
+  - name: intra_op_threads
+    value: '4'
+    redacted: false
+  - name: inter_op_threads
+    value: '1'
+    redacted: false
+windows:
+  warmup:
+    excluded: true
+    requests: 0
+  measurement:
+    requests: 12
+    start: '2026-08-25T16:47:12Z'
+    end: '2026-08-25T16:47:45Z'
+artifacts:
+  - metrics/requests.parquet
+  - metrics/samples.parquet
+  - metrics/summary.json
+  - quality/results.json
+  - outputs/responses.jsonl
+checksums:
+  smollm2-config.json: 8eb740e8bbe4cff95ea7b4588d17a2432deb16e8075bc5828ff7ba9be94d982a
+  smollm2-generation-config.json: 87b916edaaab66b3899b9d0dd0752727dff6666686da0504d89ae0a6e055a013
+  smollm2-model.safetensors: 5af571cbf074e6d21a03528d2330792e532ca608f24ac70a143f6b369968ab8c
+  smollm2-special-tokens-map.json: 2b7379f3ae813529281a5c602bc5a11c1d4e0a99107aaa597fe936c1e813ca52
+  smollm2-tokenizer.json: 9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c
+  smollm2-tokenizer-config.json: 4ec77d44f62efeb38d7e044a1db318f6a939438425312dfa333b8382dbad98df
+  minilm-config.json: 953f9c0d463486b10a6871cc2fd59f223b2c70184f49815e7efbcab5d8908b41
+  minilm-model-fp32.onnx: 6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452
+  minilm-model-int8-arm64.onnx: 4278337fd0ff3c68bfb6291042cad8ab363e1d9fbc43dcb499fe91c871902474
+  minilm-special-tokens-map.json: 303df45a03609e4ead04bc3dc1536d0ab19b5358db685b6f3da123d05ec200e3
+  minilm-tokenizer.json: be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037
+  minilm-tokenizer-config.json: acb92769e8195aabd29b7b2137a9e6d6e25c476a4f15aa4355c233426c61576b
+  minilm-vocab.txt: 07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3
+  container-image: a923a8db7101164ea1db9e7193e858b5daf78577e78921942aeaf67de5f30957
+quality:
+  gate: Q1
+  passed: true
+  results_path: quality/results.json
+validation:
+  passed: true
+  validated_at: '2026-08-25T16:47:45Z'
+  errors: []

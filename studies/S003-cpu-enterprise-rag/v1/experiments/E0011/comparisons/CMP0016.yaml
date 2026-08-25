@@ -1,0 +1,70 @@
+%YAML 1.2
+---
+$schema: https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/comparison.schema.json
+schema_version: 1
+kind: Comparison
+id: CMP0016
+version: 1
+slug: online-versus-precomputed-cmp0016
+title: When do precomputed document embeddings outperform online embedding? comparison
+description: Controlled effects for atlas://configuration/CFG019@v1 against atlas://configuration/CFG015@v1.
+status: accepted
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T16:50:58Z'
+updated_at: '2026-08-25T16:50:58Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: atlas compare paired-bootstrap effect estimation
+  source_paths:
+    - studies/S003-cpu-enterprise-rag/v1/experiments/E0011/runs/R3311
+    - studies/S003-cpu-enterprise-rag/v1/experiments/E0011/runs/R3312
+    - studies/S003-cpu-enterprise-rag/v1/experiments/E0011/runs/R3313
+    - studies/S003-cpu-enterprise-rag/v1/experiments/E0011/runs/R3351
+    - studies/S003-cpu-enterprise-rag/v1/experiments/E0011/runs/R3352
+    - studies/S003-cpu-enterprise-rag/v1/experiments/E0011/runs/R3353
+  generated: true
+extensions: {}
+experiment: atlas://experiment/E0011@v1
+baseline_runs:
+  - atlas://run/R3311@v1
+  - atlas://run/R3312@v1
+  - atlas://run/R3313@v1
+candidate_runs:
+  - atlas://run/R3351@v1
+  - atlas://run/R3352@v1
+  - atlas://run/R3353@v1
+changed_axes:
+  - runtime_configuration cache document_embeddings
+compatibility:
+  passed: true
+  checks:
+    - workload identity is frozen
+    - quality identity is frozen
+    - slo identity is frozen
+    - model identity is frozen
+    - hardware identity is frozen
+    - runtime identity is frozen
+method:
+  paired: true
+  confidence_level: 0.95
+  bootstrap_resamples: 10000
+effects:
+  - metric: atlas://metric/MET015@v1
+    baseline: 2799.18828008345
+    candidate: 2907.5223310833912
+    absolute: 108.33405099994116
+    relative: 0.03870195219476679
+    confidence_interval:
+      lower: -13.89692358384309
+      upper: 198.31466683401277
+      level: 0.95
+    unit: ms
+quality_eligible: true
+slo_eligible: true
+result: no_significant_effect
