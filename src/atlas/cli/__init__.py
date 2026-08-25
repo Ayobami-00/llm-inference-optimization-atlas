@@ -30,6 +30,8 @@ from atlas.execution import (
 )
 from atlas.execution.cache import inspect_cache, prune_cache
 from atlas.execution.evidence import promote_evidence, validate_evidence
+from atlas.graph import GraphCompiler, GraphError
+from atlas.graph.server import serve_site
 from atlas.ontology import check_ontology
 from atlas.proposals import (
     create_github_issue,
@@ -65,6 +67,7 @@ evidence_app = typer.Typer(no_args_is_help=True, help="Validate and promote run 
 finding_app = typer.Typer(no_args_is_help=True, help="Validate evidence-backed findings.")
 decision_app = typer.Typer(no_args_is_help=True, help="Validate deployment decisions.")
 cache_app = typer.Typer(no_args_is_help=True, help="Inspect and prune the shared artifact cache.")
+graph_app = typer.Typer(no_args_is_help=True, help="Compile and serve evidence graph projections.")
 app.add_typer(schema_app, name="schema")
 app.add_typer(ontology_app, name="ontology")
 app.add_typer(sources_app, name="sources")
@@ -77,6 +80,7 @@ app.add_typer(evidence_app, name="evidence")
 app.add_typer(finding_app, name="finding")
 app.add_typer(decision_app, name="decision")
 app.add_typer(cache_app, name="cache")
+app.add_typer(graph_app, name="graph")
 
 
 @app.callback()
@@ -593,3 +597,42 @@ def cache_prune(
         raise typer.Abort()
     result = prune_cache(cache_root)
     _emit(ctx, {"ok": True, **result}, title="Cache pruned")
+
+
+@graph_app.command("build")
+def graph_build(
+    ctx: typer.Context,
+    study: Annotated[str | None, typer.Argument(help="Study ID or slug.")] = None,
+    all_studies: Annotated[
+        bool, typer.Option("--all", help="Build global and every per-study projection.")
+    ] = False,
+) -> None:
+    """Compile deterministic graph JSON from canonical artifacts."""
+    if all_studies and study:
+        raise typer.BadParameter("Provide a study or --all, not both")
+    root = find_repository_root()
+    try:
+        result = GraphCompiler(root).build(None if all_studies or study is None else study)
+    except GraphError as error:
+        Console(stderr=True).print(f"[red]{error}[/]")
+        raise typer.Exit(EXIT_INTEGRITY) from error
+    payload = result.as_dict()
+    payload["path"] = repository_relative(result.root, root)
+    _emit(ctx, payload, title="Evidence graph built")
+
+
+@graph_app.command("serve")
+def graph_serve(
+    study: Annotated[str | None, typer.Argument(help="Study directory slug.")] = None,
+    open_browser: Annotated[
+        bool, typer.Option("--open", help="Open the local Atlas in the default browser.")
+    ] = False,
+    port: Annotated[int, typer.Option("--port", min=1, max=65535)] = 8000,
+) -> None:
+    """Serve the same static site used by GitHub Pages."""
+    root = find_repository_root()
+    try:
+        serve_site(root / "build" / "site", study=study, port=port, open_browser=open_browser)
+    except FileNotFoundError as error:
+        Console(stderr=True).print(f"[red]{error}[/]")
+        raise typer.Exit(EXIT_EXECUTION) from error

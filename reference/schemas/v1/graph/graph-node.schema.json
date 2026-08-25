@@ -6,7 +6,7 @@
   "required": ["id", "type", "label", "status", "source_path", "artifact_ref", "summary", "tags"],
   "properties": {
     "id": { "type": "string" },
-    "type": { "enum": ["workload_archetype", "study", "workload", "characteristic", "traffic", "quality_contract", "slo", "model", "hardware", "runtime", "configuration", "bottleneck", "optimization", "hypothesis", "experiment", "run", "comparison", "finding", "decision", "source"] },
+    "type": { "enum": ["workload_archetype", "study", "workload", "characteristic", "traffic", "quality_contract", "slo", "model", "hardware", "runtime", "configuration", "bottleneck", "optimization", "hypothesis", "experiment", "run", "comparison", "finding", "decision", "replication", "source"] },
     "label": { "type": "string" },
     "status": { "type": "string" },
     "source_path": { "type": "string" },
