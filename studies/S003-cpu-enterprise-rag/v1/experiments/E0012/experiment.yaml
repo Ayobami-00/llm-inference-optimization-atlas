@@ -36,7 +36,7 @@ baseline: atlas://configuration/CFG020@v1
 candidates:
   - atlas://configuration/CFG015@v1
 changed_factors:
-  - model runtime execution environment
+  - execution environment
 frozen_factors:
   - workload fixture and seed
   - model revision except when declared

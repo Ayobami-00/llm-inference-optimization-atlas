@@ -58,9 +58,7 @@ def extract_python(text: str, function_name: str) -> str:
 
 def evaluate_code_results(results: list[dict[str, Any]]) -> dict[str, Any]:
     safe = all(bool(item.get("sandbox_completed")) for item in results)
-    pass_rate = (
-        fmean(float(bool(item.get("tests_passed"))) for item in results) if results else 0.0
-    )
+    pass_rate = fmean(float(bool(item.get("tests_passed"))) for item in results) if results else 0.0
     return {
         "gate": "Q1",
         "passed": safe and pass_rate >= 1 / 3,

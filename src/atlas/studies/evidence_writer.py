@@ -136,9 +136,7 @@ def write_run_draft(base: Path, draft: RunDraft) -> Path:
         "title": f"Run {draft.run_id}",
         "description": f"Replicate {draft.replicate} for {draft.experiment}.",
         "status": "complete",
-        "authors": [
-            {"name": "Atlas study runner", "roles": ["software"], "conflicts": []}
-        ],
+        "authors": [{"name": "Atlas study runner", "roles": ["software"], "conflicts": []}],
         "created_at": draft.started_at,
         "updated_at": draft.ended_at,
         "license": "Apache-2.0",
@@ -192,8 +190,7 @@ def write_run_draft(base: Path, draft: RunDraft) -> Path:
         path for path in output.rglob("*") if path.is_file() and path.name != "checksums.sha256"
     )
     lines = [
-        f"{sha256_file(path)}  {path.relative_to(output).as_posix()}"
-        for path in manifest_paths
+        f"{sha256_file(path)}  {path.relative_to(output).as_posix()}" for path in manifest_paths
     ]
     (output / "checksums.sha256").write_text("\n".join(lines) + "\n")
     return output

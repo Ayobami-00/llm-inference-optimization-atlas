@@ -29,8 +29,8 @@ extensions:
     top_k: 3
     embeddings: precomputed
     environment: native
-    model: M003
-    runtime: RT001
+    model: M004
+    runtime: RT003
   atlas.pipeline-models:
     - atlas://model/M001@v1
 $schema: 
@@ -38,16 +38,16 @@ $schema:
 workload: atlas://workload-spec/WS003@v1
 quality: atlas://quality-contract/QC003@v1
 slo: atlas://slo/SLO003@v1
-model: atlas://model/M003@v1
+model: atlas://model/M004@v1
 hardware: atlas://hardware/HW001@v1
-runtime: atlas://runtime/RT001@v1
+runtime: atlas://runtime/RT003@v1
 runtime_configuration: atlas://runtime-configuration/RTCFG020@v1
 resolved_hashes:
   workload: 4179552ee1aa303098a69385ae6cf2dc4d14db73ce3635f72a19ab746fbd12f2
   quality: dd0720409884d882f2b8dd3992a18ea0fec68f25ec2ab0f3bf04363974397f0e
   slo: 110f6fdde89e880aa9244a252007d5c7196a1e384ffe3b8f45229863bbb489d5
-  model: b8c84d4edd14e64b4dcd47a6d55ded8acf3cdbd296760ff1461ae21067ff7622
+  model: a47d5d4ce9c8e2bb7b4589643d99c1cdbc58ce81f4a091ca115f0ebba1cc359f
   hardware: a2c5a27db63ba7cd435546ee7a2c49b07552a9a161619a75a8653d8a773c5290
-  runtime: 84eb0e2851a9ac805ed3a2668565553943397a95ff814c48dadea4bf01f70cea
+  runtime: 013feab7735bd3af4496ef6d45f401d09dbdecdf005ba1034ff503ed0191f9aa
   runtime_configuration: 
-    e89a6f118d76dcdbec6e59bae33a76abac55fb52a2b8a62625ed0d78731db80a
+    d96bb2b0c22acca61d90cf2585370c27f3f3ab1b20f0b21718795aa8ad8f35ab

@@ -50,7 +50,7 @@ parallelism:
 communication:
   distributed: false
 memory:
-  context_tokens: 512
+  context_tokens: 2048
   offload: false
 threads:
   generation: 4

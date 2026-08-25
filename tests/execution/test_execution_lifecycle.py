@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from atlas.execution.service import Bundle, ExecutionError, run_bundle
+from atlas.execution.service import Bundle, ExecutionError, prepare_bundle, run_bundle
 
 
 def _script(path: Path, body: str) -> None:
@@ -62,3 +62,29 @@ def test_entrypoint_receives_repository_and_cache_roots(tmp_path: Path) -> None:
     )
 
     run_bundle(tmp_path, bundle, "quick")
+
+
+def test_prepare_runs_optional_networked_provisioning_entrypoint(tmp_path: Path) -> None:
+    study_root = tmp_path / "studies" / "S001-test" / "v1"
+    bundle_root = study_root / "execution" / "fake"
+    bundle_root.mkdir(parents=True)
+    _script(
+        bundle_root / "prepare.sh",
+        'test "$ATLAS_CACHE_DIR" = "' + str(tmp_path / ".atlas" / "cache") + '"\n'
+        'touch "$ATLAS_WORK_DIR/prepared"\n',
+    )
+    bundle = Bundle(
+        study_root,
+        bundle_root,
+        {
+            "artifacts": [],
+            "entrypoints": {"prepare": "prepare.sh", "run": "run.sh"},
+            "timeouts": {"prepare_seconds": 10},
+        },
+    )
+
+    prepared = prepare_bundle(bundle, tmp_path / ".atlas" / "cache")
+
+    marker = tmp_path / ".atlas" / "work" / "S001-test" / "fake" / "prepare" / "prepared"
+    assert prepared == []
+    assert marker.is_file()

@@ -137,6 +137,21 @@ def prepare_bundle(bundle: Bundle, cache_root: Path) -> list[Path]:
             prepared.append(destination)
         finally:
             temporary.unlink(missing_ok=True)
+    prepare = bundle.data.get("entrypoints", {}).get("prepare")
+    if prepare:
+        repository_root = bundle.study_root.parents[2]
+        work_dir = (
+            repository_root
+            / ".atlas"
+            / "work"
+            / bundle.study_root.parent.name
+            / bundle.root.name
+            / "prepare"
+        )
+        work_dir.mkdir(parents=True, exist_ok=True)
+        code = _entrypoint(bundle, "prepare", work_dir, "quick")
+        if code:
+            raise ExecutionError(f"prepare failed with exit code {code}")
     return prepared
 
 
@@ -162,7 +177,10 @@ def _entrypoint(bundle: Bundle, name: str, work_dir: Path, profile: str) -> int:
         }
     )
     command = [str(script)] if os.access(script, os.X_OK) else ["bash", str(script)]
-    timeout_key = "cleanup_seconds" if name == "destroy" else "run_seconds"
+    timeout_key = {
+        "prepare": "prepare_seconds",
+        "destroy": "cleanup_seconds",
+    }.get(name, "run_seconds")
     timeout = int(bundle.data.get("timeouts", {}).get(timeout_key, 1800))
     try:
         result = subprocess.run(

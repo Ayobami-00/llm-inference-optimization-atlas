@@ -34,7 +34,7 @@ candidates:
   - atlas://configuration/CFG008@v1
   - atlas://configuration/CFG014@v1
 changed_factors:
-  - runtime_configuration memory context_tokens
+  - workload request shape input_tokens
 frozen_factors:
   - workload fixture and seed
   - model revision except when declared

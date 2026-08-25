@@ -1,0 +1,62 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/execution/execution-bundle.schema.json
+schema_version: 1
+kind: ExecutionBundle
+id: XB002
+version: 1
+slug: llama-cpp-cpu-server
+title: Qwen2.5 Coder llama.cpp CPU server execution
+description: Builds pinned llama.cpp source, serves a pinned GGUF model over loopback HTTP, and evaluates code in a locked-down Docker sandbox.
+status: active
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [software, investigator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: [atlas://source/SRC0102@v1, atlas://source/SRC0107@v1]
+provenance:
+  method: repository-authored execution bundle with immutable source and model artifacts
+  source_paths: [src/atlas/studies/runners/s002.py, src/atlas/studies/runners/s002_lifecycle.py]
+  generated: false
+extensions: {}
+platforms:
+  - {os: macos, architecture: aarch64}
+  - {os: linux, architecture: x86_64}
+backend: cpu
+requirements:
+  - {name: cmake, version: '>=3.20'}
+  - {name: C++ compiler, version: C++17 capable}
+  - {name: docker, version: '>=24'}
+  - {name: sandbox-image, version: 'python:3.12.11-alpine3.22@sha256:efcdfa6a6b2fd2afb9c7dfa9a5b288a6f68338b5cfdebe6b637d986067d85757'}
+artifacts:
+  - name: llama-cpp-source.tar.gz
+    url: https://github.com/ggml-org/llama.cpp/archive/aedb2a5e9ca3d4064148bbb919e0ddc0c1b70ab3.tar.gz
+    sha256: 762283319feb3de30886dc850d42f0e426b06600e7f9639d34e06506597309ca
+    size_bytes: 34860293
+    license: MIT
+  - name: qwen-coder-q4-k-m.gguf
+    url: https://huggingface.co/Qwen/Qwen2.5-Coder-0.5B-Instruct-GGUF/resolve/e8d6e4a27d8c9c2b27e4316a7bd5cdca65d2aa24/qwen2.5-coder-0.5b-instruct-q4_k_m.gguf
+    sha256: 1d9614638d18024d0fbb36575a15f1302a3adf044df10345688ec4f6e1c4ff32
+    size_bytes: 491400064
+    license: Apache-2.0
+entrypoints:
+  prepare: ./prepare.sh
+  start: ./start.sh
+  run: ./run.sh
+  destroy: ./destroy.sh
+inputs:
+  tasks: ../../inputs/tasks.jsonl
+  configurations: ../../configurations
+outputs:
+  draft_directory: .atlas/work/S002-cpu-coding-agent/llama-cpp-cpu-server
+  required_files: [run.yaml, environment.json, artifacts.yaml, metrics/summary.json]
+profiles:
+  quick: {replicates: 1, max_requests: 3, purpose: model-server and sandbox smoke test}
+  full: {replicates: 3, max_requests: 6, purpose: accepted exact-setup evidence}
+resources:
+  minimum_memory_bytes: 2147483648
+  network_during_run: loopback-only plus Docker network disabled
+  generated_code_sandbox: ephemeral non-root container
+timeouts: {prepare_seconds: 3600, run_seconds: 10800, cleanup_seconds: 60}
+cleanup: {required: true, idempotent: true}
+limitations:
+  - Source compilation products are platform-specific and retained only in the ignored shared cache.
+  - Unit tests establish correctness only for the six compact repository-owned tasks.

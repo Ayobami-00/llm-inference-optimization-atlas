@@ -58,4 +58,3 @@ def test_writer_emits_promotable_evidence_shape(tmp_path: Path) -> None:
     report = validate_evidence(ROOT, output)
 
     assert report.ok, report.errors
-

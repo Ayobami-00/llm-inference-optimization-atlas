@@ -13,6 +13,7 @@ Each bundle contains:
 execution/<bundle>/
 ├── execution.yaml
 ├── README.md
+├── prepare.sh     # when compilation or image preparation is needed
 ├── run.sh
 ├── start.sh       # when a service/resource must be started
 ├── destroy.sh     # paired with start.sh
@@ -20,14 +21,17 @@ execution/<bundle>/
 └── config/
 ```
 
-`run.sh` is mandatory. `start.sh` and `destroy.sh` are mandatory when lifecycle management is needed.
-The internal layout is intentionally unconstrained. Wrappers use Bash 3.2-compatible syntax and resolve
-paths relative to themselves, not the caller's working directory.
+`run.sh` is mandatory. `prepare.sh` is optional and owns networked or expensive provisioning that must
+happen before an offline run. `start.sh` and `destroy.sh` are mandatory when lifecycle management is
+needed. The internal layout is intentionally unconstrained. Wrappers use Bash 3.2-compatible syntax and
+resolve paths relative to themselves, not the caller's working directory.
 
 ## Preparation
 
 `atlas execution prepare` resolves declared artifacts, shows identity, license, and size, then downloads
-only after consent into the shared `.atlas/cache`. It verifies checksums and records resolved paths.
+only after consent into the shared `.atlas/cache`. It verifies checksums and then invokes an optional,
+idempotent `prepare.sh` for pinned source compilation or container-image preparation. `start.sh` and
+`run.sh` must not silently provision missing dependencies; they fail with a preparation instruction.
 Validation never downloads artifacts. Model weights, package caches, container layers, and generated
 builds are never committed.
 
