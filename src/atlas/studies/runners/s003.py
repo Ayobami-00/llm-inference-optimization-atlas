@@ -72,6 +72,8 @@ def _worker_command(
     embedding_model: Path,
     generation_model: Path,
     request_limit: int,
+    intra_op_threads: int,
+    inter_op_threads: int,
 ) -> list[str]:
     return [
         "--condition",
@@ -86,6 +88,10 @@ def _worker_command(
         str(generation_model),
         "--request-limit",
         str(request_limit),
+        "--intra-op-threads",
+        str(intra_op_threads),
+        "--inter-op-threads",
+        str(inter_op_threads),
     ]
 
 
@@ -99,6 +105,8 @@ def _invoke_worker(
     embedding_model: Path,
     generation_model: Path,
     request_limit: int,
+    intra_op_threads: int,
+    inter_op_threads: int,
 ) -> tuple[dict[str, Any], float, str | None]:
     arguments = _worker_command(
         condition_path=condition_path,
@@ -107,6 +115,8 @@ def _invoke_worker(
         embedding_model=embedding_model,
         generation_model=generation_model,
         request_limit=request_limit,
+        intra_op_threads=intra_op_threads,
+        inter_op_threads=inter_op_threads,
     )
     started = time.perf_counter()
     image_id = None
@@ -128,7 +138,7 @@ def _invoke_worker(
             "--tmpfs",
             "/tmp:rw,nosuid,size=64m",
             "--cpus",
-            "4",
+            str(intra_op_threads),
             "--memory",
             "3g",
             "--pids-limit",
@@ -183,6 +193,15 @@ def _execute_run(
 ) -> Path:
     config = _configuration(study_root, configuration)
     condition = dict(config["extensions"]["atlas.condition"])
+    runtime_configuration_id = str(config["runtime_configuration"]).split("/")[-1].split("@")[0]
+    runtime_configuration = load_data(
+        study_root / "configurations" / f"{runtime_configuration_id}.yaml"
+    )
+    if not isinstance(runtime_configuration, dict):
+        raise RuntimeError(f"Invalid runtime configuration {runtime_configuration_id}")
+    threads = runtime_configuration["threads"]
+    intra_op_threads = int(threads["intra_op"])
+    inter_op_threads = int(threads["inter_op"])
     run_work = work_dir / run_id(experiment, configuration, replicate)
     run_work.mkdir(parents=True)
     condition_path = run_work / "condition.json"
@@ -197,6 +216,8 @@ def _execute_run(
         embedding_model=embedding_model,
         generation_model=generation_model,
         request_limit=request_limit,
+        intra_op_threads=intra_op_threads,
+        inter_op_threads=inter_op_threads,
     )
     rows = payload["rows"]
     startup_overhead = max(0.0, total_ms - payload["elapsed_seconds"] * 1000)
@@ -290,6 +311,16 @@ def _execute_run(
             {
                 "name": "embedding_representation",
                 "value": condition["representation"],
+                "redacted": False,
+            },
+            {
+                "name": "intra_op_threads",
+                "value": str(intra_op_threads),
+                "redacted": False,
+            },
+            {
+                "name": "inter_op_threads",
+                "value": str(inter_op_threads),
                 "redacted": False,
             },
         ],

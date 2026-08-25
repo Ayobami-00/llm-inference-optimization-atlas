@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-import onnxruntime as ort
+import onnxruntime as ort  # type: ignore[import-untyped]
 import psutil
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -35,7 +35,8 @@ def _embed(session: ort.InferenceSession, tokenizer: Any, texts: list[str]) -> n
     token_embeddings = session.run(None, inputs)[0]
     mask = encoded["attention_mask"][:, :, None].astype(np.float32)
     pooled = (token_embeddings * mask).sum(axis=1) / np.clip(mask.sum(axis=1), 1e-9, None)
-    return pooled / np.clip(np.linalg.norm(pooled, axis=1, keepdims=True), 1e-9, None)
+    normalized = pooled / np.clip(np.linalg.norm(pooled, axis=1, keepdims=True), 1e-9, None)
+    return np.asarray(normalized, dtype=np.float32)
 
 
 def _generate(tokenizer: Any, model: Any, prompt: str) -> dict[str, Any]:
@@ -78,26 +79,30 @@ def _generate(tokenizer: Any, model: Any, prompt: str) -> dict[str, Any]:
 
 def execute(args: argparse.Namespace) -> dict[str, Any]:
     process_started = time.perf_counter()
+    torch.set_num_threads(args.intra_op_threads)
+    torch.set_num_interop_threads(args.inter_op_threads)
     condition = json.loads(args.condition.read_text())
     documents = _jsonl(args.documents)
     questions = _jsonl(args.questions)[: args.request_limit]
-    embedding_tokenizer = AutoTokenizer.from_pretrained(args.embedding_model, local_files_only=True)
+    embedding_tokenizer = AutoTokenizer.from_pretrained(  # type: ignore[no-untyped-call]
+        args.embedding_model, local_files_only=True
+    )
     model_name = "model-int8.onnx" if condition["representation"] == "int8" else "model.onnx"
     options = ort.SessionOptions()
-    options.intra_op_num_threads = 4
-    options.inter_op_num_threads = 1
+    options.intra_op_num_threads = args.intra_op_threads
+    options.inter_op_num_threads = args.inter_op_threads
     embedding_session = ort.InferenceSession(
         str(args.embedding_model / model_name),
         sess_options=options,
         providers=["CPUExecutionProvider"],
     )
-    generation_tokenizer = AutoTokenizer.from_pretrained(
+    generation_tokenizer = AutoTokenizer.from_pretrained(  # type: ignore[no-untyped-call]
         args.generation_model, local_files_only=True
     )
     generation_model = AutoModelForCausalLM.from_pretrained(
         args.generation_model, local_files_only=True
     )
-    generation_model.eval()
+    generation_model.eval()  # type: ignore[no-untyped-call]
     document_text = [f"{item['title']}. {item['text']}" for item in documents]
     document_embeddings = None
     if condition["embeddings"] == "precomputed":
@@ -180,6 +185,8 @@ def main() -> None:
     parser.add_argument("--embedding-model", type=Path, required=True)
     parser.add_argument("--generation-model", type=Path, required=True)
     parser.add_argument("--request-limit", type=int, required=True)
+    parser.add_argument("--intra-op-threads", type=int, required=True)
+    parser.add_argument("--inter-op-threads", type=int, required=True)
     args = parser.parse_args()
     print(json.dumps(execute(args), sort_keys=True))
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 from atlas.studies.runners.common import distribution, summarize_requests
 from atlas.studies.runners.s001 import run_id
 from atlas.studies.runners.s002 import run_id as s002_run_id
+from atlas.studies.runners.s003 import _worker_command
 from atlas.studies.runners.s003 import run_id as s003_run_id
 
 
@@ -19,6 +20,21 @@ def test_s002_run_ids_are_stable_and_unique_across_experiments() -> None:
 def test_s003_run_ids_are_stable_and_unique_across_experiments() -> None:
     assert s003_run_id("E0009", "CFG015", 1) == "R3111"
     assert s003_run_id("E0012", "CFG020", 3) == "R3463"
+
+
+def test_s003_worker_command_materializes_thread_contract(tmp_path) -> None:
+    command = _worker_command(
+        condition_path=tmp_path / "condition.json",
+        documents=tmp_path / "documents.jsonl",
+        questions=tmp_path / "questions.jsonl",
+        embedding_model=tmp_path / "embedding",
+        generation_model=tmp_path / "generation",
+        request_limit=12,
+        intra_op_threads=4,
+        inter_op_threads=1,
+    )
+
+    assert command[-4:] == ["--intra-op-threads", "4", "--inter-op-threads", "1"]
 
 
 def test_distribution_reports_required_percentiles() -> None:
