@@ -66,6 +66,10 @@ python_version = "3.12"
 strict = true
 packages = ["atlas"]
 
+[[tool.mypy.overrides]]
+module = ["pyarrow", "pyarrow.*"]
+ignore_missing_imports = true
+
 [tool.coverage.run]
 source = ["atlas"]
 branch = true
