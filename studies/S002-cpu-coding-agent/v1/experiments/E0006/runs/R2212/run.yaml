@@ -1,0 +1,79 @@
+%YAML 1.2
+---
+$schema: https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/run-record.schema.json
+schema_version: 1
+kind: RunRecord
+id: R2212
+version: 1
+slug: run-r2212
+title: Run R2212
+description: Replicate 2 for atlas://experiment/E0006@v1.
+status: complete
+authors:
+  - name: Atlas study runner
+    roles:
+      - software
+    conflicts: []
+created_at: '2026-08-25T15:55:33Z'
+updated_at: '2026-08-25T15:55:41Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: reproducible-execution-bundle
+  source_paths:
+    - execution.yaml
+  generated: true
+  parent_artifacts:
+    - atlas://experiment/E0006@v1
+    - atlas://configuration/CFG008@v1
+extensions: {}
+experiment: atlas://experiment/E0006@v1
+configuration: atlas://configuration/CFG008@v1
+replicate: 2
+seed: 202
+started_at: '2026-08-25T15:55:33Z'
+ended_at: '2026-08-25T15:55:41Z'
+outcome: complete
+hardware_snapshot: atlas://hardware/HW001@v1
+runtime_snapshot: atlas://runtime/RT002@v1
+input_fingerprints:
+  tasks.jsonl: e1b2c3465af6dec750fd68904ed959ff30a6d424ef9cec0c2ac269795f8f41d9
+command:
+  - atlas
+  - execution
+  - run
+  - S002-cpu-coding-agent
+  - llama-cpp-cpu-server
+environment:
+  - name: LLAMA_ARG_THREADS
+    value: '4'
+    redacted: false
+  - name: LLAMA_ARG_N_PARALLEL
+    value: '1'
+    redacted: false
+windows:
+  warmup:
+    excluded: true
+    requests: 0
+  measurement:
+    requests: 6
+    start: '2026-08-25T15:55:33Z'
+    end: '2026-08-25T15:55:41Z'
+artifacts:
+  - metrics/requests.parquet
+  - metrics/samples.parquet
+  - metrics/summary.json
+  - quality/results.json
+  - outputs/responses.jsonl
+checksums:
+  llama-cpp-source.tar.gz: 762283319feb3de30886dc850d42f0e426b06600e7f9639d34e06506597309ca
+  qwen-coder-q4-k-m.gguf: 1d9614638d18024d0fbb36575a15f1302a3adf044df10345688ec4f6e1c4ff32
+  llama-server: 4ff04e40ee43cf46ec9792bc01c471b04e53c98c2cc72dd3c378685603222d16
+quality:
+  gate: Q1
+  passed: true
+  results_path: quality/results.json
+validation:
+  passed: true
+  validated_at: '2026-08-25T15:55:41Z'
+  errors: []

@@ -1,0 +1,50 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/decision.schema.json
+schema_version: 1
+kind: DeploymentDecision
+id: DEC0002
+version: 1
+slug: select-warm-four-thread-single-slot-coding-server
+title: Select warm four-thread single-slot execution for the coding fixture
+description: Exact-setup llama.cpp deployment decision grounded in accepted S002 evidence.
+status: accepted
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [decision], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: Pareto judgment over accepted S002 findings and quality/SLO-eligible comparisons
+  source_paths: [studies/S002-cpu-coding-agent/v1/findings/F0007.yaml, studies/S002-cpu-coding-agent/v1/findings/F0008.yaml, studies/S002-cpu-coding-agent/v1/findings/F0009.yaml, studies/S002-cpu-coding-agent/v1/findings/F0010.yaml, studies/S002-cpu-coding-agent/v1/findings/F0011.yaml, studies/S002-cpu-coding-agent/v1/findings/F0012.yaml]
+  generated: false
+extensions: {}
+study: atlas://study/S002@v1
+outcome: recommended
+selected_configuration: atlas://configuration/CFG008@v1
+pareto_rationale: CFG008 combines the 51.3% TTFT benefit of warm prefix reuse with the measured four-thread TPOT optimum and avoids an unproven second slot. Its 512-token request shape costs 24.9% TTFT relative to 256 tokens but supports the representative middle context without the 108.5% TTFT increase measured at 1024 tokens.
+operating_envelope:
+  workload: closed-loop repeated-prefix coding tasks using WS002
+  hardware: Apple M3 CPU topology HW001
+  runtime: pinned llama.cpp RT002
+  model: Qwen2.5-Coder-0.5B-Instruct Q4_K_M M002
+  prefix_cache: enabled
+  inference_threads: 4
+  server_slots: 1
+  request_shape_target_tokens: 512
+  quality_gate: Q1 sandboxed unit tests
+  slo_profile: atlas://slo/SLO002@v1
+supporting_findings: [atlas://finding/F0007@v1, atlas://finding/F0008@v1, atlas://finding/F0009@v1, atlas://finding/F0010@v1, atlas://finding/F0011@v1, atlas://finding/F0012@v1]
+rejected_alternatives:
+  - {configuration: atlas://configuration/CFG009@v1, reason: Disabling warm prefix reuse increased TTFT by 51.3% relative to CFG008.}
+  - {configuration: atlas://configuration/CFG010@v1, reason: One thread increased TPOT by 122.9%.}
+  - {configuration: atlas://configuration/CFG011@v1, reason: Eight threads increased TPOT by 135.1%.}
+  - {configuration: atlas://configuration/CFG012@v1, reason: Two slots had no significant SLO-goodput benefit for this CPU envelope.}
+  - {configuration: atlas://configuration/CFG013@v1, reason: The 256-token target is faster but does not represent the selected middle coding context.}
+  - {configuration: atlas://configuration/CFG014@v1, reason: The 1024-token target more than doubled TTFT and should be used only when required.}
+caveats:
+  - The recommendation is limited to the exact model, llama.cpp build, Apple M3 topology, compact tasks, and closed-loop request pattern tested.
+  - Unit-test quality on six functions does not establish broad code-generation correctness or security.
+  - Server context capacity remains fixed at 2048; the experiment changes request shape rather than server allocation.
+revisit_conditions:
+  - Real project contexts regularly exceed the 512-token target or need multiple concurrent agent sessions.
+  - Affinity tuning, continuous batching, or a newer llama.cpp kernel changes the four-thread optimum.
+  - Replication on a different CPU, model quantization, or coding workload changes the prefix-reuse effect.

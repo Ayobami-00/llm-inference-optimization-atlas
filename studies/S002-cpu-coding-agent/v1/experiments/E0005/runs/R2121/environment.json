@@ -1,0 +1,7 @@
+{
+  "executable": "uv-managed Python",
+  "machine": "arm64",
+  "platform": "macOS-14.2-arm64-arm-64bit",
+  "private_identifiers_included": false,
+  "python": "3.12.9"
+}

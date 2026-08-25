@@ -1,0 +1,52 @@
+{
+  "details": [
+    {
+      "diagnostic": "",
+      "exit_code": 0,
+      "request_id": "CODE002",
+      "sandbox_completed": true,
+      "tests_passed": true
+    },
+    {
+      "diagnostic": "",
+      "exit_code": 0,
+      "request_id": "CODE003",
+      "sandbox_completed": true,
+      "tests_passed": true
+    },
+    {
+      "diagnostic": "",
+      "exit_code": 0,
+      "request_id": "CODE001",
+      "sandbox_completed": true,
+      "tests_passed": true
+    },
+    {
+      "diagnostic": "",
+      "exit_code": 0,
+      "request_id": "CODE005",
+      "sandbox_completed": true,
+      "tests_passed": true
+    },
+    {
+      "diagnostic": "",
+      "exit_code": 0,
+      "request_id": "CODE006",
+      "sandbox_completed": true,
+      "tests_passed": true
+    },
+    {
+      "diagnostic": "Traceback (most recent call last):\n  File \"/workspace/test_solution.py\", line 8, in <module>\n    assert is_palindrome('Never odd or even')\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/test_solution.py\", line 3, in is_palindrome\n    cleaned_text = re.sub(r'[^a-zA-Z0-9]', '', text).lower()\n                   ^^\nNameError: name 're' is not defined. Did you forget to import 're'?\n",
+      "exit_code": 1,
+      "request_id": "CODE004",
+      "sandbox_completed": true,
+      "tests_passed": false
+    }
+  ],
+  "dimensions": {
+    "sandbox_completion": 1.0,
+    "unit_test_pass_rate": 0.8333333333333334
+  },
+  "gate": "Q1",
+  "passed": true
+}
