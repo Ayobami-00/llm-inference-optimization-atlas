@@ -1,0 +1,96 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/contributions/proposal.schema.json
+schema_version: 1
+kind: Proposal
+id: P0004
+version: 1
+slug: cpu-enterprise-rag-representation-and-container-overhead
+title: CPU enterprise RAG representation and container overhead
+description: >-
+  Study a repository-owned enterprise RAG pipeline using MiniLM embeddings and
+  SmolLM2 generation across ONNX FP32/INT8, retrieval top_k, embedding
+  precomputation, and host/container execution.
+status: proposed
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles: [proposer]
+    conflicts: []
+created_at: '2026-08-25T14:01:11Z'
+updated_at: '2026-08-25T14:01:12Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: github-issue-form
+  source_paths:
+    - https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/4
+  generated: true
+extensions:
+  github.issue-url: https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/4
+proposal_type: study
+summary: >-
+  Study a repository-owned enterprise RAG pipeline using MiniLM embeddings and
+  SmolLM2 generation across ONNX FP32/INT8, retrieval top_k, embedding
+  precomputation, and host/container execution.
+motivation: >-
+  Measure the quality/performance boundary of a realistic small-data RAG
+  pipeline on modern consumer CPUs while separating retrieval, embedding,
+  generation, and container overhead.
+scope:
+  study_id: S003
+  slug: cpu-enterprise-rag
+  archetype: atlas://workload/W003@v1
+  traffic_regimes:
+    - atlas://traffic/T001@v1
+    - atlas://traffic/T002@v1
+  models:
+    - atlas://model/M001@v1
+    - atlas://model/M003@v1
+    - atlas://model/M004@v1
+    - atlas://model/M005@v1
+  hardware: [atlas://hardware/HW001@v1]
+  runtimes:
+    - atlas://runtime/RT001@v1
+    - atlas://runtime/RT003@v1
+  research_questions:
+    - What latency, memory, and retrieval-quality tradeoff does INT8 embedding introduce?
+    - How do top_k values 1, 3, and 5 affect grounding, answer quality, and latency?
+    - When do precomputed embeddings outperform online embedding?
+    - What overhead does the pinned Docker pipeline add relative to native host execution?
+  included:
+    - Approximately 24 repository-owned enterprise-style documents
+    - Twelve grounded questions with expected citations
+    - Retrieval recall, answer correctness, grounding, citation, and format evaluation
+    - Multi-architecture Docker CPU pipeline
+    - Quick and three-replicate full profiles
+  excluded:
+    - Private enterprise data
+    - External vector databases or network services
+    - GPU execution
+    - Broad enterprise-domain transfer claims
+artifacts:
+  - study
+  - workload
+  - quality_contract
+  - slo_profile
+  - configurations
+  - hypotheses
+  - experiments
+  - runs
+  - comparisons
+  - findings
+  - decision
+  - execution_bundle
+resources:
+  compute: Local Apple M3 CPU and Docker Desktop; approximately 6-12 hours for the full profile
+  downloads: SmolLM2, MiniLM representations, and container dependencies; approximately 1 GB
+  storage: Approximately 4 GB including image layers, cache, and draft evidence
+risks:
+  - Container and native environments may differ beyond the intended isolation axis.
+  - INT8 representation changes require Q1 quality gating.
+  - The tiny corpus limits transferability to large enterprise collections.
+  - Docker availability and host resource pressure may invalidate runs.
+approval:
+  state: approved
+  issue_url: https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/4
+  approved_by: Ayobami-00
+  approved_at: '2026-08-25T14:01:12Z'

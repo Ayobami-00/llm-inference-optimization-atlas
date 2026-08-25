@@ -1,0 +1,84 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/contributions/proposal.schema.json
+schema_version: 1
+kind: Proposal
+id: P0003
+version: 1
+slug: cpu-coding-agent-prefix-reuse-with-llama-cpp
+title: CPU coding-agent prefix reuse with llama.cpp
+description: >-
+  Study Qwen2.5-Coder-0.5B-Instruct Q4_K_M through pinned llama.cpp CPU HTTP
+  serving across prefix reuse, thread budgets, server slots, and context growth.
+status: proposed
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles: [proposer]
+    conflicts: []
+created_at: '2026-08-25T14:00:07Z'
+updated_at: '2026-08-25T14:00:09Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: github-issue-form
+  source_paths:
+    - https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/3
+  generated: true
+extensions:
+  github.issue-url: https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/3
+proposal_type: study
+summary: >-
+  Study Qwen2.5-Coder-0.5B-Instruct Q4_K_M through pinned llama.cpp CPU HTTP
+  serving across prefix reuse, thread budgets, server slots, and context growth.
+motivation: >-
+  Quantify when prefix reuse and concurrency help a closed-loop coding workload
+  while retaining unit-test correctness and strict sandboxing.
+scope:
+  study_id: S002
+  slug: cpu-coding-agent
+  archetype: atlas://workload/W002@v1
+  traffic_regimes: [atlas://traffic/T006@v1]
+  models: [atlas://model/M002@v1]
+  hardware: [atlas://hardware/HW001@v1]
+  runtimes: [atlas://runtime/RT002@v1]
+  research_questions:
+    - What latency benefit does warm prefix reuse provide over cold evaluation?
+    - How do CPU thread budgets 1, 4, and 8 affect token latency and task completion?
+    - When does a second server slot improve goodput without harmful queueing?
+    - How does controlled 256, 512, and 1024-token context growth change performance?
+  included:
+    - Six repository-owned code tasks
+    - Repeated prefixes and incremental context
+    - Unit-test-based Q1 evaluation
+    - Ephemeral no-network non-root Docker execution sandbox
+    - Quick and three-replicate full profiles
+  excluded:
+    - Network access from generated code
+    - GPU or Metal offload
+    - Claims about large production codebases
+artifacts:
+  - study
+  - workload
+  - quality_contract
+  - slo_profile
+  - configurations
+  - hypotheses
+  - experiments
+  - runs
+  - comparisons
+  - findings
+  - decision
+  - execution_bundle
+resources:
+  compute: Local Apple M3 CPU; approximately 5-10 hours for the full profile
+  downloads: Qwen GGUF plus llama.cpp binaries; approximately 525 MB
+  storage: Less than 3 GB including cache, sandbox images, and draft evidence
+risks:
+  - Generated code is untrusted and requires resource-limited sandbox execution.
+  - Prefix-cache behavior may change across runtime revisions.
+  - Long contexts may exceed practical laptop run time.
+  - Findings are exact-setup evidence until replicated.
+approval:
+  state: approved
+  issue_url: https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/3
+  approved_by: Ayobami-00
+  approved_at: '2026-08-25T14:00:09Z'

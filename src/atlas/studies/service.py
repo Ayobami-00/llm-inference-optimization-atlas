@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import shutil
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -27,7 +28,7 @@ def _slug(value: str) -> str:
 
 def _next_identifier(root: Path, prefix: str, width: int) -> str:
     pattern = re.compile(rf"^{re.escape(prefix)}(?P<number>\d{{{width}}})$")
-    maximum = -1
+    maximum = 0
     for path in discover_data_files(root, root):
         try:
             data = load_data(path)
@@ -39,6 +40,41 @@ def _next_identifier(root: Path, prefix: str, width: int) -> str:
         if isinstance(identifier, str) and (match := pattern.fullmatch(identifier)):
             maximum = max(maximum, int(match.group("number")))
     return f"{prefix}{maximum + 1:0{width}d}"
+
+
+def _study_identifier(root: Path, proposal: dict[str, Any]) -> str:
+    scope = proposal.get("scope", {})
+    requested = scope.get("study_id") if isinstance(scope, dict) else None
+    if requested is None:
+        return _next_identifier(root, "S", 3)
+    identifier = str(requested)
+    if not re.fullmatch(r"S[0-9]{3}", identifier):
+        raise StudyError("Study proposal scope.study_id must match S###")
+    try:
+        _find_artifact(root, identifier)
+    except StudyError:
+        return identifier
+    raise StudyError(f"Canonical artifact ID already exists: {identifier}")
+
+
+def _study_authors(proposal: dict[str, Any]) -> tuple[list[dict[str, Any]], list[str]]:
+    authors: list[dict[str, Any]] = []
+    maintainers: list[str] = []
+    for value in proposal.get("authors", []):
+        if not isinstance(value, dict) or not value.get("name"):
+            continue
+        author = {
+            key: value[key]
+            for key in ("name", "github", "orcid", "affiliation", "conflicts")
+            if key in value
+        }
+        author["roles"] = ["investigator"]
+        author.setdefault("conflicts", [])
+        authors.append(author)
+        maintainers.append(str(value.get("github") or value["name"]))
+    if not authors:
+        raise StudyError("The approved proposal must identify at least one author")
+    return authors, maintainers
 
 
 def _find_artifact(root: Path, identifier: str) -> tuple[Path, dict[str, Any]]:
@@ -63,15 +99,17 @@ def _proposal(root: Path, proposal_or_id: str) -> tuple[Path, dict[str, Any]]:
 
 
 def new_study(root: Path, proposal_or_id: str) -> Path:
-    _, proposal = _proposal(root, proposal_or_id)
+    proposal_path, proposal = _proposal(root, proposal_or_id)
     if proposal.get("kind") != "Proposal" or proposal.get("proposal_type") != "study":
         raise StudyError("Study scaffolding requires a study proposal")
     approval = proposal.get("approval", {})
     if approval.get("state") != "approved" or not approval.get("issue_url"):
         raise StudyError("The study proposal must have an approved state and GitHub issue URL")
 
-    identifier = _next_identifier(root, "S", 3)
-    slug = _slug(str(proposal.get("slug", proposal.get("title", "study"))))
+    identifier = _study_identifier(root, proposal)
+    scope = proposal.get("scope", {})
+    requested_slug = scope.get("slug") if isinstance(scope, dict) else None
+    slug = _slug(str(requested_slug or proposal.get("slug", proposal.get("title", "study"))))
     study_root = root / "studies" / f"{identifier}-{slug}" / "v1"
     if study_root.exists():
         raise StudyError(f"Refusing to overwrite existing study: {study_root}")
@@ -89,6 +127,9 @@ def new_study(root: Path, proposal_or_id: str) -> Path:
     if not isinstance(template, dict):
         raise StudyError("Invalid study template")
     now = _timestamp()
+    authors, maintainers = _study_authors(proposal)
+    number = identifier.removeprefix("S")
+    proposal_reference = f"atlas://proposal/{proposal['id']}@v{proposal.get('version', 1)}"
     template.update(
         {
             "id": identifier,
@@ -97,14 +138,34 @@ def new_study(root: Path, proposal_or_id: str) -> Path:
             "description": str(proposal.get("summary", proposal.get("description", ""))),
             "created_at": now,
             "updated_at": now,
+            "authors": authors,
+            "product_brief": str(
+                scope.get("product_brief", proposal.get("summary", proposal.get("description", "")))
+            ),
             "proposal": {
-                "id": f"atlas://proposal/{proposal['id']}@v{proposal.get('version', 1)}",
+                "id": proposal_reference,
                 "issue_url": approval["issue_url"],
                 "approval": "approved",
             },
+            "contracts": {
+                "workload": f"atlas://workload-spec/WS{number}@v1",
+                "quality": f"atlas://quality-contract/QC{number}@v1",
+                "slo": f"atlas://slo/SLO{number}@v1",
+            },
+            "candidate_space": {
+                "models": scope.get("models", []),
+                "hardware": scope.get("hardware", []),
+                "runtimes": scope.get("runtimes", []),
+            },
+            "maintainers": maintainers,
+            "provenance": {
+                "method": "approved-proposal-scaffold",
+                "source_paths": [approval["issue_url"]],
+                "generated": True,
+                "parent_artifacts": [proposal_reference],
+            },
         }
     )
-    scope = proposal.get("scope", {})
     if isinstance(scope, dict):
         if isinstance(scope.get("archetype"), str):
             template["archetype"] = scope["archetype"]
@@ -117,6 +178,10 @@ def new_study(root: Path, proposal_or_id: str) -> Path:
     with (study_root / "study.yaml").open("w") as stream:
         yaml_writer().dump(template, stream)
 
+    proposal_output = study_root / "proposal.yaml"
+    if proposal_path.resolve() != proposal_output.resolve():
+        shutil.copyfile(proposal_path, proposal_output)
+
     contribution = {
         "$schema": (
             "https://ayobami-00.github.io/llm-inference-optimization-atlas/"
@@ -126,7 +191,7 @@ def new_study(root: Path, proposal_or_id: str) -> Path:
         "issue_url": approval["issue_url"],
         "approval_label": "proposal:approved",
         "contribution_type": "study",
-        "artifacts": ["study.yaml"],
+        "artifacts": ["proposal.yaml", "study.yaml"],
         "closes_issue": True,
     }
     with (study_root / "contribution.yaml").open("w") as stream:

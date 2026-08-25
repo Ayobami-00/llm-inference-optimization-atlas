@@ -1,0 +1,89 @@
+%YAML 1.2
+---
+$schema: 
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/study.schema.json
+schema_version: 1
+kind: Study
+id: S003
+version: 1
+slug: cpu-enterprise-rag
+title: CPU enterprise RAG representation and container overhead
+description: Study a repository-owned enterprise RAG pipeline using MiniLM 
+  embeddings and SmolLM2 generation across ONNX FP32/INT8, retrieval top_k, 
+  embedding precomputation, and host/container execution.
+status: active
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T14:05:37Z'
+updated_at: '2026-08-25T14:05:37Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: approved-proposal-scaffold
+  source_paths:
+    - https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/4
+  generated: true
+  parent_artifacts: [atlas://proposal/P0004@v1]
+extensions: {}
+archetype: atlas://workload/W003@v1
+proposal:
+  id: atlas://proposal/P0004@v1
+  issue_url: 
+    https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/4
+  approval: approved
+product_brief: >-
+  A compact enterprise knowledge assistant retrieves repository-owned policy,
+  operations, security, and support documents, then generates answers with
+  explicit document citations. The pipeline must run on laptop CPUs, preserve
+  grounding quality, and separate embedding, retrieval, generation, and
+  container overhead.
+research_questions:
+  - What latency, memory, and retrieval-quality tradeoff does INT8 embedding 
+    introduce?
+  - How do top_k values 1, 3, and 5 affect grounding, answer quality, and 
+    latency?
+  - When do precomputed embeddings outperform online embedding?
+  - What overhead does the pinned Docker pipeline add relative to native host 
+    execution?
+boundaries:
+  included:
+    - Approximately 24 repository-owned enterprise-style documents
+    - Twelve grounded questions with expected citations
+    - Retrieval recall, answer correctness, grounding, citation, and format 
+      evaluation
+    - Multi-architecture Docker CPU pipeline
+    - Quick and three-replicate full profiles
+  excluded:
+    - Private enterprise data
+    - External vector databases or network services
+    - GPU execution
+    - Broad enterprise-domain transfer claims
+contracts:
+  workload: atlas://workload-spec/WS003@v1
+  quality: atlas://quality-contract/QC003@v1
+  slo: atlas://slo/SLO003@v1
+candidate_space:
+  models:
+    - atlas://model/M001@v1
+    - atlas://model/M003@v1
+    - atlas://model/M004@v1
+    - atlas://model/M005@v1
+  hardware:
+    - atlas://hardware/HW001@v1
+  runtimes:
+    - atlas://runtime/RT001@v1
+    - atlas://runtime/RT003@v1
+maintainers:
+  - Ayobami-00
+lifecycle:
+  phase: PHASE-1
+  phase_status: running
+completion_criteria:
+  - All preregistered experiments have three valid full-profile replicates.
+  - Every finding is supported by eligible comparisons and has an explicit 
+    scope.
+  - A deployment decision or no-recommendation artifact is reviewed.
