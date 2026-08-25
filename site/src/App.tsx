@@ -22,7 +22,7 @@ function initialView(): GraphView["id"] {
   const value = new URLSearchParams(window.location.search).get("view");
   return viewOrder.includes(value as GraphView["id"])
     ? (value as GraphView["id"])
-    : "bottleneck";
+    : "story";
 }
 
 function setDeepLink(node: GraphNode | null, view: GraphView["id"]): void {

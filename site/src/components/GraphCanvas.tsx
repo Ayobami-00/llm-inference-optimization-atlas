@@ -97,7 +97,6 @@ export function GraphCanvas({
       elements,
       minZoom: 0.15,
       maxZoom: 2.5,
-      wheelSensitivity: 0.18,
       style: [
         {
           selector: "node",
@@ -109,7 +108,7 @@ export function GraphCanvas({
             label: "data(label)",
             "font-family": "IBM Plex Sans, ui-sans-serif, system-ui",
             "font-size": 10,
-            "font-weight": 550,
+            "font-weight": 500,
             "text-background-color": "#09110f",
             "text-background-opacity": 0.82,
             "text-background-padding": "3px",

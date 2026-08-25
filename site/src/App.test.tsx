@@ -75,9 +75,9 @@ describe("Atlas explorer", () => {
 
   it("switches graph views and opens entity evidence", async () => {
     render(<App />);
-    expect(await screen.findByRole("heading", { name: "Bottleneck" })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Story/ }));
-    expect(screen.getByRole("heading", { name: "Story" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Story" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Bottleneck/ }));
+    expect(screen.getByRole("heading", { name: "Bottleneck" })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Select graph node" }));
     await waitFor(() => expect(screen.getByRole("heading", { name: "Paged KV cache" })).toBeVisible());
@@ -86,7 +86,7 @@ describe("Atlas explorer", () => {
 
   it("offers keyboard-addressable search results", async () => {
     render(<App />);
-    await screen.findByRole("heading", { name: "Bottleneck" });
+    await screen.findByRole("heading", { name: "Story" });
     fireEvent.change(screen.getByRole("searchbox", { name: "Search evidence" }), {
       target: { value: "paged" },
     });
