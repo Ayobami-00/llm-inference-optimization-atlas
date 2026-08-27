@@ -1,5 +1,7 @@
 # LLM Inference Optimization Atlas
 
+![LLM Inference Optimization Atlas — Evidence before intuition](site/public/og.png)
+
 A schema-first, Git-native evidence base for deciding how to run LLM inference.
 
 The Atlas records reproducible experiments across realistic workloads, models,
