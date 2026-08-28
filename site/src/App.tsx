@@ -11,6 +11,7 @@ import {
 
 import { GraphCanvas } from "./components/GraphCanvas";
 import { loadAtlas, loadEntity } from "./data";
+import { relationLabel } from "./relations";
 import type { AtlasData, EntityDetail, GraphNode, GraphView } from "./types";
 
 const viewOrder: GraphView["id"][] = [
@@ -23,11 +24,6 @@ const viewOrder: GraphView["id"][] = [
 
 function titleCase(value: string): string {
   return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-function relationLabel(value: string): string {
-  if (value === "USES_CONFIGURATION") return "selects / uses";
-  return value.replaceAll("_", " ").toLowerCase();
 }
 
 const viewNarratives: Record<GraphView["id"], [string, string, string]> = {
@@ -74,6 +70,53 @@ function artifactCode(reference: string): string {
 }
 
 const repositoryUrl = "https://github.com/Ayobami-00/llm-inference-optimization-atlas";
+const tourStorageKey = "atlas:s003-tour:v1";
+const tourStudyPath = "studies/S003-cpu-enterprise-rag/v1/";
+
+interface TourStep {
+  code: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+}
+
+const tourSteps: TourStep[] = [
+  {
+    code: "WS003",
+    eyebrow: "Begin with the workload",
+    title: "Freeze what is being evaluated",
+    description:
+      "WS003 defines twelve grounded questions over a small enterprise corpus. Every result in this study inherits that exact scope.",
+  },
+  {
+    code: "E0009",
+    eyebrow: "Ask a falsifiable question",
+    title: "Turn an intuition into an experiment",
+    description:
+      "E0009 tests whether INT8 embeddings improve latency without crossing the study’s quality boundary.",
+  },
+  {
+    code: "CMP0013",
+    eyebrow: "Compare like with like",
+    title: "Measure the intervention",
+    description:
+      "CMP0013 holds the study context fixed and estimates the effect between compatible baseline and candidate runs.",
+  },
+  {
+    code: "F0013",
+    eyebrow: "Keep inconclusive evidence",
+    title: "Scope the finding honestly",
+    description:
+      "F0013 records that the compact experiment did not resolve an INT8 latency benefit. The Atlas keeps that result instead of hiding it.",
+  },
+  {
+    code: "DEC0003",
+    eyebrow: "Finish with a decision",
+    title: "Trace evidence into action",
+    description:
+      "DEC0003 selects an exact-setup configuration from the accepted findings. Reveal its path to see the rationale and rejected alternatives together.",
+  },
+];
 
 interface ReferenceContextValue {
   nodes: ReadonlyMap<string, GraphNode>;
@@ -140,33 +183,49 @@ function setDeepLink(node: GraphNode | null, view: GraphView["id"]): void {
   window.history.replaceState({}, "", url);
 }
 
-function revealNodeBesideDrawer(core: Core, nodeId: string): boolean {
+function revealNodeBesidePanel(
+  core: Core,
+  nodeId: string,
+  panelSelector: string,
+  visibilityKey: string,
+): boolean {
   const node = core.getElementById(nodeId);
   const container = core.container();
-  const drawer = document.querySelector<HTMLElement>(".entity-drawer");
-  if (!node.length || !container || !drawer) return false;
+  const panel = document.querySelector<HTMLElement>(panelSelector);
+  if (!node.length || !container || !panel) return false;
 
   const canvasRect = container.getBoundingClientRect();
-  const drawerRect = drawer.getBoundingClientRect();
+  const panelRect = panel.getBoundingClientRect();
   const overlapsCanvas =
-    drawerRect.left < canvasRect.right &&
-    drawerRect.right > canvasRect.left &&
-    drawerRect.top < canvasRect.bottom &&
-    drawerRect.bottom > canvasRect.top;
-  if (!overlapsCanvas) return false;
-
+    panelRect.left < canvasRect.right &&
+    panelRect.right > canvasRect.left &&
+    panelRect.top < canvasRect.bottom &&
+    panelRect.bottom > canvasRect.top;
   const margin = 48;
+  if (!overlapsCanvas) {
+    const position = node.renderedPosition();
+    const visible =
+      position.x >= margin &&
+      position.x <= canvasRect.width - margin &&
+      position.y >= margin &&
+      position.y <= canvasRect.height - margin;
+    container.dataset[visibilityKey] = String(visible);
+    return visible;
+  }
+
   let visibleLeft = margin;
   let visibleRight = canvasRect.width - margin;
   let visibleTop = margin;
   let visibleBottom = canvasRect.height - margin;
 
-  if (drawerRect.left > canvasRect.left + margin * 2) {
-    visibleRight = Math.min(visibleRight, drawerRect.left - canvasRect.left - margin);
-  } else if (drawerRect.top > canvasRect.top + margin * 2) {
-    visibleBottom = Math.min(visibleBottom, drawerRect.top - canvasRect.top - margin);
+  if (panelRect.right >= canvasRect.right - margin) {
+    visibleRight = Math.min(visibleRight, panelRect.left - canvasRect.left - margin);
+  } else if (panelRect.left <= canvasRect.left + margin) {
+    visibleLeft = Math.max(visibleLeft, panelRect.right - canvasRect.left + margin);
+  } else if (panelRect.bottom >= canvasRect.bottom - margin) {
+    visibleBottom = Math.min(visibleBottom, panelRect.top - canvasRect.top - margin);
   } else {
-    return false;
+    visibleTop = Math.max(visibleTop, panelRect.bottom - canvasRect.top + margin);
   }
   if (visibleRight <= visibleLeft || visibleBottom <= visibleTop) return false;
 
@@ -184,8 +243,12 @@ function revealNodeBesideDrawer(core: Core, nodeId: string): boolean {
     adjusted.x <= visibleRight &&
     adjusted.y >= visibleTop &&
     adjusted.y <= visibleBottom;
-  container.dataset.selectedNodeVisible = String(visible);
+  container.dataset[visibilityKey] = String(visible);
   return visible;
+}
+
+function revealNodeBesideDrawer(core: Core, nodeId: string): boolean {
+  return revealNodeBesidePanel(core, nodeId, ".entity-drawer", "selectedNodeVisible");
 }
 
 function EffectList({ detail }: { detail: EntityDetail }) {
@@ -565,6 +628,141 @@ function EntityDrawer({
   );
 }
 
+function rememberTourChoice(): void {
+  try {
+    window.localStorage.setItem(tourStorageKey, "seen");
+  } catch {
+    // The tour remains usable when storage is disabled.
+  }
+}
+
+function hasSeenTour(): boolean {
+  try {
+    return window.localStorage.getItem(tourStorageKey) === "seen";
+  } catch {
+    return false;
+  }
+}
+
+function tourUrl(): string {
+  return `${import.meta.env.BASE_URL}${tourStudyPath}?view=story&tour=1`;
+}
+
+function removeTourParameters(): void {
+  const url = new URL(window.location.href);
+  url.searchParams.delete("tour");
+  url.searchParams.delete("welcome");
+  window.history.replaceState({}, "", url);
+}
+
+function WelcomeTour({ onStart, onDismiss }: { onStart: () => void; onDismiss: () => void }) {
+  return (
+    <div
+      className="welcome-layer"
+      onKeyDown={(event) => {
+        if (event.key === "Escape") onDismiss();
+      }}
+    >
+      <section
+        className="welcome-tour"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="welcome-tour-title"
+      >
+        <button className="welcome-close" onClick={onDismiss} aria-label="Dismiss guided tour">
+          Close ×
+        </button>
+        <p className="eyebrow">First time in the Atlas?</p>
+        <h2 id="welcome-tour-title">Read one complete evidence story with us.</h2>
+        <p className="welcome-lead">
+          Take a two-minute tour through the real S003 enterprise RAG study. You will see how a
+          workload becomes an experiment, a finding, and finally a defensible deployment decision.
+        </p>
+        <ol className="welcome-route" aria-label="Guided tour route">
+          <li>
+            <code>WS003</code>
+            <span>Workload</span>
+          </li>
+          <li>
+            <code>E0009</code>
+            <span>Experiment</span>
+          </li>
+          <li>
+            <code>CMP0013</code>
+            <span>Comparison</span>
+          </li>
+          <li>
+            <code>F0013</code>
+            <span>Finding</span>
+          </li>
+          <li>
+            <code>DEC0003</code>
+            <span>Decision</span>
+          </li>
+        </ol>
+        <div className="welcome-actions">
+          <button className="primary-action" onClick={onStart} autoFocus>
+            Start the S003 tour
+          </button>
+          <button className="secondary-action" onClick={onDismiss}>
+            Explore on my own
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function StudyTour({
+  stepIndex,
+  node,
+  onPrevious,
+  onNext,
+  onSkip,
+}: {
+  stepIndex: number;
+  node?: GraphNode;
+  onPrevious: () => void;
+  onNext: () => void;
+  onSkip: () => void;
+}) {
+  const step = tourSteps[stepIndex];
+  const isLast = stepIndex === tourSteps.length - 1;
+  return (
+    <aside className="study-tour" aria-label="S003 guided tour" aria-live="polite">
+      <header>
+        <div>
+          <p className="eyebrow">S003 guided tour</p>
+          <span>Step {stepIndex + 1} of {tourSteps.length}</span>
+        </div>
+        <button onClick={onSkip} aria-label="Exit guided tour">
+          Exit
+        </button>
+      </header>
+      <div className="tour-progress" aria-hidden="true">
+        {tourSteps.map((item, index) => (
+          <i key={item.code} className={index <= stepIndex ? "active" : ""} />
+        ))}
+      </div>
+      <p className="tour-eyebrow">{step.eyebrow}</p>
+      <h2>{step.title}</h2>
+      <div className="tour-focus">
+        <code>{step.code}</code>
+        <span>{node?.label ?? "Locating evidence record…"}</span>
+      </div>
+      <p>{step.description}</p>
+      <footer>
+        <button className="secondary-action" onClick={onPrevious} disabled={stepIndex === 0}>
+          Previous
+        </button>
+        <button className="primary-action" onClick={onNext}>
+          {isLast ? "Reveal why this decision" : "Next evidence step"}
+        </button>
+      </footer>
+    </aside>
+  );
+}
+
 export function App() {
   const [atlas, setAtlas] = useState<AtlasData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -577,15 +775,27 @@ export function App() {
   const [detail, setDetail] = useState<EntityDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [highlighted, setHighlighted] = useState<Set<string>>(new Set());
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
+  const [tourStep, setTourStep] = useState<number | null>(null);
   const core = useRef<Core | null>(null);
 
   useEffect(() => {
     loadAtlas()
       .then((value) => {
         setAtlas(value);
-        const requested = new URLSearchParams(window.location.search).get("node");
+        const parameters = new URLSearchParams(window.location.search);
+        const requested = parameters.get("node");
         const node = value.graph.nodes.find((candidate) => candidate.id === requested);
         if (node) setSelected(node);
+        if (parameters.get("tour") === "1" && window.location.pathname.includes(tourStudyPath)) {
+          setViewId("story");
+          setTourStep(0);
+        } else if (
+          value.manifest.scope.type === "global" &&
+          (parameters.get("welcome") === "1" || !hasSeenTour())
+        ) {
+          setWelcomeOpen(true);
+        }
       })
       .catch((reason: unknown) => setError(reason instanceof Error ? reason.message : String(reason)));
   }, []);
@@ -652,7 +862,12 @@ export function App() {
   };
 
   const activeView = atlas?.views[viewId];
+  const activeTour = tourStep === null ? null : tourSteps[tourStep];
+  const tourNode = activeTour
+    ? atlas?.graph.nodes.find((node) => artifactCode(node.artifact_ref) === activeTour.code)
+    : undefined;
   const presentation = activeView?.filters.presentation;
+
   const referenceNodes = useMemo(() => {
     const nodes = new Map<string, GraphNode>();
     if (!atlas) return nodes;
@@ -758,6 +973,52 @@ export function App() {
     });
   };
 
+  const beginTour = () => {
+    rememberTourChoice();
+    setWelcomeOpen(false);
+    if (window.location.pathname.includes(tourStudyPath)) {
+      setViewId("story");
+      setSelectedTypes(new Set());
+      setHighlighted(new Set());
+      setSelected(null);
+      setDetail(null);
+      setTourStep(0);
+      const url = new URL(window.location.href);
+      url.searchParams.set("view", "story");
+      url.searchParams.set("tour", "1");
+      url.searchParams.delete("node");
+      window.history.replaceState({}, "", url);
+      return;
+    }
+    window.location.assign(tourUrl());
+  };
+
+  const dismissWelcome = () => {
+    rememberTourChoice();
+    setWelcomeOpen(false);
+    removeTourParameters();
+  };
+
+  const exitTour = () => {
+    rememberTourChoice();
+    setTourStep(null);
+    removeTourParameters();
+  };
+
+  const advanceTour = () => {
+    if (tourStep === null) return;
+    if (tourStep < tourSteps.length - 1) {
+      setTourStep(tourStep + 1);
+      return;
+    }
+    const decision = tourNode;
+    exitTour();
+    if (decision) {
+      selectNode(decision);
+      window.requestAnimationFrame(() => highlightDecisionPath(decision));
+    }
+  };
+
   if (error) {
     return (
       <main className="fatal-state">
@@ -784,7 +1045,7 @@ export function App() {
     <div className="atlas-shell">
       <header className="topbar">
         <a className="brand" href={import.meta.env.BASE_URL} aria-label="Atlas home">
-          <strong>LLM optimization Inference Atlas</strong>
+          <strong>LLM Inference Optimization Atlas</strong>
         </a>
         <div
           className="search-wrap"
@@ -841,6 +1102,10 @@ export function App() {
           <p className="eyebrow">Explore by question</p>
           <h1>{activeView.name}</h1>
           <p>{activeView.description}</p>
+          <button className="tour-launch" onClick={beginTour}>
+            <span>Guided tour</span>
+            <small>Follow one real S003 evidence story</small>
+          </button>
         </div>
         <nav className="view-nav" aria-label="Graph views">
           {viewOrder.map((id, index) => (
@@ -982,6 +1247,8 @@ export function App() {
             selectedTypes={selectedTypes}
             showNegative={showNegative}
             highlighted={highlighted}
+            selectedId={tourNode?.id ?? selected?.id}
+            tourActive={tourStep !== null}
             onSelect={selectNode}
             onReady={graphReady}
           />
@@ -989,7 +1256,7 @@ export function App() {
         <footer className="graph-footer">
           {presentation && (
             <div className="relation-legend" aria-label="Relation legend">
-              <span>Hover a node to name its links</span>
+              <span>Hover an arrow to explain its relationship</span>
               {presentation.relations.map((relation) => (
                 <span key={relation}>
                   <i
@@ -1003,7 +1270,11 @@ export function App() {
           )}
           <div className="canvas-note">
             <span>
-              Drag to pan · scroll to zoom · select a circle to open its complete record
+              {highlighted.size > 0
+                ? "Gold is the decision path · faded entities sit outside its evidence chain"
+                : selected
+                  ? "Dark rings show the selected record and its immediate relationships"
+                  : "Drag to pan · scroll to zoom · select a circle to open its complete record"}
             </span>
             <span>Generated {atlas.manifest.generated_at.slice(0, 10)}</span>
           </div>
@@ -1019,6 +1290,16 @@ export function App() {
         onClose={clearSelection}
         onWhy={highlightDecisionPath}
       />
+      {welcomeOpen && <WelcomeTour onStart={beginTour} onDismiss={dismissWelcome} />}
+      {tourStep !== null && (
+        <StudyTour
+          stepIndex={tourStep}
+          node={tourNode}
+          onPrevious={() => setTourStep((current) => Math.max(0, (current ?? 1) - 1))}
+          onNext={advanceTour}
+          onSkip={exitTour}
+        />
+      )}
     </div>
   );
 }

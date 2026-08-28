@@ -270,6 +270,39 @@ input:focus-visible {
   line-height: 1.55;
 }
 
+.tour-launch {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 11px;
+  margin-top: 15px;
+  border: 1px solid #c6d2ca;
+  border-radius: 7px;
+  color: var(--ink);
+  text-align: left;
+  background: #ffffff;
+  cursor: pointer;
+  box-shadow: inset 3px 0 var(--signal);
+}
+
+.tour-launch:hover {
+  border-color: #84988d;
+  background: #f1f5f1;
+}
+
+.tour-launch span {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.tour-launch small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
 .view-nav {
   display: grid;
   gap: 3px;
@@ -847,6 +880,7 @@ input:focus-visible {
   position: relative;
   min-width: 0;
   min-height: 280px;
+  scroll-margin-top: 72px;
   overflow: hidden;
   background:
     radial-gradient(circle at 50% 45%, rgba(244, 239, 224, 0.25), transparent 35%),
@@ -896,6 +930,69 @@ input:focus-visible {
 .node-tooltip small {
   color: #68766f;
   font-size: 9px;
+}
+
+.relation-tooltip {
+  position: absolute;
+  z-index: 16;
+  display: grid;
+  gap: 8px;
+  width: min(340px, calc(100vw - 32px));
+  padding: 13px 14px;
+  border: 1px solid #9eb4a9;
+  border-radius: 9px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 14px 34px rgba(31, 48, 41, 0.18);
+  transform: translate(18px, -50%);
+  pointer-events: none;
+}
+
+.relation-tooltip > div {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 7px;
+  border-bottom: 1px solid #e1e7e2;
+}
+
+.relation-tooltip strong {
+  color: #1f6e52;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.055em;
+}
+
+.relation-tooltip > div span {
+  color: #68766f;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.055em;
+  white-space: nowrap;
+}
+
+.relation-tooltip p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.relation-tooltip small {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 7px;
+  align-items: center;
+  color: #59675f;
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.relation-tooltip small i {
+  color: #27795c;
+  font-size: 15px;
+  font-style: normal;
 }
 
 .graph-node-index {
@@ -1071,6 +1168,255 @@ input:focus-visible {
   font-size: 12px;
   line-height: 1.5;
   background: #edf6f0;
+}
+
+.secondary-action {
+  padding: 10px 14px;
+  border: 1px solid #bfcac3;
+  border-radius: 6px;
+  color: var(--ink);
+  font-weight: 700;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.secondary-action:hover {
+  border-color: #778b80;
+  background: #f1f4f1;
+}
+
+.welcome-layer {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(12, 22, 19, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.welcome-tour {
+  position: relative;
+  width: min(720px, 100%);
+  padding: clamp(28px, 5vw, 52px);
+  border: 1px solid #d4ddd6;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 92% 12%, rgba(232, 179, 90, 0.18), transparent 28%),
+    #ffffff;
+  box-shadow: 0 28px 80px rgba(6, 13, 11, 0.34);
+}
+
+.welcome-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  padding: 6px 9px;
+  border: 0;
+  color: #56655d;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  background: transparent;
+  cursor: pointer;
+}
+
+.welcome-tour h2 {
+  max-width: 600px;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(34px, 5vw, 56px);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.welcome-lead {
+  max-width: 610px;
+  margin: 18px 0 24px;
+  color: #506158;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.welcome-route {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  padding: 0;
+  margin: 0 0 28px;
+  list-style: none;
+}
+
+.welcome-route li {
+  position: relative;
+  display: grid;
+  gap: 5px;
+  padding: 13px 10px;
+  border-top: 1px solid #b8c7be;
+}
+
+.welcome-route li::before {
+  position: absolute;
+  top: -5px;
+  left: 10px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  content: "";
+  background: var(--signal);
+}
+
+.welcome-route code {
+  color: #765018;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.welcome-route span {
+  color: #506158;
+  font-size: 10px;
+}
+
+.welcome-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.welcome-actions .primary-action {
+  width: auto;
+}
+
+.study-tour {
+  position: fixed;
+  z-index: 36;
+  bottom: 66px;
+  left: 310px;
+  width: min(430px, calc(100vw - 340px));
+  padding: 18px;
+  border: 1px solid #b9c8bf;
+  border-radius: 10px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 18px 48px rgba(31, 48, 41, 0.2);
+  backdrop-filter: blur(14px);
+}
+
+.study-tour > header,
+.study-tour > footer {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.study-tour > header > div {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.study-tour > header .eyebrow {
+  margin: 0;
+}
+
+.study-tour > header span {
+  color: #69776f;
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+
+.study-tour > header button {
+  padding: 4px 6px;
+  border: 0;
+  color: #617068;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tour-progress {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  margin: 13px 0 16px;
+}
+
+.tour-progress i {
+  height: 3px;
+  border-radius: 999px;
+  background: #dfe6e1;
+}
+
+.tour-progress i.active {
+  background: var(--signal);
+}
+
+.tour-eyebrow {
+  margin: 0 0 4px;
+  color: #617068;
+  font-size: 10px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.study-tour h2 {
+  margin: 0 0 11px;
+  font-family: var(--font-display);
+  font-size: 25px;
+  font-weight: 500;
+  line-height: 1.08;
+}
+
+.tour-focus {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid #d8e0da;
+  border-radius: 6px;
+  background: #f5f8f5;
+}
+
+.tour-focus code {
+  color: #765018;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.tour-focus span {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.study-tour > p:not(.tour-eyebrow) {
+  margin: 11px 0 16px;
+  color: #53635b;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.study-tour > footer {
+  justify-content: flex-end;
+}
+
+.study-tour > footer .primary-action {
+  width: auto;
+}
+
+.study-tour button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .drawer-section {
@@ -1742,9 +2088,20 @@ input:focus-visible {
     min-height: 620px;
   }
 
+  .atlas-shell:has(.study-tour) .graph-stage {
+    min-height: 1080px;
+  }
+
   .entity-drawer {
     top: 64px;
     width: min(440px, 92vw);
+  }
+
+  .study-tour {
+    right: 18px;
+    bottom: 18px;
+    left: 18px;
+    width: auto;
   }
 }
 
@@ -1865,6 +2222,54 @@ input:focus-visible {
     top: 0;
     width: 100vw;
   }
+
+  .welcome-layer {
+    align-items: end;
+    padding: 10px;
+  }
+
+  .welcome-tour {
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
+    padding: 34px 20px 22px;
+  }
+
+  .welcome-tour h2 {
+    font-size: 36px;
+  }
+
+  .welcome-route {
+    grid-template-columns: repeat(5, minmax(58px, 1fr));
+    overflow-x: auto;
+  }
+
+  .welcome-actions {
+    display: grid;
+  }
+
+  .welcome-actions .primary-action {
+    width: 100%;
+  }
+
+  .study-tour {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    padding: 15px;
+  }
+
+  .study-tour h2 {
+    font-size: 22px;
+  }
+
+  .study-tour > footer {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .study-tour > footer .primary-action {
+    width: 100%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1884,6 +2289,10 @@ input:focus-visible {
 
   .graph-stage {
     min-height: 780px;
+  }
+
+  .atlas-shell:has(.study-tour) .graph-stage {
+    min-height: 1080px;
   }
 
   .stage-heading {

@@ -1,6 +1,7 @@
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { relationDescription, relationLabel } from "../relations";
 import type { GraphData, GraphEdge, GraphNode, GraphPresentation, GraphView } from "../types";
 
 const colors: Record<string, string> = {
@@ -46,6 +47,8 @@ interface Props {
   selectedTypes: Set<string>;
   showNegative: boolean;
   highlighted: Set<string>;
+  selectedId?: string;
+  tourActive: boolean;
   onSelect: (node: GraphNode) => void;
   onReady: (core: Core) => void;
 }
@@ -170,6 +173,81 @@ function layeredPositions(
   return positions;
 }
 
+function focusTourNode(core: Core, nodeId: string, container: HTMLElement): void {
+  const node = core.getElementById(nodeId);
+  if (!node.length) return;
+  core.elements().unselect();
+  node.select();
+  const neighborhood = node.closedNeighborhood();
+  core.fit(neighborhood.length ? neighborhood : node, 110);
+
+  const panel = document.querySelector<HTMLElement>(".study-tour");
+  if (!panel) return;
+  const canvasRect = container.getBoundingClientRect();
+  const panelRect = panel.getBoundingClientRect();
+  const margin = 48;
+  const overlapsCanvas =
+    panelRect.left < canvasRect.right &&
+    panelRect.right > canvasRect.left &&
+    panelRect.top < canvasRect.bottom &&
+    panelRect.bottom > canvasRect.top;
+  let visibleLeft = margin;
+  let visibleRight = canvasRect.width - margin;
+  let visibleTop = margin;
+  let visibleBottom = canvasRect.height - margin;
+
+  if (overlapsCanvas) {
+    const overlapWidth =
+      Math.min(panelRect.right, canvasRect.right) - Math.max(panelRect.left, canvasRect.left);
+    const preferVerticalSpace = overlapWidth >= canvasRect.width * 0.72;
+    if (
+      preferVerticalSpace &&
+      panelRect.top + panelRect.height / 2 >= canvasRect.top + canvasRect.height / 2
+    ) {
+      visibleBottom = Math.min(visibleBottom, panelRect.top - canvasRect.top - margin);
+    } else if (preferVerticalSpace) {
+      visibleTop = Math.max(visibleTop, panelRect.bottom - canvasRect.top + margin);
+    } else if (panelRect.right >= canvasRect.right - margin) {
+      visibleRight = Math.min(visibleRight, panelRect.left - canvasRect.left - margin);
+    } else if (panelRect.left <= canvasRect.left + margin) {
+      visibleLeft = Math.max(visibleLeft, panelRect.right - canvasRect.left + margin);
+    } else if (panelRect.bottom >= canvasRect.bottom - margin) {
+      visibleBottom = Math.min(visibleBottom, panelRect.top - canvasRect.top - margin);
+    } else {
+      visibleTop = Math.max(visibleTop, panelRect.bottom - canvasRect.top + margin);
+    }
+  }
+
+  if (visibleRight > visibleLeft && visibleBottom > visibleTop) {
+    const position = node.renderedPosition();
+    const shift = { x: 0, y: 0 };
+    if (position.x < visibleLeft) shift.x = visibleLeft - position.x;
+    else if (position.x > visibleRight) shift.x = visibleRight - position.x;
+    if (position.y < visibleTop) shift.y = visibleTop - position.y;
+    else if (position.y > visibleBottom) shift.y = visibleBottom - position.y;
+    if (shift.x || shift.y) core.panBy(shift);
+  }
+
+  const adjusted = node.renderedPosition();
+  container.dataset.tourNodeVisible = String(
+    adjusted.x >= visibleLeft &&
+      adjusted.x <= visibleRight &&
+      adjusted.y >= visibleTop &&
+      adjusted.y <= visibleBottom,
+  );
+}
+
+function edgeTooltipPosition(
+  position: { x: number; y: number },
+  container: HTMLElement | null,
+): { x: number; y: number } {
+  if (!container) return position;
+  return {
+    x: Math.min(Math.max(12, position.x), Math.max(12, container.clientWidth - 364)),
+    y: Math.min(Math.max(96, position.y), Math.max(96, container.clientHeight - 96)),
+  };
+}
+
 export function GraphCanvas({
   graph,
   view,
@@ -177,6 +255,8 @@ export function GraphCanvas({
   selectedTypes,
   showNegative,
   highlighted,
+  selectedId,
+  tourActive,
   onSelect,
   onReady,
 }: Props) {
@@ -188,14 +268,29 @@ export function GraphCanvas({
     pan: { x: number; y: number };
   } | null>(null);
   const [expandedRunGroups, setExpandedRunGroups] = useState<Set<string>>(new Set());
-  const [tooltip, setTooltip] = useState<{
-    code: string;
-    label: string;
-    type: string;
-    x: number;
-    y: number;
-    synthetic: boolean;
-  } | null>(null);
+  const [tooltip, setTooltip] = useState<
+    | {
+        kind: "node";
+        code: string;
+        label: string;
+        type: string;
+        x: number;
+        y: number;
+        synthetic: boolean;
+      }
+    | {
+        kind: "edge";
+        relation: string;
+        source: string;
+        target: string;
+        description: string;
+        assertion: string;
+        confidence: string;
+        x: number;
+        y: number;
+      }
+    | null
+  >(null);
   const viewNodes = useMemo(() => new Set(view.node_ids), [view]);
   const viewEdges = useMemo(() => new Set(view.edge_ids), [view]);
   const presentation = view.filters.presentation;
@@ -223,6 +318,16 @@ export function GraphCanvas({
 
     const nodeIds = new Set(visibleNodes.map((node) => node.id));
     const nodeById = new Map(visibleNodes.map((node) => [node.id, node]));
+    const selectedNeighbors = new Set<string>();
+    if (selectedId && nodeIds.has(selectedId)) {
+      for (const edge of graph.edges) {
+        if (!viewEdges.has(edge.id)) continue;
+        const source = endpoint.get(edge.source) ?? edge.source;
+        const target = endpoint.get(edge.target) ?? edge.target;
+        if (source === selectedId && nodeIds.has(target)) selectedNeighbors.add(target);
+        if (target === selectedId && nodeIds.has(source)) selectedNeighbors.add(source);
+      }
+    }
     const selectedConfigurations = new Set(
       graph.edges
         .filter(
@@ -253,6 +358,15 @@ export function GraphCanvas({
           node.synthetic ? "run-group" : "",
           selectedConfigurations.has(node.id) ? "selected-config" : "",
           highlighted.has(node.id) ? "path" : "",
+          highlighted.size > 0 && !highlighted.has(node.id) ? "path-muted" : "",
+          node.id === selectedId ? "selected-node" : "",
+          selectedNeighbors.has(node.id) ? "selected-neighbor" : "",
+          selectedId &&
+          highlighted.size === 0 &&
+          node.id !== selectedId &&
+          !selectedNeighbors.has(node.id)
+            ? "selection-muted"
+            : "",
           normalizedQuery ? (matches ? "search-match" : "search-muted") : "",
         ]
           .filter(Boolean)
@@ -283,16 +397,20 @@ export function GraphCanvas({
       const targetMuted = normalizedQuery && !nodeElements.find(
         (element) => element.data.id === edge.target && !String(element.classes).includes("search-muted"),
       );
+      const isPath =
+        highlighted.has(edge.id) ||
+        (highlighted.has(edge.source) && highlighted.has(edge.target));
+      const isSelectedEdge = edge.source === selectedId || edge.target === selectedId;
       return {
         data: {
           ...edge,
           displayRelation: presentationEdgeLabel(edge, nodeById),
         },
         classes: [
-          highlighted.has(edge.id) ||
-          (highlighted.has(edge.source) && highlighted.has(edge.target))
-            ? "path"
-            : "",
+          isPath ? "path" : "",
+          highlighted.size > 0 && !isPath ? "path-muted" : "",
+          isSelectedEdge ? "selected-edge" : "",
+          selectedId && highlighted.size === 0 && !isSelectedEdge ? "selection-muted" : "",
           sourceMuted && targetMuted ? "search-muted" : "",
           `relation-${edge.relation.toLowerCase().replaceAll("_", "-")}`,
         ]
@@ -308,6 +426,7 @@ export function GraphCanvas({
     layoutPresentation,
     presentation,
     query,
+    selectedId,
     selectedTypes,
     showNegative,
     viewEdges,
@@ -419,6 +538,74 @@ export function GraphCanvas({
           },
         },
         {
+          selector: ".selection-muted",
+          style: { opacity: 0.13 },
+        },
+        {
+          selector: ".path-muted",
+          style: { opacity: 0.055 },
+        },
+        {
+          selector: "node.selected-neighbor",
+          style: {
+            "border-color": "#425d52",
+            "border-width": 3,
+            opacity: 0.92,
+            "z-index": 25,
+          },
+        },
+        {
+          selector: "edge.selected-edge",
+          style: {
+            "line-color": "#263c34",
+            "target-arrow-color": "#263c34",
+            width: 3.8,
+            opacity: 1,
+            "z-index": 24,
+          },
+        },
+        {
+          selector: "node.selected-node",
+          style: {
+            "border-color": "#17231f",
+            "border-width": 5,
+            "underlay-color": "#e8b35a",
+            "underlay-opacity": 0.36,
+            "underlay-padding": 11,
+            opacity: 1,
+            "z-index": 32,
+          },
+        },
+        {
+          selector: "node.edge-endpoint",
+          style: {
+            "border-color": "#27795c",
+            "border-width": 4,
+            "underlay-color": "#90c8ad",
+            "underlay-opacity": 0.25,
+            "underlay-padding": 7,
+            opacity: 1,
+            "z-index": 34,
+          },
+        },
+        {
+          selector: "edge.edge-hover",
+          style: {
+            label: "data(displayRelation)",
+            color: "#17231f",
+            "font-size": 10.5,
+            "font-weight": 750,
+            "text-background-color": "#ffffff",
+            "text-background-opacity": 1,
+            "text-background-padding": "5px",
+            "line-color": "#27795c",
+            "target-arrow-color": "#27795c",
+            width: 4.4,
+            opacity: 1,
+            "z-index": 36,
+          },
+        },
+        {
           selector: ".path",
           style: {
             "border-color": "#b77919",
@@ -430,6 +617,15 @@ export function GraphCanvas({
           },
         },
         {
+          selector: "node.selected-node.path",
+          style: {
+            "border-color": "#17231f",
+            "underlay-color": "#d0922d",
+            "underlay-opacity": 0.44,
+            "z-index": 40,
+          },
+        },
+        {
           selector: ".search-muted",
           style: { opacity: 0.12 },
         },
@@ -437,7 +633,10 @@ export function GraphCanvas({
           selector: ".search-match",
           style: { "border-color": "#b77919", "border-width": 4, "z-index": 30 },
         },
-        { selector: ":selected", style: { "border-color": "#17231f", "border-width": 4 } },
+        {
+          selector: ":selected",
+          style: { "border-color": "#17231f", "border-width": 5, "z-index": 40 },
+        },
       ],
       layout: layered
         ? { name: "preset", fit: !narrow, padding: 38 }
@@ -477,6 +676,19 @@ export function GraphCanvas({
       cy.zoom(storedViewport.zoom);
       cy.pan(storedViewport.pan);
     }
+    let tourFrame = 0;
+    if (tourActive && selectedId) {
+      tourFrame = window.requestAnimationFrame(() => {
+        if (window.innerWidth <= 900) {
+          container.current
+            ?.closest(".graph-frame")
+            ?.scrollIntoView({ block: "start", behavior: "auto" });
+        }
+        tourFrame = window.requestAnimationFrame(() => {
+          if (container.current) focusTourNode(cy, selectedId, container.current);
+        });
+      });
+    }
     const exposeViewport = () => {
       if (!container.current) return;
       const pan = cy.pan();
@@ -498,6 +710,7 @@ export function GraphCanvas({
       const data = event.target.data() as CanvasNode;
       const position = event.target.renderedPosition();
       setTooltip({
+        kind: "node",
         code: displayIdentifier(data),
         label: data.label,
         type: data.type,
@@ -515,8 +728,41 @@ export function GraphCanvas({
       event.target.connectedEdges().removeClass("context");
       setTooltip(null);
     });
+    const showEdgeTooltip = (event: cytoscape.EventObject) => {
+      const edge = event.target;
+      const data = edge.data() as GraphEdge;
+      const source = edge.source().data() as CanvasNode;
+      const target = edge.target().data() as CanvasNode;
+      const position = event.renderedPosition ?? edge.renderedMidpoint();
+      const tooltipPosition = edgeTooltipPosition(position, container.current);
+      setTooltip({
+        kind: "edge",
+        relation: relationLabel(data.relation),
+        source: `${displayIdentifier(source)} · ${source.label}`,
+        target: `${displayIdentifier(target)} · ${target.label}`,
+        description: relationDescription(data.relation),
+        assertion: data.assertion_level.replaceAll("_", " "),
+        confidence: data.confidence,
+        x: tooltipPosition.x,
+        y: tooltipPosition.y,
+      });
+    };
+    cy.on("mouseover", "edge", (event) => {
+      event.target.addClass("edge-hover");
+      event.target.source().addClass("edge-endpoint");
+      event.target.target().addClass("edge-endpoint");
+      showEdgeTooltip(event);
+    });
+    cy.on("mousemove", "edge", showEdgeTooltip);
+    cy.on("mouseout", "edge", (event) => {
+      event.target.removeClass("edge-hover");
+      event.target.source().removeClass("edge-endpoint");
+      event.target.target().removeClass("edge-endpoint");
+      setTooltip(null);
+    });
     onReady(cy);
     return () => {
+      window.cancelAnimationFrame(tourFrame);
       previousViewport.current = {
         viewId: view.id,
         zoom: cy.zoom(),
@@ -525,11 +771,24 @@ export function GraphCanvas({
       cy.destroy();
       core.current = null;
     };
-  }, [elements, layoutPresentation, onReady, onSelect, view.default_layout, view.id]);
+  }, [
+    elements,
+    layoutPresentation,
+    onReady,
+    onSelect,
+    selectedId,
+    tourActive,
+    view.default_layout,
+    view.id,
+  ]);
 
   const accessibleNodes = elements.filter(
     (element): element is ElementDefinition & { data: CanvasNode } =>
       "type" in element.data && typeof element.data.type === "string",
+  );
+  const accessibleEdges = elements.filter(
+    (element): element is ElementDefinition & { data: GraphEdge } =>
+      "relation" in element.data && typeof element.data.relation === "string",
   );
 
   return (
@@ -542,8 +801,15 @@ export function GraphCanvas({
         data-rendered-nodes={accessibleNodes.length}
         data-run-groups={elements.filter((element) => element.data.synthetic === true).length}
         data-highlighted-elements={highlighted.size}
+        data-selected-id={selectedId ?? ""}
+        data-tour-node-visible={tourActive ? "pending" : undefined}
+        data-dimmed-elements={
+          elements.filter((element) =>
+            String(element.classes).match(/(?:selection-muted|path-muted)/),
+          ).length
+        }
       />
-      {tooltip && (
+      {tooltip?.kind === "node" && (
         <div className="node-tooltip" style={{ left: tooltip.x, top: tooltip.y }} role="tooltip">
           <strong>{tooltip.code}</strong>
           <span>{tooltip.label}</span>
@@ -552,6 +818,16 @@ export function GraphCanvas({
               ? "Select to reveal individual runs"
               : `Select to open complete ${tooltip.type.replaceAll("_", " ")} details`}
           </small>
+        </div>
+      )}
+      {tooltip?.kind === "edge" && (
+        <div className="relation-tooltip" style={{ left: tooltip.x, top: tooltip.y }} role="tooltip">
+          <div>
+            <strong>{tooltip.relation}</strong>
+            <span>{tooltip.assertion} · {tooltip.confidence} confidence</span>
+          </div>
+          <p>{tooltip.description}</p>
+          <small>{tooltip.source}<i aria-hidden="true">→</i>{tooltip.target}</small>
         </div>
       )}
       <nav className="graph-node-index" aria-label="Graph node navigator">
@@ -566,6 +842,7 @@ export function GraphCanvas({
                 const position = element.renderedPosition();
                 element.connectedEdges().addClass("context");
                 setTooltip({
+                  kind: "node",
                   code: displayIdentifier(node),
                   label: node.label,
                   type: node.type,
@@ -587,6 +864,48 @@ export function GraphCanvas({
               }}
             >
               {displayIdentifier(node)} — {node.label}
+            </button>
+          );
+        })}
+      </nav>
+      <nav className="graph-node-index" aria-label="Graph relationship navigator">
+        {accessibleEdges.map((element) => {
+          const edge = element.data;
+          const source = graph.nodes.find((node) => node.id === edge.source);
+          const target = graph.nodes.find((node) => node.id === edge.target);
+          return (
+            <button
+              key={edge.id}
+              onFocus={() => {
+                const renderedEdge = core.current?.getElementById(edge.id);
+                if (!renderedEdge?.length) return;
+                renderedEdge.addClass("edge-hover");
+                renderedEdge.source().addClass("edge-endpoint");
+                renderedEdge.target().addClass("edge-endpoint");
+                const position = renderedEdge.renderedMidpoint();
+                const tooltipPosition = edgeTooltipPosition(position, container.current);
+                setTooltip({
+                  kind: "edge",
+                  relation: relationLabel(edge.relation),
+                  source: `${source ? displayIdentifier(source) : artifactCode(edge.source)} · ${source?.label ?? "Source entity"}`,
+                  target: `${target ? displayIdentifier(target) : artifactCode(edge.target)} · ${target?.label ?? "Target entity"}`,
+                  description: relationDescription(edge.relation),
+                  assertion: edge.assertion_level.replaceAll("_", " "),
+                  confidence: edge.confidence,
+                  x: tooltipPosition.x,
+                  y: tooltipPosition.y,
+                });
+              }}
+              onBlur={() => {
+                const renderedEdge = core.current?.getElementById(edge.id);
+                renderedEdge?.removeClass("edge-hover");
+                renderedEdge?.source().removeClass("edge-endpoint");
+                renderedEdge?.target().removeClass("edge-endpoint");
+                setTooltip(null);
+              }}
+            >
+              {source ? displayIdentifier(source) : artifactCode(edge.source)} {relationLabel(edge.relation)}{" "}
+              {target ? displayIdentifier(target) : artifactCode(edge.target)}
             </button>
           );
         })}

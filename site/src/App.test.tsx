@@ -123,13 +123,20 @@ import { App } from "./App";
 describe("Atlas explorer", () => {
   beforeEach(() => {
     window.history.replaceState({}, "", "/llm-inference-optimization-atlas/");
+    Object.defineProperty(window, "localStorage", {
+      configurable: true,
+      value: {
+        getItem: vi.fn(() => "seen"),
+        setItem: vi.fn(),
+      },
+    });
     centerGraph.mockClear();
   });
 
   it("switches graph views and opens entity evidence", async () => {
     render(<App />);
     expect(await screen.findByRole("heading", { name: "Story" })).toBeInTheDocument();
-    expect(screen.getByText("LLM optimization Inference Atlas")).toBeInTheDocument();
+    expect(screen.getByText("LLM Inference Optimization Atlas")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /All/ })).not.toBeInTheDocument();
     expect(
       screen.getByRole("heading", {

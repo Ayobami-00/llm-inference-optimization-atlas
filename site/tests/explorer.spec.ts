@@ -1,9 +1,14 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.setItem("atlas:s003-tour:v1", "seen"));
+});
+
 test("navigates views, searches, and resolves source details", async ({ page }) => {
   await page.goto("./");
   await expect(page.getByRole("link", { name: "Atlas home" })).toBeVisible();
+  await expect(page.getByText("LLM Inference Optimization Atlas")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Story" })).toBeVisible();
   await expect(page.getByRole("navigation", { name: "Graph views" }).getByRole("button")).toHaveCount(5);
   await page.getByRole("searchbox", { name: "Search evidence" }).focus();
@@ -28,8 +33,23 @@ test("has no automatically detectable serious accessibility violations", async (
   expect(results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact ?? ""))).toEqual([]);
 });
 
+test("offers a first-visit tour through a real study", async ({ page }) => {
+  await page.goto("./?welcome=1");
+  const welcome = page.getByRole("dialog", { name: "Read one complete evidence story with us." });
+  await expect(welcome).toBeVisible();
+  await expect(welcome.getByLabel("Guided tour route")).toContainText(
+    "WS003WorkloadE0009ExperimentCMP0013ComparisonF0013FindingDEC0003Decision",
+  );
+  await expect(welcome.getByRole("button", { name: "Start the S003 tour" })).toBeVisible();
+  const results = await new AxeBuilder({ page }).include(".welcome-tour").analyze();
+  expect(
+    results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact ?? "")),
+  ).toEqual([]);
+});
+
 test("offers a branded and recoverable not-found page", async ({ page }) => {
   await page.goto("./404.html");
+  await expect(page.getByText("LLM Inference Optimization Atlas")).toBeVisible();
   await expect(page.getByRole("heading", { name: "This path is not in the Atlas." })).toBeVisible();
   await expect(page.getByText("404 · This route has no evidence record")).toBeVisible();
   await expect(page.getByRole("link", { name: "Return to the Atlas" })).toHaveAttribute(
@@ -96,6 +116,62 @@ test("highlights the supporting path from a decision drawer", async ({ page }) =
   await expect
     .poll(async () => Number(await page.getByLabel("Interactive evidence graph").getAttribute("data-highlighted-elements")))
     .toBeGreaterThan(1);
+  await expect
+    .poll(async () => Number(await page.getByLabel("Interactive evidence graph").getAttribute("data-dimmed-elements")))
+    .toBeGreaterThan(1);
+});
+
+test("spotlights a selected node and its immediate relationships", async ({ page }) => {
+  await page.goto("./studies/S003-cpu-enterprise-rag/v1/");
+  const canvas = page.getByLabel("Interactive evidence graph");
+  const experiment = page
+    .getByRole("navigation", { name: "Graph node navigator" })
+    .getByRole("button", { name: /E0009/ });
+  await experiment.focus();
+  await page.keyboard.press("Enter");
+  await expect(canvas).toHaveAttribute("data-selected-id", /E0009/);
+  await expect.poll(async () => Number(await canvas.getAttribute("data-dimmed-elements"))).toBeGreaterThan(1);
+  await expect(page.getByText(/Dark rings show the selected record/)).toBeVisible();
+});
+
+test("explains graph relationships through arrow focus", async ({ page }) => {
+  await page.goto("./studies/S003-cpu-enterprise-rag/v1/");
+  const relationship = page
+    .getByRole("navigation", { name: "Graph relationship navigator" })
+    .getByRole("button")
+    .first();
+  await relationship.focus();
+  const tooltip = page.getByRole("tooltip");
+  await expect(tooltip).toBeVisible();
+  await expect(tooltip.locator("p")).not.toBeEmpty();
+  await expect(tooltip).toContainText(/confidence/);
+  const bounds = await tooltip.boundingBox();
+  const viewport = page.viewportSize();
+  expect(bounds).not.toBeNull();
+  expect(viewport).not.toBeNull();
+  expect(bounds!.x).toBeGreaterThanOrEqual(0);
+  expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(viewport!.width);
+});
+
+test("walks through S003 and finishes by revealing the decision path", async ({ page }) => {
+  await page.goto("./studies/S003-cpu-enterprise-rag/v1/?view=story&tour=1");
+  const tour = page.getByRole("complementary", { name: "S003 guided tour" });
+  const canvas = page.getByLabel("Interactive evidence graph");
+  await expect(tour).toContainText("Step 1 of 5");
+  await expect(canvas).toHaveAttribute("data-selected-id", /WS003/);
+  await expect(canvas).toHaveAttribute("data-tour-node-visible", "true");
+
+  for (const code of ["E0009", "CMP0013", "F0013", "DEC0003"]) {
+    await tour.getByRole("button", { name: "Next evidence step" }).click();
+    await expect(canvas).toHaveAttribute("data-selected-id", new RegExp(code));
+    await expect(canvas).toHaveAttribute("data-tour-node-visible", "true");
+  }
+
+  await tour.getByRole("button", { name: "Reveal why this decision" }).click();
+  await expect(tour).not.toBeVisible();
+  await expect(page.getByRole("complementary", { name: "Evidence details" })).toBeVisible();
+  await expect.poll(async () => Number(await canvas.getAttribute("data-highlighted-elements"))).toBeGreaterThan(1);
+  await expect.poll(async () => Number(await canvas.getAttribute("data-dimmed-elements"))).toBeGreaterThan(1);
 });
 
 test("presents a guided study story and expands replicate runs", async ({ page }) => {
