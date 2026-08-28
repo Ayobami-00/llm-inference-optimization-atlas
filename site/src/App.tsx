@@ -48,7 +48,7 @@ const viewNarratives: Record<GraphView["id"], [string, string, string]> = {
   ],
   evidence: [
     "This view exposes the complete evidence chain from a falsifiable hypothesis to experiments, replicate runs, comparisons, and findings.",
-    "Repeated runs are grouped until opened so the experimental structure remains legible without hiding its replication depth.",
+    "Every replicate run is rendered by default, making the full experimental structure and replication depth visible immediately.",
     "Follow the arrows from left to right to see exactly which measurements support each scoped claim.",
   ],
   deployment: [

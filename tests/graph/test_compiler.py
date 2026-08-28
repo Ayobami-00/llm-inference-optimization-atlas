@@ -125,3 +125,16 @@ def test_claim_edges_always_carry_atlas_evidence() -> None:
         if edge["relation"] in causal:
             assert edge["assertion_level"] in {"experimentally_supported", "replicated"}
             assert edge["evidence"]
+
+
+def test_evidence_view_expands_replicate_runs_by_default() -> None:
+    output = GraphCompiler(ROOT).build("S003-cpu-enterprise-rag").root
+    projection = output / "studies" / "S003-cpu-enterprise-rag" / "v1"
+    graph = _load(projection / "graph.json")
+    evidence = _load(projection / "views" / "evidence.json")
+    presentation = evidence["filters"]["presentation"]
+    run_ids = {node["id"] for node in graph["nodes"] if node["type"] == "run"}
+
+    assert presentation["compact_runs"] is False
+    assert presentation["stages"][2]["label"] == "Runs"
+    assert run_ids <= set(evidence["node_ids"])

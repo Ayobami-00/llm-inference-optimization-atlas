@@ -63,7 +63,7 @@ test("preserves zoom and keeps the selected node beside the drawer", async ({ pa
   await expect(canvas).toHaveAttribute("data-selected-node-visible", "true");
 });
 
-test("presents a study as a guided story and groups replicate runs", async ({ page }) => {
+test("presents a guided study story and expands replicate runs", async ({ page }) => {
   await page.goto("./studies/S003-cpu-enterprise-rag/v1/");
   await expect(page.getByRole("heading", { name: "Story" })).toBeVisible();
   await expect(page.getByLabel("Story view explanation").locator("p")).toHaveCount(3);
@@ -104,13 +104,13 @@ test("presents a study as a guided story and groups replicate runs", async ({ pa
     .getByRole("navigation", { name: "Graph views" })
     .getByRole("button", { name: /Evidence/ })
     .click();
-  await expect(page.getByLabel("Graph reading order")).toContainText("Replicate groups");
+  await expect(page.getByLabel("Graph reading order")).toContainText("Runs");
   await expect(page.getByLabel("Interactive evidence graph")).toHaveAttribute(
     "data-run-groups",
-    "9",
+    "0",
   );
   await expect(page.getByLabel("Interactive evidence graph")).toHaveAttribute(
     "data-rendered-nodes",
-    "27",
+    "45",
   );
 });

@@ -145,19 +145,22 @@ function layeredPositions(
     const ranked = nodes
       .filter((node) => stage.types.includes(node.type))
       .sort((left, right) => left.id.localeCompare(right.id));
-    const usesSubcolumns = ranked.length > 6;
-    const columns = usesSubcolumns
-      ? [ranked.filter((_, index) => index % 2 === 0), ranked.filter((_, index) => index % 2 === 1)]
-      : [ranked];
+    const columnCount = ranked.length > 18 ? 4 : ranked.length > 6 ? 2 : 1;
+    const columns = Array.from({ length: columnCount }, (_, columnIndex) =>
+      ranked.filter((_, index) => index % columnCount === columnIndex),
+    );
     columns.forEach((column, columnIndex) => {
       const nodeHeight = 64;
-      const verticalGap = presentation.compact_runs ? 48 : 36;
-      const horizontalGap = presentation.compact_runs ? 390 : 320;
+      const runAwareLayout = presentation.compact_runs !== undefined;
+      const verticalGap = runAwareLayout ? 48 : 36;
+      const horizontalGap = runAwareLayout ? 420 : 320;
       const totalHeight = column.length * nodeHeight + Math.max(0, column.length - 1) * verticalGap;
       let cursor = -totalHeight / 2;
       column.forEach((node) => {
         positions.set(node.id, {
-          x: rank * horizontalGap + (usesSubcolumns ? (columnIndex === 0 ? -96 : 96) : 0),
+          x:
+            rank * horizontalGap +
+            (columnCount > 1 ? (columnIndex - (columnCount - 1) / 2) * 168 : 0),
           y: cursor + nodeHeight / 2,
         });
         cursor += nodeHeight + verticalGap;

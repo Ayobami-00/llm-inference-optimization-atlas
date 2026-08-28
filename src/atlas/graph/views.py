@@ -38,7 +38,8 @@ VIEW_TYPES = {
     "evidence": {
         "name": "Evidence",
         "description": (
-            "Inspect hypotheses, grouped replicates, comparisons, findings, and replications."
+            "Inspect hypotheses, individual replicate runs, comparisons, findings, "
+            "and replications."
         ),
         "types": {
             "hypothesis",
@@ -90,16 +91,16 @@ PRESENTATION = {
         "stages": [
             {"label": "Hypotheses", "types": ["hypothesis"]},
             {"label": "Experiments", "types": ["experiment"]},
-            {"label": "Replicate groups", "types": ["run"]},
+            {"label": "Runs", "types": ["run"]},
             {"label": "Comparisons", "types": ["comparison"]},
             {"label": "Findings", "types": ["finding", "replication"]},
         ],
         "intro": (
-            "Replicate runs are grouped by experiment and configuration; "
-            "select a group to expand it."
+            "Every replicate run is shown by default; follow each experiment through "
+            "its runs and comparisons to the resulting finding."
         ),
         "relations": ["TESTS", "HAS_RUN", "COMPARES", "SUPPORTS"],
-        "compact_runs": True,
+        "compact_runs": False,
     },
     "deployment": {
         "stages": [
