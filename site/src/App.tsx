@@ -417,8 +417,7 @@ export function App() {
               </button>
               <button
                 onClick={() => {
-                  core.current?.fit(undefined, presentation ? 76 : 50);
-                  if (presentation) core.current?.panBy({ x: 0, y: 24 });
+                  core.current?.fit(undefined, presentation ? 38 : 50);
                 }}
                 aria-label="Fit graph"
               >

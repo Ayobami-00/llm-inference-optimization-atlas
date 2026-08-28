@@ -407,18 +407,19 @@ input:focus-visible {
   right: 22px;
   left: 24px;
   z-index: 5;
-  display: flex;
-  justify-content: space-between;
   pointer-events: none;
 }
 
 .stage-heading > div:first-child {
-  flex: 1;
+  width: 100%;
   min-width: 0;
-  padding-right: 20px;
+  padding: 0 clamp(120px, 12vw, 230px);
 }
 
 .stage-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
   display: flex;
   gap: 9px;
   align-items: center;
@@ -430,6 +431,7 @@ input:focus-visible {
   flex-wrap: wrap;
   gap: 4px 14px;
   align-items: baseline;
+  justify-content: center;
 }
 
 .stage-description {
@@ -441,6 +443,7 @@ input:focus-visible {
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: 0.035em;
+  text-align: center;
   text-transform: uppercase;
 }
 
@@ -499,7 +502,7 @@ input:focus-visible {
 
 .reading-guide {
   position: absolute;
-  top: 70px;
+  top: 84px;
   right: 24px;
   left: 24px;
   z-index: 5;
@@ -555,7 +558,11 @@ input:focus-visible {
 
 .graph-canvas {
   position: absolute;
-  inset: 0;
+  inset: 96px 0 54px;
+}
+
+.graph-canvas.with-presentation {
+  top: 152px;
 }
 
 .relation-legend {
@@ -969,17 +976,27 @@ input:focus-visible {
   }
 
   .stage-heading > div:first-child {
-    max-width: 190px;
+    max-width: none;
+    padding: 0;
+  }
+
+  .stage-description {
+    font-size: 15px;
+    line-height: 1.15;
+  }
+
+  .stage-actions {
+    position: static;
+    justify-content: center;
+    margin-top: 10px;
   }
 
   .why-control {
-    position: absolute;
-    top: 42px;
-    right: 0;
+    position: static;
   }
 
   .reading-guide {
-    top: 88px;
+    top: 138px;
   }
 
   .reading-guide > p {
@@ -992,6 +1009,14 @@ input:focus-visible {
   .canvas-note {
     right: 12px;
     left: 12px;
+  }
+
+  .graph-canvas {
+    inset: 140px 0 48px;
+  }
+
+  .graph-canvas.with-presentation {
+    top: 205px;
   }
 
   .canvas-note span:last-child {

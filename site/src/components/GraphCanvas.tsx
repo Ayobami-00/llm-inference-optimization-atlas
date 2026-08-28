@@ -420,7 +420,7 @@ export function GraphCanvas({
         { selector: ":selected", style: { "border-color": "#f4efe0", "border-width": 4 } },
       ],
       layout: layered
-        ? { name: "preset", fit: !narrow, padding: 76 }
+        ? { name: "preset", fit: !narrow, padding: 38 }
         : {
             name: view.default_layout === "dagre" ? "breadthfirst" : "cose",
             animate: false,
@@ -437,7 +437,6 @@ export function GraphCanvas({
         .filter((node) => Boolean(firstStage?.types.includes(node.data("type"))));
       cy.center(start.length ? start : cy.nodes());
     }
-    if (layered && !narrow) cy.panBy({ x: 0, y: 24 });
     cy.on("tap", "node", (event) => {
       const data = event.target.data() as CanvasNode;
       if (data.synthetic) {
@@ -457,7 +456,7 @@ export function GraphCanvas({
 
   return (
     <div
-      className="graph-canvas"
+      className={`graph-canvas${presentation ? " with-presentation" : ""}`}
       ref={container}
       role="region"
       aria-label="Interactive evidence graph"
