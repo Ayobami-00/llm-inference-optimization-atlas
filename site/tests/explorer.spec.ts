@@ -43,6 +43,26 @@ test("renders canonical references as named repository links", async ({ page }) 
   await expect(details).not.toContainText("atlas://");
 });
 
+test("preserves zoom and keeps the selected node beside the drawer", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name.includes("mobile"), "The mobile drawer intentionally fills the viewport.");
+  await page.goto("./studies/S003-cpu-enterprise-rag/v1/");
+  const canvas = page.getByLabel("Interactive evidence graph");
+  await expect(canvas).toHaveAttribute("data-zoom", /\d/);
+  await page.getByRole("button", { name: "Zoom in" }).click();
+  await page.getByRole("button", { name: "Zoom in" }).click();
+  const zoomed = Number(await canvas.getAttribute("data-zoom"));
+
+  const decision = page
+    .getByRole("navigation", { name: "Graph node navigator" })
+    .getByRole("button", { name: /DEC0003/ });
+  await decision.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("complementary", { name: "Evidence details" })).toBeVisible();
+
+  await expect.poll(async () => Number(await canvas.getAttribute("data-zoom"))).toBeCloseTo(zoomed, 3);
+  await expect(canvas).toHaveAttribute("data-selected-node-visible", "true");
+});
+
 test("presents a study as a guided story and groups replicate runs", async ({ page }) => {
   await page.goto("./studies/S003-cpu-enterprise-rag/v1/");
   await expect(page.getByRole("heading", { name: "Story" })).toBeVisible();

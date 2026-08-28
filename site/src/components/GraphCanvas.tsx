@@ -179,6 +179,11 @@ export function GraphCanvas({
 }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const core = useRef<Core | null>(null);
+  const previousViewport = useRef<{
+    viewId: GraphView["id"];
+    zoom: number;
+    pan: { x: number; y: number };
+  } | null>(null);
   const [expandedRunGroups, setExpandedRunGroups] = useState<Set<string>>(new Set());
   const [tooltip, setTooltip] = useState<{
     code: string;
@@ -463,6 +468,20 @@ export function GraphCanvas({
         cy.center(cy.nodes());
       }
     }
+    const storedViewport = previousViewport.current;
+    if (storedViewport?.viewId === view.id) {
+      cy.zoom(storedViewport.zoom);
+      cy.pan(storedViewport.pan);
+    }
+    const exposeViewport = () => {
+      if (!container.current) return;
+      const pan = cy.pan();
+      container.current.dataset.zoom = cy.zoom().toFixed(4);
+      container.current.dataset.panX = pan.x.toFixed(2);
+      container.current.dataset.panY = pan.y.toFixed(2);
+    };
+    cy.on("zoom pan", exposeViewport);
+    exposeViewport();
     cy.on("tap", "node", (event) => {
       const data = event.target.data() as CanvasNode;
       if (data.synthetic) {
@@ -494,6 +513,11 @@ export function GraphCanvas({
     });
     onReady(cy);
     return () => {
+      previousViewport.current = {
+        viewId: view.id,
+        zoom: cy.zoom(),
+        pan: cy.pan(),
+      };
       cy.destroy();
       core.current = null;
     };

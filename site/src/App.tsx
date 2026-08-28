@@ -140,6 +140,54 @@ function setDeepLink(node: GraphNode | null, view: GraphView["id"]): void {
   window.history.replaceState({}, "", url);
 }
 
+function revealNodeBesideDrawer(core: Core, nodeId: string): boolean {
+  const node = core.getElementById(nodeId);
+  const container = core.container();
+  const drawer = document.querySelector<HTMLElement>(".entity-drawer");
+  if (!node.length || !container || !drawer) return false;
+
+  const canvasRect = container.getBoundingClientRect();
+  const drawerRect = drawer.getBoundingClientRect();
+  const overlapsCanvas =
+    drawerRect.left < canvasRect.right &&
+    drawerRect.right > canvasRect.left &&
+    drawerRect.top < canvasRect.bottom &&
+    drawerRect.bottom > canvasRect.top;
+  if (!overlapsCanvas) return false;
+
+  const margin = 48;
+  let visibleLeft = margin;
+  let visibleRight = canvasRect.width - margin;
+  let visibleTop = margin;
+  let visibleBottom = canvasRect.height - margin;
+
+  if (drawerRect.left > canvasRect.left + margin * 2) {
+    visibleRight = Math.min(visibleRight, drawerRect.left - canvasRect.left - margin);
+  } else if (drawerRect.top > canvasRect.top + margin * 2) {
+    visibleBottom = Math.min(visibleBottom, drawerRect.top - canvasRect.top - margin);
+  } else {
+    return false;
+  }
+  if (visibleRight <= visibleLeft || visibleBottom <= visibleTop) return false;
+
+  const position = node.renderedPosition();
+  const shift = { x: 0, y: 0 };
+  if (position.x < visibleLeft) shift.x = visibleLeft - position.x;
+  else if (position.x > visibleRight) shift.x = visibleRight - position.x;
+  if (position.y < visibleTop) shift.y = visibleTop - position.y;
+  else if (position.y > visibleBottom) shift.y = visibleBottom - position.y;
+  if (shift.x || shift.y) core.panBy(shift);
+
+  const adjusted = node.renderedPosition();
+  const visible =
+    adjusted.x >= visibleLeft &&
+    adjusted.x <= visibleRight &&
+    adjusted.y >= visibleTop &&
+    adjusted.y <= visibleBottom;
+  container.dataset.selectedNodeVisible = String(visible);
+  return visible;
+}
+
 function EffectList({ detail }: { detail: EntityDetail }) {
   const effects = detail.artifact.effects;
   if (!Array.isArray(effects) || effects.length === 0) return null;
@@ -543,12 +591,26 @@ export function App() {
       .finally(() => setDetailLoading(false));
   }, [atlas, selected]);
 
+  useEffect(() => {
+    if (!selected) return;
+    let frame = 0;
+    let attempts = 0;
+    const reveal = () => {
+      const current = core.current;
+      if (current && revealNodeBesideDrawer(current, selected.id)) return;
+      attempts += 1;
+      if (attempts < 4) frame = window.requestAnimationFrame(reveal);
+    };
+    frame = window.requestAnimationFrame(reveal);
+    return () => window.cancelAnimationFrame(frame);
+  }, [detailLoading, selected]);
+
   const selectNode = useCallback(
     (node: GraphNode) => {
       setSelected(node);
       setQuery("");
       setSearchOpen(false);
-      setHighlighted(new Set());
+      setHighlighted((current) => (current.size === 0 ? current : new Set()));
       setDeepLink(node, viewId);
       window.requestAnimationFrame(() => {
         const element = core.current?.getElementById(node.id);
