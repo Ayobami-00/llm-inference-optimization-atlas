@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-import onnxruntime as ort  # type: ignore[import-untyped]
+import onnxruntime as ort
 import psutil
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -84,9 +84,7 @@ def execute(args: argparse.Namespace) -> dict[str, Any]:
     condition = json.loads(args.condition.read_text())
     documents = _jsonl(args.documents)
     questions = _jsonl(args.questions)[: args.request_limit]
-    embedding_tokenizer = AutoTokenizer.from_pretrained(  # type: ignore[no-untyped-call]
-        args.embedding_model, local_files_only=True
-    )
+    embedding_tokenizer = AutoTokenizer.from_pretrained(args.embedding_model, local_files_only=True)
     model_name = "model-int8.onnx" if condition["representation"] == "int8" else "model.onnx"
     options = ort.SessionOptions()
     options.intra_op_num_threads = args.intra_op_threads
@@ -96,13 +94,13 @@ def execute(args: argparse.Namespace) -> dict[str, Any]:
         sess_options=options,
         providers=["CPUExecutionProvider"],
     )
-    generation_tokenizer = AutoTokenizer.from_pretrained(  # type: ignore[no-untyped-call]
+    generation_tokenizer = AutoTokenizer.from_pretrained(
         args.generation_model, local_files_only=True
     )
     generation_model = AutoModelForCausalLM.from_pretrained(
         args.generation_model, local_files_only=True
     )
-    generation_model.eval()  # type: ignore[no-untyped-call]
+    generation_model.eval()
     document_text = [f"{item['title']}. {item['text']}" for item in documents]
     document_embeddings = None
     if condition["embeddings"] == "precomputed":

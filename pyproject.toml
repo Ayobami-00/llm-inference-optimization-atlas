@@ -67,7 +67,16 @@ strict = true
 packages = ["atlas"]
 
 [[tool.mypy.overrides]]
-module = ["pyarrow", "pyarrow.*"]
+module = [
+  "onnxruntime",
+  "onnxruntime.*",
+  "pyarrow",
+  "pyarrow.*",
+  "torch",
+  "torch.*",
+  "transformers",
+  "transformers.*",
+]
 ignore_missing_imports = true
 
 [tool.coverage.run]
