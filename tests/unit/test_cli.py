@@ -2,13 +2,56 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
+import pytest
 from typer.testing import CliRunner
 
+import atlas.cli as cli
 from atlas.cli import app
 
 ROOT = Path(__file__).parents[2]
 runner = CliRunner()
+
+
+def test_doctor_human_output_renders_each_tool_on_its_own_row(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def tool_version(name: str, *arguments: str) -> dict[str, Any]:
+        del arguments
+        if name == "docker":
+            return {"available": False}
+        return {"available": True, "version": f"{name} test-version"}
+
+    monkeypatch.setattr(cli, "_tool_version", tool_version)
+
+    result = runner.invoke(app, ["doctor"])
+
+    assert result.exit_code == 0, result.output
+    assert "Tools" in result.output
+    assert "git" in result.output
+    assert "✓ available" in result.output
+    assert "docker" in result.output
+    assert "✗ unavailable" in result.output
+    assert "—" in result.output
+    assert '{"docker"' not in result.output
+
+
+def test_doctor_json_output_keeps_structured_tools(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        cli,
+        "_tool_version",
+        lambda name, *arguments: {"available": True, "version": f"{name} test-version"},
+    )
+
+    result = runner.invoke(app, ["--json", "doctor"])
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["tools"]["git"] == {
+        "available": True,
+        "version": "git test-version",
+    }
 
 
 def test_schema_check_supports_json_output(monkeypatch: object) -> None:

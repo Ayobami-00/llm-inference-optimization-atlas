@@ -103,6 +103,20 @@ def _state(ctx: typer.Context) -> CLIState:
     return ctx.ensure_object(CLIState)
 
 
+def _render_tools(console: Console, tools: dict[str, Any]) -> None:
+    table = Table(title="Tools", box=None, pad_edge=False)
+    table.add_column("Tool", style="bold")
+    table.add_column("Status")
+    table.add_column("Version")
+    for name, details in tools.items():
+        available = bool(details.get("available"))
+        status = "[green]✓ available[/]" if available else "[red]✗ unavailable[/]"
+        version = str(details.get("version", "—"))
+        table.add_row(name, status, version)
+    console.print()
+    console.print(table)
+
+
 def _emit(ctx: typer.Context, payload: dict[str, Any], *, title: str) -> None:
     if _state(ctx).json_output:
         typer.echo(json.dumps(payload, indent=2, sort_keys=True))
@@ -114,13 +128,16 @@ def _emit(ctx: typer.Context, payload: dict[str, Any], *, title: str) -> None:
     table.add_column(style="bold")
     table.add_column()
     for key, value in payload.items():
-        if key in {"ok", "issues"}:
+        if key in {"ok", "issues", "tools"}:
             continue
         rendered = (
             json.dumps(value, sort_keys=True) if isinstance(value, (dict, list)) else str(value)
         )
         table.add_row(key.replace("_", " "), rendered)
     console.print(table)
+    tools = payload.get("tools")
+    if isinstance(tools, dict):
+        _render_tools(console, tools)
     for issue in payload.get("issues", []):
         color = "red" if issue.get("severity") == "error" else "yellow"
         console.print(
