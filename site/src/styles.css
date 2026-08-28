@@ -419,6 +419,22 @@ input:focus-visible {
   pointer-events: auto;
 }
 
+.stage-context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: baseline;
+}
+
+.stage-context h2 {
+  max-width: 680px;
+  margin: 0;
+  color: var(--paper);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
 .why-control {
   height: 32px;
   padding: 0 13px;

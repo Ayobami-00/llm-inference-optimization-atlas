@@ -29,6 +29,7 @@ const storyView = {
   ...view,
   id: "story" as const,
   name: "Story",
+  description: "Follow the evaluated workload from study design to deployment decision.",
   filters: {
     presentation: {
       stages: [
@@ -93,6 +94,11 @@ describe("Atlas explorer", () => {
     render(<App />);
     expect(await screen.findByRole("heading", { name: "Story" })).toBeInTheDocument();
     expect(screen.getByText("LLM optimizations Inference Atlas")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", {
+        name: "Follow the evaluated workload from study design to deployment decision.",
+      }),
+    ).toBeInTheDocument();
     expect(screen.getByRole("generic", { name: "Graph reading order" })).toHaveTextContent(
       "StartWorkload→Decision",
     );

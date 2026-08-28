@@ -385,9 +385,12 @@ export function App() {
       <main className="graph-stage">
         <div className="stage-heading">
           <div>
-            <p className="eyebrow">
-              {atlas.manifest.scope.type === "global" ? "Global evidence graph" : "Study graph"}
-            </p>
+            <div className="stage-context">
+              <p className="eyebrow">
+                {atlas.manifest.scope.type === "global" ? "Global evidence graph" : "Study graph"}
+              </p>
+              <h2>{activeView.description}</h2>
+            </div>
             <p>
               <strong>{activeView.node_ids.length}</strong> entities ·{" "}
               <strong>{activeView.edge_ids.length}</strong> explicit relations
