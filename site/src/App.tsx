@@ -23,6 +23,55 @@ function relationLabel(value: string): string {
   return value.replaceAll("_", " ").toLowerCase();
 }
 
+const viewNarratives: Record<GraphView["id"], [string, string, string]> = {
+  story: [
+    "This view follows the study from its frozen workload through experiments and comparisons to findings and a deployment decision.",
+    "Each branch represents a research question and connects the measured result to its carefully scoped interpretation.",
+    "Read from left to right, then select any circle to expand the evidence that matters without leaving the canvas.",
+  ],
+  bottleneck: [
+    "This view maps observed workload and system pressure to the bottlenecks that may explain it.",
+    "The links expose diagnostic signals, competing explanations, and the optimization families that could address each constraint.",
+    "Treat theoretical and observational links as investigation paths until experimental evidence validates the bottleneck.",
+  ],
+  optimization: [
+    "This view organizes optimization mechanisms around the bottlenecks they are designed to target.",
+    "Evidence links reveal where a technique improved, degraded, or failed to change a measured outcome under a specific scope.",
+    "Use the graph to separate broad applicability from experimentally supported results and their known boundaries.",
+  ],
+  evidence: [
+    "This view exposes the complete evidence chain from a falsifiable hypothesis to experiments, replicate runs, comparisons, and findings.",
+    "Repeated runs are grouped until opened so the experimental structure remains legible without hiding its replication depth.",
+    "Follow the arrows from left to right to see exactly which measurements support each scoped claim.",
+  ],
+  deployment: [
+    "This view explains how accepted findings lead to a deployment decision and the configuration it selects or rejects.",
+    "The decision is connected to its measured trade-offs, supporting evidence, and alternative configurations rather than presented as a standalone recommendation.",
+    "Use the highlighted decision path to inspect the rationale from outcome back to evidence.",
+  ],
+  all: [
+    "This view contains the complete compiled evidence graph, including scientific evidence, structural context, and external sources.",
+    "It is intentionally dense so relationships omitted from the guided views remain available for open-ended investigation.",
+    "Use search and entity filters to isolate a question, then select a node to inspect its full record and provenance.",
+  ],
+};
+
+const globalStoryNarrative: [string, string, string] = [
+  "This view connects every workload archetype to the concrete workload and study that represents it in the Atlas.",
+  "Each branch presents the high-level research story while omitting individual runs, configurations, and implementation detail.",
+  "Read from left to right to see which studies exist and which deployment decisions their evidence produced.",
+];
+
+function artifactCode(reference: string): string {
+  return reference.split("/").at(-1)?.replace(/@v\d+$/, "") ?? reference;
+}
+
+function entityPrefix(type: string, nodes: GraphNode[]): string {
+  const representative = nodes.find((node) => node.type === type);
+  const identifier = representative ? artifactCode(representative.artifact_ref) : "";
+  return identifier.match(/^[A-Z]+/)?.[0] ?? type.slice(0, 3).toUpperCase();
+}
+
 function initialView(): GraphView["id"] {
   const value = new URLSearchParams(window.location.search).get("view");
   return viewOrder.includes(value as GraphView["id"])
@@ -214,12 +263,20 @@ export function App() {
   const graphReady = useCallback((value: Core) => {
     core.current = value;
   }, []);
+  const clearSelection = useCallback(() => {
+    setSelected(null);
+    setDetail(null);
+    setHighlighted(new Set());
+    setDeepLink(null, viewId);
+  }, [viewId]);
 
   const changeView = (next: GraphView["id"]) => {
     setViewId(next);
     setSelectedTypes(new Set());
     setHighlighted(new Set());
-    setDeepLink(selected, next);
+    setSelected(null);
+    setDetail(null);
+    setDeepLink(null, next);
   };
 
   const activeView = atlas?.views[viewId];
@@ -231,7 +288,16 @@ export function App() {
     for (const node of atlas.graph.nodes) {
       if (ids.has(node.id)) counts.set(node.type, (counts.get(node.type) ?? 0) + 1);
     }
-    return [...counts.entries()].sort((left, right) => right[1] - left[1]);
+    const stageRank = new Map<string, number>();
+    activeView.filters.presentation?.stages.forEach((stage, stageIndex) => {
+      stage.types.forEach((type, typeIndex) => stageRank.set(type, stageIndex * 100 + typeIndex));
+    });
+    return [...counts.entries()].sort((left, right) => {
+      if (stageRank.size > 0) {
+        return (stageRank.get(left[0]) ?? 10_000) - (stageRank.get(right[0]) ?? 10_000);
+      }
+      return right[1] - left[1] || left[0].localeCompare(right[0]);
+    });
   }, [activeView, atlas]);
 
   const matches = useMemo(() => {
@@ -294,6 +360,16 @@ export function App() {
     (node) => node.type === "decision" && activeView.node_ids.includes(node.id),
   );
   const decisionNode = decisionNodes.length === 1 ? decisionNodes[0] : undefined;
+  const narrative =
+    viewId === "story" && atlas.manifest.scope.type === "global"
+      ? globalStoryNarrative
+      : viewNarratives[viewId];
+  const selectedInline = Boolean(
+    presentation &&
+      selected &&
+      activeView.node_ids.includes(selected.id) &&
+      presentation.stages.some((stage) => stage.types.includes(selected.type)),
+  );
 
   return (
     <div className="atlas-shell">
@@ -382,9 +458,9 @@ export function App() {
         </label>
       </aside>
 
-      <main className="graph-stage">
-        <div className="stage-heading">
-          <div>
+      <main className={`graph-stage ${presentation ? "guided-view" : "exploratory-view"}`}>
+        <section className="stage-heading" aria-labelledby="active-view-title">
+          <div className="stage-title-block">
             <div className="stage-context">
               <p className="eyebrow">
                 {atlas.manifest.scope.type === "global" ? "Global evidence graph" : "Study graph"}
@@ -394,7 +470,14 @@ export function App() {
                 <strong>{activeView.edge_ids.length}</strong> explicit relations
               </p>
             </div>
-            <h2 className="stage-description">{activeView.description}</h2>
+            <h2 className="stage-description" id="active-view-title">
+              {activeView.description}
+            </h2>
+            <div className="view-summary" aria-label={`${activeView.name} view explanation`}>
+              {narrative.map((sentence) => (
+                <p key={sentence}>{sentence}</p>
+              ))}
+            </div>
           </div>
           <div className="stage-actions">
             {decisionNode && ["story", "deployment"].includes(viewId) && (
@@ -431,63 +514,89 @@ export function App() {
               </button>
             </div>
           </div>
+          <div className="entity-key" aria-label="Entity color key">
+            <span className="key-label">Node key</span>
+            <div>
+              {typeCounts.map(([type]) => (
+                <button
+                  key={type}
+                  className={selectedTypes.has(type) ? "active" : ""}
+                  onClick={() => toggleType(type)}
+                  aria-pressed={selectedTypes.has(type)}
+                  title={`Show only ${titleCase(type)} entities`}
+                >
+                  <i style={{ background: `var(--node-${type}, #8ba096)` }} />
+                  <code>{entityPrefix(type, atlas.graph.nodes)}</code>
+                  <span>{titleCase(type)}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          {presentation && (
+            <div className="reading-guide" aria-label="Graph reading order">
+              <div className="stage-flow">
+                <span className="guide-start">Start</span>
+                {presentation.stages.map((stage, index) => (
+                  <span key={stage.label}>
+                    {stage.label}
+                    {index < presentation.stages.length - 1 && <i aria-hidden="true">→</i>}
+                  </span>
+                ))}
+              </div>
+              <p>{presentation.intro}</p>
+            </div>
+          )}
+        </section>
+        <div className="graph-frame">
+          <GraphCanvas
+            graph={atlas.graph}
+            view={activeView}
+            query={query}
+            selectedTypes={selectedTypes}
+            showNegative={showNegative}
+            highlighted={highlighted}
+            selected={selected}
+            detail={detail}
+            detailLoading={detailLoading}
+            inlineDetails={Boolean(presentation)}
+            onSelect={selectNode}
+            onCollapse={clearSelection}
+            onReady={graphReady}
+          />
         </div>
-        {presentation && (
-          <div className="reading-guide" aria-label="Graph reading order">
-            <div className="stage-flow">
-              <span className="guide-start">Start</span>
-              {presentation.stages.map((stage, index) => (
-                <span key={stage.label}>
-                  {stage.label}
-                  {index < presentation.stages.length - 1 && <i aria-hidden="true">→</i>}
+        <footer className="graph-footer">
+          {presentation && (
+            <div className="relation-legend" aria-label="Relation legend">
+              <span>Hover a node to name its links</span>
+              {presentation.relations.map((relation) => (
+                <span key={relation}>
+                  <i
+                    className={`relation-${relation.toLowerCase().replaceAll("_", "-")}`}
+                    aria-hidden="true"
+                  />{" "}
+                  {relationLabel(relation)}
                 </span>
               ))}
             </div>
-            <p>{presentation.intro}</p>
+          )}
+          <div className="canvas-note">
+            <span>
+              Drag to pan · scroll to zoom · select a circle to {presentation ? "expand" : "inspect"}
+            </span>
+            <span>Generated {atlas.manifest.generated_at.slice(0, 10)}</span>
           </div>
-        )}
-        <GraphCanvas
-          graph={atlas.graph}
-          view={activeView}
-          query={query}
-          selectedTypes={selectedTypes}
-          showNegative={showNegative}
-          highlighted={highlighted}
-          onSelect={selectNode}
-          onReady={graphReady}
-        />
-        {presentation && (
-          <div className="relation-legend" aria-label="Relation legend">
-            <span>Hover a card to name its links</span>
-            {presentation.relations.map((relation) => (
-              <span key={relation}>
-                <i
-                  className={`relation-${relation.toLowerCase().replaceAll("_", "-")}`}
-                  aria-hidden="true"
-                />{" "}
-                {relationLabel(relation)}
-              </span>
-            ))}
-          </div>
-        )}
-        <div className="canvas-note">
-          <span>Drag to pan · scroll to zoom · select an entity to inspect evidence</span>
-          <span>Generated {atlas.manifest.generated_at.slice(0, 10)}</span>
-        </div>
+        </footer>
       </main>
 
-      <EntityDrawer
-        detail={detail}
-        loading={detailLoading}
-        repositoryRevision={atlas.manifest.repository_commit}
-        onClose={() => {
-          setSelected(null);
-          setDetail(null);
-          setHighlighted(new Set());
-          setDeepLink(null, viewId);
-        }}
-        onWhy={highlightDecisionPath}
-      />
+      {!selectedInline && (
+        <EntityDrawer
+          detail={detail}
+          loading={detailLoading}
+          repositoryRevision={atlas.manifest.repository_commit}
+          onClose={clearSelection}
+          onWhy={highlightDecisionPath}
+        />
+      )}
     </div>
   );
 }

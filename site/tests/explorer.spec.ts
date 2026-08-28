@@ -7,7 +7,7 @@ test("navigates views, searches, and resolves source details", async ({ page }) 
   await expect(page.getByRole("heading", { name: "Story" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Why this decision?" })).toHaveCount(0);
   await page.getByRole("navigation", { name: "Graph views" }).getByRole("button", { name: /Optimization/ }).click();
-  await expect(page.getByRole("heading", { name: "Optimization" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Optimization", exact: true })).toBeVisible();
 
   await page.getByRole("searchbox", { name: "Search evidence" }).fill("PagedAttention");
   const result = page.getByRole("button", { name: /PagedAttention/ }).first();
@@ -27,11 +27,25 @@ test("has no automatically detectable serious accessibility violations", async (
 test("presents a study as a guided story and groups replicate runs", async ({ page }) => {
   await page.goto("./studies/S003-cpu-enterprise-rag/v1/");
   await expect(page.getByRole("heading", { name: "Story" })).toBeVisible();
+  await expect(page.getByLabel("Story view explanation").locator("p")).toHaveCount(3);
+  await expect(page.getByLabel("Entity color key")).toContainText("WSWorkload");
   await expect(page.getByLabel("Graph reading order")).toContainText(
     "Workload→Study→Experiments→Comparisons→Findings→Decision",
   );
   await expect(page.getByRole("button", { name: "Why this decision?" })).toBeVisible();
   await expect(page.getByLabel("Relation legend")).toContainText("supports");
+
+  const experiment = page
+    .getByRole("navigation", { name: "Graph node navigator" })
+    .getByRole("button", { name: /E0009/ });
+  await experiment.focus();
+  await expect(page.getByRole("tooltip")).toContainText("Select to expand");
+  await page.keyboard.press("Enter");
+  await expect(page.getByLabel("Interactive evidence graph")).toHaveAttribute(
+    "data-expanded-node",
+    "atlas://experiment/E0009@v1",
+  );
+  await expect(page.getByRole("complementary", { name: "Evidence details" })).toHaveCount(0);
 
   await page
     .getByRole("navigation", { name: "Graph views" })

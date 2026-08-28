@@ -1,7 +1,14 @@
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import type { GraphData, GraphEdge, GraphNode, GraphPresentation, GraphView } from "../types";
+import type {
+  EntityDetail,
+  GraphData,
+  GraphEdge,
+  GraphNode,
+  GraphPresentation,
+  GraphView,
+} from "../types";
 
 const colors: Record<string, string> = {
   workload_archetype: "#e8b35a",
@@ -34,7 +41,12 @@ interface Props {
   selectedTypes: Set<string>;
   showNegative: boolean;
   highlighted: Set<string>;
+  selected: GraphNode | null;
+  detail: EntityDetail | null;
+  detailLoading: boolean;
+  inlineDetails: boolean;
   onSelect: (node: GraphNode) => void;
+  onCollapse: () => void;
   onReady: (core: Core) => void;
 }
 
@@ -54,11 +66,34 @@ function compactLabel(value: string, limit = 46): string {
   return `${shortened.slice(0, boundary > 25 ? boundary : limit - 1)}…`;
 }
 
-function displayLabel(node: CanvasNode): string {
-  if (node.synthetic) return compactLabel(node.label, 42);
-  const identifier = artifactCode(node.artifact_ref);
-  if (node.type === "run") return identifier;
-  return `${identifier}\n${compactLabel(node.label)}`;
+function displayIdentifier(node: CanvasNode): string {
+  if (node.synthetic) return `R×${node.member_ids?.length ?? 0}`;
+  return artifactCode(node.artifact_ref);
+}
+
+function relevantDetail(node: CanvasNode, detail: EntityDetail | null): string {
+  if (!detail || detail.node.id !== node.id) return node.summary;
+  const artifact = detail.artifact;
+  const candidates: unknown[] = [];
+  if (node.type === "experiment") candidates.push(artifact.expected_mechanism, artifact.question);
+  if (node.type === "comparison") candidates.push(artifact.conclusion, artifact.status);
+  if (node.type === "finding") candidates.push(artifact.observation, artifact.statement);
+  if (node.type === "decision") candidates.push(artifact.pareto_rationale, artifact.outcome);
+  if (node.type === "hypothesis") candidates.push(artifact.falsifiable_statement, artifact.observation);
+  if (node.type === "study") candidates.push(artifact.product_brief);
+  if (node.type === "workload") candidates.push(artifact.product_brief);
+  const value = candidates.find((candidate) => typeof candidate === "string" && candidate.trim());
+  return typeof value === "string" && value.trim() !== node.label.trim() ? value : node.summary;
+}
+
+function expandedLabel(
+  node: CanvasNode,
+  detail: EntityDetail | null,
+  detailLoading: boolean,
+): string {
+  const meta = `${node.type.replaceAll("_", " ")} · ${node.status}`.toUpperCase();
+  const insight = detailLoading ? "Loading evidence…" : relevantDetail(node, detail);
+  return `${displayIdentifier(node)}\n${compactLabel(node.label, 52)}\n${meta}\n${compactLabel(insight, 112)}`;
 }
 
 function isNegative(node: GraphNode): boolean {
@@ -136,6 +171,7 @@ function runGroups(
 function layeredPositions(
   nodes: CanvasNode[],
   presentation: GraphPresentation,
+  expandedId: string | undefined,
 ): Map<string, { x: number; y: number }> {
   const positions = new Map<string, { x: number; y: number }>();
   presentation.stages.forEach((stage, rank) => {
@@ -143,14 +179,22 @@ function layeredPositions(
       .filter((node) => stage.types.includes(node.type))
       .sort((left, right) => left.id.localeCompare(right.id));
     const usesSubcolumns = ranked.length > 6;
-    const rows = usesSubcolumns ? Math.ceil(ranked.length / 2) : ranked.length;
-    const verticalGap = ranked.length >= 6 ? 78 : 88;
-    ranked.forEach((node, index) => {
-      positions.set(node.id, {
-        x: rank * 200 + (usesSubcolumns ? (index % 2 === 0 ? -60 : 60) : 0),
-        y:
-          ((usesSubcolumns ? Math.floor(index / 2) : index) - (rows - 1) / 2) *
-          verticalGap,
+    const columns = usesSubcolumns
+      ? [ranked.filter((_, index) => index % 2 === 0), ranked.filter((_, index) => index % 2 === 1)]
+      : [ranked];
+    columns.forEach((column, columnIndex) => {
+      const heights = column.map((node) => (node.id === expandedId ? 146 : 56));
+      const totalHeight =
+        heights.reduce((sum, height) => sum + height, 0) +
+        Math.max(0, column.length - 1) * 30;
+      let cursor = -totalHeight / 2;
+      column.forEach((node, index) => {
+        const height = heights[index];
+        positions.set(node.id, {
+          x: rank * 300 + (usesSubcolumns ? (columnIndex === 0 ? -78 : 78) : 0),
+          y: cursor + height / 2,
+        });
+        cursor += height + 30;
       });
     });
   });
@@ -164,17 +208,35 @@ export function GraphCanvas({
   selectedTypes,
   showNegative,
   highlighted,
+  selected,
+  detail,
+  detailLoading,
+  inlineDetails,
   onSelect,
+  onCollapse,
   onReady,
 }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const core = useRef<Core | null>(null);
   const [expandedRunGroups, setExpandedRunGroups] = useState<Set<string>>(new Set());
+  const [tooltip, setTooltip] = useState<{
+    code: string;
+    label: string;
+    type: string;
+    x: number;
+    y: number;
+    expanded: boolean;
+    synthetic: boolean;
+  } | null>(null);
   const viewNodes = useMemo(() => new Set(view.node_ids), [view]);
   const viewEdges = useMemo(() => new Set(view.edge_ids), [view]);
   const presentation = view.filters.presentation;
+  const expandedId = inlineDetails ? selected?.id : undefined;
 
-  useEffect(() => setExpandedRunGroups(new Set()), [view.id]);
+  useEffect(() => {
+    setExpandedRunGroups(new Set());
+    setTooltip(null);
+  }, [view.id]);
 
   const elements = useMemo<ElementDefinition[]>(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -202,7 +264,9 @@ export function GraphCanvas({
         )
         .map((edge) => edge.target),
     );
-    const positions = presentation ? layeredPositions(visibleNodes, presentation) : new Map();
+    const positions = presentation
+      ? layeredPositions(visibleNodes, presentation, expandedId)
+      : new Map();
     const nodeElements: ElementDefinition[] = visibleNodes.map((node) => {
       const matches =
         !normalizedQuery ||
@@ -213,11 +277,15 @@ export function GraphCanvas({
         data: {
           ...node,
           color: colors[node.type] ?? "#c8d0c8",
-          displayLabel: displayLabel(node),
+          displayLabel:
+            node.id === expandedId
+              ? expandedLabel(node, detail, detailLoading)
+              : displayIdentifier(node),
         },
         position: positions.get(node.id),
         classes: [
-          presentation ? "card" : "dot",
+          presentation ? "guided-node" : "dot",
+          node.id === expandedId ? "expanded" : "",
           node.synthetic ? "run-group" : "",
           selectedConfigurations.has(node.id) ? "selected-config" : "",
           highlighted.has(node.id) ? "path" : "",
@@ -271,6 +339,9 @@ export function GraphCanvas({
     return [...nodeElements, ...edgeElements];
   }, [
     expandedRunGroups,
+    expandedId,
+    detail,
+    detailLoading,
     graph,
     highlighted,
     presentation,
@@ -295,84 +366,90 @@ export function GraphCanvas({
           selector: "node",
           style: {
             "background-color": "data(color)",
-            "border-color": "#09110f",
+            "border-color": "#24312c",
             "border-width": 2,
-            color: "#ece9dd",
+            color: "#17231f",
             label: "data(displayLabel)",
             "font-family": "IBM Plex Sans, ui-sans-serif, system-ui",
-            "font-size": 10,
-            "font-weight": 600,
-            "text-background-color": "#09110f",
-            "text-background-opacity": 0.82,
-            "text-background-padding": "3px",
-            "text-margin-y": 13,
-            "text-max-width": "110px",
+            "font-size": 8.5,
+            "font-weight": 800,
+            "text-halign": "center",
+            "text-valign": "center",
+            "text-max-width": "46px",
             "text-wrap": "ellipsis",
-            height: "18px",
-            width: "18px",
+            height: "50px",
+            width: "50px",
           },
         },
         {
-          selector: "node.card",
+          selector: "node.guided-node",
+          style: {
+            shape: "ellipse",
+            width: "64px",
+            height: "64px",
+            "font-size": 8.2,
+            "text-max-width": "60px",
+          },
+        },
+        {
+          selector: "node.expanded",
           style: {
             shape: "roundrectangle",
-            width: "156px",
-            height: "58px",
-            "background-color": "#13201c",
-            "border-color": "data(color)",
-            "border-width": 2,
-            color: "#f0eee4",
-            "font-size": 12,
-            "font-weight": 600,
-            "text-background-opacity": 0,
-            "text-margin-y": 0,
-            "text-max-width": "134px",
-            "text-valign": "center",
+            width: "230px",
+            height: "146px",
+            "border-width": 3,
+            "font-size": 10.5,
+            "font-weight": 650,
+            "line-height": 1.35,
+            "text-max-width": "198px",
             "text-wrap": "wrap",
+            "text-justification": "left",
+            "text-halign": "center",
+            "text-valign": "center",
+            "overlay-color": "#17231f",
+            "overlay-opacity": 0.04,
+            "overlay-padding": 8,
           },
         },
         {
           selector: "node.run-group",
           style: {
-            width: "106px",
             "border-style": "dashed",
-            "background-color": "#182a23",
-            "font-size": 11,
+            "font-size": 9,
           },
         },
         {
           selector: "node.selected-config",
           style: {
-            "border-color": "#59b894",
+            "border-color": "#27795c",
             "border-width": 4,
-            "background-color": "#173026",
           },
         },
         {
           selector: "edge",
           style: {
-            width: 1.6,
-            "line-color": "#557168",
-            "target-arrow-color": "#779288",
+            width: 2.1,
+            "line-color": "#91a19a",
+            "target-arrow-color": "#71877e",
             "target-arrow-shape": "triangle",
-            "arrow-scale": 0.75,
-            "curve-style": layered ? "taxi" : "bezier",
-            "taxi-direction": "rightward",
-            "taxi-turn": 24,
-            opacity: 0.76,
+            "arrow-scale": 0.95,
+            "curve-style": "bezier",
+            opacity: 0.82,
           },
         },
         {
           selector: "edge.context",
           style: {
             label: "data(displayRelation)",
-            color: "#d7ddd8",
-            "font-size": 8,
-            "text-background-color": "#09110f",
-            "text-background-opacity": 0.94,
-            "text-background-padding": "3px",
-            "line-color": "#91a99f",
-            "target-arrow-color": "#91a99f",
+            color: "#25342e",
+            "font-size": 8.5,
+            "font-weight": 650,
+            "text-background-color": "#ffffff",
+            "text-background-opacity": 0.96,
+            "text-background-padding": "4px",
+            "line-color": "#465f55",
+            "target-arrow-color": "#465f55",
+            width: 2.8,
             opacity: 1,
             "z-index": 12,
           },
@@ -401,10 +478,10 @@ export function GraphCanvas({
         {
           selector: ".path",
           style: {
-            "border-color": "#f2d36f",
+            "border-color": "#b77919",
             "border-width": 4,
-            "line-color": "#f2d36f",
-            "target-arrow-color": "#f2d36f",
+            "line-color": "#d0922d",
+            "target-arrow-color": "#d0922d",
             opacity: 1,
             "z-index": 20,
           },
@@ -415,9 +492,9 @@ export function GraphCanvas({
         },
         {
           selector: ".search-match",
-          style: { "border-color": "#f2d36f", "border-width": 4, "z-index": 30 },
+          style: { "border-color": "#b77919", "border-width": 4, "z-index": 30 },
         },
-        { selector: ":selected", style: { "border-color": "#f4efe0", "border-width": 4 } },
+        { selector: ":selected", style: { "border-color": "#17231f", "border-width": 4 } },
       ],
       layout: layered
         ? { name: "preset", fit: !narrow, padding: 38 }
@@ -429,7 +506,13 @@ export function GraphCanvas({
           },
     });
     core.current = cy;
-    if (layered && narrow) {
+    if (layered && expandedId) {
+      const expandedNode = cy.getElementById(expandedId);
+      if (expandedNode.length) {
+        cy.zoom(Math.max(cy.zoom(), 0.78));
+        cy.center(expandedNode);
+      }
+    } else if (layered && narrow) {
       cy.zoom(0.72);
       const firstStage = presentation?.stages[0];
       const start = cy
@@ -443,25 +526,121 @@ export function GraphCanvas({
         setExpandedRunGroups((current) => new Set(current).add(data.id));
         return;
       }
+      if (inlineDetails && data.id === expandedId) {
+        onCollapse();
+        return;
+      }
       onSelect(data);
     });
-    cy.on("mouseover", "node", (event) => event.target.connectedEdges().addClass("context"));
-    cy.on("mouseout", "node", (event) => event.target.connectedEdges().removeClass("context"));
+    const showTooltip = (event: cytoscape.EventObject) => {
+      const data = event.target.data() as CanvasNode;
+      const position = event.target.renderedPosition();
+      setTooltip({
+        code: displayIdentifier(data),
+        label: data.label,
+        type: data.type,
+        x: position.x,
+        y: position.y,
+        expanded: data.id === expandedId,
+        synthetic: Boolean(data.synthetic),
+      });
+    };
+    cy.on("mouseover", "node", (event) => {
+      event.target.connectedEdges().addClass("context");
+      showTooltip(event);
+    });
+    cy.on("mousemove", "node", showTooltip);
+    cy.on("mouseout", "node", (event) => {
+      event.target.connectedEdges().removeClass("context");
+      setTooltip(null);
+    });
     onReady(cy);
     return () => {
       cy.destroy();
       core.current = null;
     };
-  }, [elements, onReady, onSelect, presentation, view.default_layout]);
+  }, [
+    elements,
+    expandedId,
+    inlineDetails,
+    onCollapse,
+    onReady,
+    onSelect,
+    presentation,
+    view.default_layout,
+  ]);
+
+  const accessibleNodes = elements.filter(
+    (element): element is ElementDefinition & { data: CanvasNode } =>
+      "type" in element.data && typeof element.data.type === "string",
+  );
 
   return (
-    <div
-      className={`graph-canvas${presentation ? " with-presentation" : ""}`}
-      ref={container}
-      role="region"
-      aria-label="Interactive evidence graph"
-      data-rendered-nodes={elements.filter((element) => "type" in element.data).length}
-      data-run-groups={elements.filter((element) => element.data.synthetic === true).length}
-    />
+    <div className={`graph-surface${presentation ? " with-presentation" : ""}`}>
+      <div
+        className="graph-canvas"
+        ref={container}
+        role="img"
+        aria-label="Interactive evidence graph. Use the node navigator for keyboard access."
+        data-rendered-nodes={accessibleNodes.length}
+        data-run-groups={elements.filter((element) => element.data.synthetic === true).length}
+        data-expanded-node={expandedId ?? ""}
+      />
+      {tooltip && (
+        <div className="node-tooltip" style={{ left: tooltip.x, top: tooltip.y }} role="tooltip">
+          <strong>{tooltip.code}</strong>
+          <span>{tooltip.label}</span>
+          <small>
+            {tooltip.synthetic
+              ? "Select to reveal individual runs"
+              : tooltip.expanded
+                ? "Select to collapse"
+                : inlineDetails
+                  ? "Select to expand"
+                  : `Select to inspect ${tooltip.type.replaceAll("_", " ")}`}
+          </small>
+        </div>
+      )}
+      <nav className="graph-node-index" aria-label="Graph node navigator">
+        {accessibleNodes.map((element) => {
+          const node = element.data;
+          return (
+            <button
+              key={node.id}
+              onFocus={() => {
+                const element = core.current?.getElementById(node.id);
+                if (!element?.length) return;
+                const position = element.renderedPosition();
+                element.connectedEdges().addClass("context");
+                setTooltip({
+                  code: displayIdentifier(node),
+                  label: node.label,
+                  type: node.type,
+                  x: position.x,
+                  y: position.y,
+                  expanded: node.id === expandedId,
+                  synthetic: Boolean(node.synthetic),
+                });
+              }}
+              onBlur={() => {
+                core.current?.getElementById(node.id).connectedEdges().removeClass("context");
+                setTooltip(null);
+              }}
+              onClick={() => {
+                if (node.synthetic) {
+                  setExpandedRunGroups((current) => new Set(current).add(node.id));
+                } else if (inlineDetails && node.id === expandedId) {
+                  onCollapse();
+                } else {
+                  onSelect(node);
+                }
+              }}
+            >
+              {displayIdentifier(node)} — {node.label}
+            </button>
+          );
+        })}
+      </nav>
+    </div>
   );
 }

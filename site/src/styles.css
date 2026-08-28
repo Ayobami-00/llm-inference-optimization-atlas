@@ -1,15 +1,16 @@
 :root {
-  color: #eae9df;
-  background: #09110f;
+  color: #17231f;
+  background: #ffffff;
   font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --ink: #09110f;
-  --panel: #0e1815;
-  --panel-soft: #13201c;
-  --line: #253a33;
-  --muted: #8b9a93;
-  --paper: #eae9df;
+  --ink: #17231f;
+  --panel: #f6f8f4;
+  --panel-soft: #edf2ed;
+  --line: #d8dfda;
+  --muted: #63716a;
+  --paper: #17231f;
+  --canvas: #ffffff;
   --signal: #e8b35a;
   --mint: #59b894;
   --danger: #dc715e;
@@ -74,10 +75,7 @@ input:focus-visible {
   display: grid;
   grid-template: 72px calc(100vh - 72px) / 286px minmax(0, 1fr);
   min-height: 100vh;
-  background:
-    linear-gradient(rgba(94, 132, 116, 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(94, 132, 116, 0.055) 1px, transparent 1px), var(--ink);
-  background-size: 28px 28px;
+  background: var(--canvas);
 }
 
 .topbar {
@@ -87,7 +85,7 @@ input:focus-visible {
   grid-template-columns: 286px minmax(280px, 620px) 1fr;
   align-items: center;
   border-bottom: 1px solid var(--line);
-  background: rgba(9, 17, 15, 0.94);
+  background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(16px);
 }
 
@@ -149,10 +147,10 @@ input:focus-visible {
   width: 100%;
   height: 40px;
   padding: 0 16px 0 38px;
-  border: 1px solid #2b4038;
+  border: 1px solid var(--line);
   border-radius: 8px;
-  color: var(--paper);
-  background: #101b18;
+  color: var(--ink);
+  background: #f8faf7;
 }
 
 .search-wrap::before {
@@ -166,7 +164,7 @@ input:focus-visible {
 }
 
 .search-wrap input::placeholder {
-  color: #718078;
+  color: #87938d;
 }
 
 .search-results {
@@ -180,8 +178,8 @@ input:focus-visible {
   border: 1px solid var(--line);
   border-radius: 9px;
   list-style: none;
-  background: #111d19;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.42);
+  background: #ffffff;
+  box-shadow: 0 20px 48px rgba(31, 48, 41, 0.16);
 }
 
 .search-results button {
@@ -198,7 +196,7 @@ input:focus-visible {
 }
 
 .search-results button:hover {
-  background: #1a2924;
+  background: var(--panel-soft);
 }
 
 .search-results small {
@@ -211,7 +209,7 @@ input:focus-visible {
   margin-right: 22px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  color: #a8b3ad;
+  color: #526159;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 10px;
   text-transform: uppercase;
@@ -235,7 +233,7 @@ input:focus-visible {
   overflow-y: auto;
   padding: 25px 20px 18px;
   border-right: 1px solid var(--line);
-  background: rgba(11, 21, 18, 0.92);
+  background: #f7f8f4;
 }
 
 .rail-intro {
@@ -244,7 +242,7 @@ input:focus-visible {
 
 .eyebrow {
   margin: 0 0 8px;
-  color: var(--signal);
+  color: #765018;
   font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
@@ -280,14 +278,14 @@ input:focus-visible {
   padding: 9px 10px;
   border: 0;
   border-radius: 6px;
-  color: #9ba9a2;
+  color: #5f6d66;
   text-align: left;
   background: transparent;
   cursor: pointer;
 }
 
 .view-nav button span {
-  color: #98a69f;
+  color: #536159;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 9px;
 }
@@ -295,7 +293,7 @@ input:focus-visible {
 .view-nav button:hover,
 .view-nav button.active {
   color: var(--paper);
-  background: #17251f;
+  background: #e7ece7;
 }
 
 .view-nav button.active {
@@ -335,7 +333,7 @@ input:focus-visible {
   padding: 7px 8px;
   border: 1px solid transparent;
   border-radius: 5px;
-  color: #a7b1ac;
+  color: #53615a;
   text-align: left;
   background: transparent;
   cursor: pointer;
@@ -343,8 +341,8 @@ input:focus-visible {
 
 .type-filters button:hover,
 .type-filters button.active {
-  border-color: #2b4138;
-  background: #14211d;
+  border-color: #b9c7bf;
+  background: #e8eee9;
 }
 
 .type-filters i {
@@ -639,6 +637,299 @@ input:focus-visible {
   pointer-events: none;
 }
 
+/* The graph workspace is a document first and a canvas second. These rows reserve
+   space for explanation and controls so no overlay can cover evidence. */
+.graph-stage {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(280px, 1fr) auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--ink);
+  background: var(--canvas);
+}
+
+.graph-stage::after {
+  display: none;
+}
+
+.stage-heading {
+  position: relative;
+  inset: auto;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 24px;
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+  pointer-events: auto;
+}
+
+.stage-heading > div:first-child,
+.stage-title-block {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+}
+
+.stage-context {
+  justify-content: flex-start;
+}
+
+.stage-description {
+  margin: 5px 0 0;
+  color: var(--ink);
+  font-size: clamp(17px, 1.3vw, 23px);
+  line-height: 1.12;
+  text-align: left;
+}
+
+.view-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  max-width: 1120px;
+  margin-top: 11px;
+}
+
+.view-summary p {
+  padding-left: 11px;
+  margin: 0;
+  border-left: 2px solid #d8dfda;
+  color: #526159;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.stage-actions {
+  position: static;
+  align-self: start;
+}
+
+.why-control {
+  border-color: #c78b2d;
+  color: #66460f;
+  background: #fff8e9;
+}
+
+.why-control:hover {
+  color: #ffffff;
+  background: #9e6818;
+}
+
+.zoom-controls button {
+  border-color: var(--line);
+  color: #435149;
+  background: #f8faf7;
+}
+
+.zoom-controls button:hover {
+  background: #e9eeea;
+}
+
+.stage-heading p {
+  color: var(--muted);
+}
+
+.stage-heading strong {
+  color: var(--ink);
+}
+
+.entity-key {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding-top: 11px;
+  border-top: 1px solid #e9ede9;
+}
+
+.key-label {
+  padding-top: 5px;
+  color: #6b7871;
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+}
+
+.entity-key > div {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.entity-key button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 5px;
+  align-items: center;
+  min-height: 25px;
+  padding: 3px 7px 3px 4px;
+  border: 1px solid #dce3de;
+  border-radius: 999px;
+  color: #45534c;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.entity-key button:hover,
+.entity-key button.active {
+  border-color: #71827a;
+  background: #f1f4f1;
+}
+
+.entity-key i {
+  width: 17px;
+  height: 17px;
+  border: 1px solid rgba(23, 35, 31, 0.28);
+  border-radius: 50%;
+}
+
+.entity-key code {
+  color: #17231f;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.entity-key button span {
+  color: #66746d;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.reading-guide {
+  position: static;
+  grid-column: 1 / -1;
+  pointer-events: auto;
+}
+
+.stage-flow {
+  border-color: #d8dfda;
+  color: #596860;
+  background: #f7f9f6;
+  backdrop-filter: none;
+}
+
+.stage-flow span.guide-start {
+  color: #4c350f;
+  background: #f3c56f;
+}
+
+.stage-flow i {
+  color: #819088;
+}
+
+.reading-guide > p {
+  color: #6b7972;
+}
+
+.graph-frame {
+  position: relative;
+  min-width: 0;
+  min-height: 280px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(244, 239, 224, 0.25), transparent 35%),
+    linear-gradient(rgba(91, 115, 104, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(91, 115, 104, 0.055) 1px, transparent 1px), #ffffff;
+  background-size: auto, 28px 28px, 28px 28px, auto;
+}
+
+.graph-surface,
+.graph-frame .graph-canvas,
+.graph-frame .graph-canvas.with-presentation {
+  position: absolute;
+  inset: 0;
+}
+
+.graph-surface {
+  overflow: hidden;
+}
+
+.node-tooltip {
+  position: absolute;
+  z-index: 12;
+  display: grid;
+  gap: 3px;
+  width: max-content;
+  max-width: 230px;
+  padding: 9px 11px;
+  border: 1px solid #ccd6cf;
+  border-radius: 8px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 10px 28px rgba(31, 48, 41, 0.14);
+  transform: translate(20px, calc(-100% - 14px));
+  pointer-events: none;
+}
+
+.node-tooltip strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+}
+
+.node-tooltip span {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.node-tooltip small {
+  color: #68766f;
+  font-size: 9px;
+}
+
+.graph-node-index {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.graph-footer {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  gap: 6px;
+  padding: 8px 24px 11px;
+  border-top: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.relation-legend {
+  position: static;
+  padding: 0 0 7px;
+  border: 0;
+  border-bottom: 1px solid #e7ece8;
+  border-radius: 0;
+  color: #65736c;
+  background: transparent;
+  backdrop-filter: none;
+  pointer-events: auto;
+}
+
+.relation-legend > span:first-child {
+  color: #526159;
+}
+
+.relation-legend i {
+  background: #71877e;
+  box-shadow: 4px 0 0 -1px #71877e;
+}
+
+.canvas-note {
+  position: static;
+  color: #59665f;
+}
+
 .entity-drawer {
   position: fixed;
   z-index: 40;
@@ -648,9 +939,10 @@ input:focus-visible {
   width: min(390px, calc(100vw - 306px));
   overflow-y: auto;
   padding: 46px 28px 30px;
-  border-left: 1px solid #385148;
-  background: rgba(14, 25, 21, 0.98);
-  box-shadow: -24px 0 50px rgba(0, 0, 0, 0.3);
+  border-left: 1px solid #ccd6cf;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: -24px 0 50px rgba(31, 48, 41, 0.16);
   backdrop-filter: blur(20px);
   animation: drawer-in 180ms ease-out;
 }
@@ -678,7 +970,7 @@ input:focus-visible {
 
 .entity-drawer h2 {
   margin: 0;
-  color: #f1efe4;
+  color: var(--ink);
   font-family: Georgia, "Times New Roman", serif;
   font-size: 30px;
   font-weight: 400;
@@ -686,7 +978,7 @@ input:focus-visible {
 }
 
 .drawer-summary {
-  color: #a6b2ac;
+  color: #526159;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 14px;
   line-height: 1.65;
@@ -727,13 +1019,13 @@ input:focus-visible {
   padding-top: 20px;
   margin-top: 20px;
   border-top: 1px solid var(--line);
-  color: #9da9a3;
+  color: #58665f;
   font-size: 12px;
   line-height: 1.55;
 }
 
 .drawer-section a {
-  color: #e3c675;
+  color: #8a5d16;
   text-decoration: none;
   overflow-wrap: anywhere;
 }
@@ -782,7 +1074,7 @@ input:focus-visible {
 }
 
 .relation-list span {
-  color: #bdc6c1;
+  color: #46544d;
   font-size: 10px;
 }
 
@@ -811,7 +1103,7 @@ input:focus-visible {
   height: 4px;
   margin-top: 7px;
   overflow: hidden;
-  background: #24352f;
+  background: #e4e9e5;
 }
 
 .effect-track span {
@@ -833,7 +1125,7 @@ input:focus-visible {
   place-content: center;
   padding: 30px;
   color: var(--muted);
-  background: var(--ink);
+  background: #ffffff;
 }
 
 .fatal-state h1 {
@@ -1036,5 +1328,84 @@ input:focus-visible {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .atlas-shell {
+    grid-template-rows: 112px auto minmax(780px, auto);
+  }
+
+  .graph-stage {
+    min-height: 780px;
+  }
+
+  .stage-heading {
+    position: relative;
+    inset: auto;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 14px 12px 12px;
+  }
+
+  .stage-heading > div:first-child,
+  .stage-title-block {
+    padding: 0;
+  }
+
+  .stage-description {
+    font-size: 16px;
+    text-align: left;
+  }
+
+  .view-summary {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .stage-actions {
+    justify-content: flex-start;
+    margin-top: 0;
+  }
+
+  .entity-key {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .key-label {
+    padding: 0;
+  }
+
+  .reading-guide {
+    position: static;
+    inset: auto;
+  }
+
+  .reading-guide > p {
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .graph-frame .graph-canvas,
+  .graph-frame .graph-canvas.with-presentation {
+    position: absolute;
+    inset: 0;
+  }
+
+  .relation-legend {
+    position: static;
+    inset: auto;
+    overflow-x: auto;
+  }
+
+  .graph-footer {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .canvas-note {
+    position: static;
+    inset: auto;
   }
 }

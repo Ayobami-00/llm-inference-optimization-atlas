@@ -105,6 +105,12 @@ describe("Atlas explorer", () => {
     expect(screen.getByRole("generic", { name: "Relation legend" })).toHaveTextContent(
       "produces",
     );
+    const explanation = screen.getByRole("generic", { name: "Story view explanation" });
+    expect(explanation.querySelectorAll("p")).toHaveLength(3);
+    expect(explanation).toHaveTextContent("concrete workload and study");
+    expect(screen.getByRole("generic", { name: "Entity color key" })).toHaveTextContent(
+      "OPTOptimization",
+    );
     fireEvent.click(screen.getByRole("button", { name: /Bottleneck/ }));
     expect(screen.getByRole("heading", { name: "Bottleneck" })).toBeInTheDocument();
 
