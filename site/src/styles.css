@@ -1129,18 +1129,65 @@ input:focus-visible {
 }
 
 .record-reference {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  max-width: 100%;
+  padding: 5px 9px;
+  border: 1px solid #c9d5ce;
+  border-radius: 6px;
   color: #765018;
   font-weight: 750;
-  text-decoration: underline;
-  text-decoration-color: #cfa45a;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f7f4 100%);
+  box-shadow: 0 1px 2px rgba(35, 54, 46, 0.12);
+  cursor: pointer;
+  text-decoration: none;
+  touch-action: manipulation;
+  transition:
+    color 120ms ease,
+    border-color 120ms ease,
+    background 120ms ease,
+    box-shadow 120ms ease,
+    transform 120ms ease;
+}
+
+.artifact-field-grid article > a.record-reference,
+.detail-nested a.record-reference {
+  display: inline-flex;
+}
+
+.record-reference::after {
+  content: "↗";
+  flex: 0 0 auto;
+  color: #7b8b82;
+  font-size: 0.9em;
+  font-weight: 900;
 }
 
 .record-reference:hover,
 .record-reference:focus-visible {
   color: #3c6d58;
-  text-decoration-color: currentColor;
+  border-color: #6e9b87;
+  background: #f3faf6;
+  box-shadow: 0 3px 8px rgba(35, 84, 64, 0.16);
+  transform: translateY(-1px);
+}
+
+.record-reference:hover::after,
+.record-reference:focus-visible::after {
+  color: currentColor;
+}
+
+.record-reference:focus-visible {
+  outline: 2px solid #3c6d58;
+  outline-offset: 2px;
+}
+
+.record-reference:active {
+  background: #e8f2ec;
+  box-shadow: inset 0 1px 2px rgba(35, 84, 64, 0.18);
+  transform: translateY(0);
 }
 
 .unresolved-reference {
@@ -1200,6 +1247,17 @@ input:focus-visible {
   font-size: 9px;
   background: #f3f6f3;
   overflow-wrap: anywhere;
+}
+
+.detail-chip-list li:has(> .record-reference) {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.detail-chip-list .record-reference {
+  font-size: 9px;
 }
 
 .detail-object-list {
@@ -1333,13 +1391,17 @@ input:focus-visible {
   text-transform: uppercase;
 }
 
-.relation-card > code,
-.relation-card > .record-reference {
+.relation-card > code {
   display: block;
   margin: 5px 0 9px;
   color: #765018;
   font-size: 10px;
   font-weight: 800;
+}
+
+.relation-card > .record-reference {
+  margin: 7px 0 10px;
+  font-size: 10px;
 }
 
 .relation-card > dl {

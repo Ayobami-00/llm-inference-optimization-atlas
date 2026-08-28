@@ -57,11 +57,12 @@ test("presents a study as a guided story and groups replicate runs", async ({ pa
   const workload = page
     .getByRole("navigation", { name: "Graph node navigator" })
     .getByRole("button", { name: /WS003/ });
-  await workload.click();
+  await workload.focus();
+  await page.keyboard.press("Enter");
   const workloadDetails = page.getByRole("complementary", { name: "Evidence details" });
   const archetype = workloadDetails.getByRole("link", {
     name: "Open Enterprise RAG in the repository",
-  });
+  }).first();
   await expect(archetype).toHaveAttribute("href", /reference\/ontology\/v1\/workloads\.yaml$/);
   await page.getByRole("button", { name: "Close details" }).click();
 
