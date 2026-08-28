@@ -3,25 +3,228 @@
   "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/models/model-revision.schema.json",
   "title": "Model revision",
   "allOf": [
-    { "$ref": "../common/artifact.schema.json" },
+    {
+      "$ref": "../common/artifact.schema.json"
+    },
     {
       "type": "object",
-      "required": ["repository", "revision", "family", "modalities", "parameters", "architecture", "tokenizer", "weights", "compatibility", "artifacts"],
+      "required": [
+        "repository",
+        "revision",
+        "family",
+        "modalities",
+        "parameters",
+        "architecture",
+        "tokenizer",
+        "weights",
+        "compatibility",
+        "artifacts"
+      ],
       "properties": {
-        "kind": { "const": "ModelRevision" },
-        "id": { "pattern": "^M[0-9]{3}$" },
-        "repository": { "type": "string" },
-        "revision": { "type": "string", "minLength": 7 },
-        "family": { "type": "string" },
-        "modalities": { "type": "array", "minItems": 1, "items": { "type": "string" } },
-        "parameters": { "type": "object", "required": ["total"], "properties": { "total": { "type": "integer", "minimum": 1 }, "active": { "type": "integer", "minimum": 1 } }, "additionalProperties": false },
-        "architecture": { "type": "object", "required": ["type", "layers", "hidden_size", "attention_type", "context_window"], "properties": { "type": { "type": "string" }, "layers": { "type": "integer", "minimum": 1 }, "hidden_size": { "type": "integer", "minimum": 1 }, "attention_type": { "enum": ["MHA", "MQA", "GQA", "MLA", "other"] }, "query_heads": { "type": "integer", "minimum": 1 }, "kv_heads": { "type": "integer", "minimum": 1 }, "head_dimension": { "type": "integer", "minimum": 1 }, "context_window": { "type": "integer", "minimum": 1 }, "positional_encoding": { "type": "string" }, "sliding_window": { "type": ["integer", "null"], "minimum": 1 } }, "additionalProperties": false },
-        "moe": { "type": "object" },
-        "tokenizer": { "type": "object", "required": ["repository", "revision"], "properties": { "repository": { "type": "string" }, "revision": { "type": "string" }, "vocabulary_size": { "type": "integer", "minimum": 1 } }, "additionalProperties": false },
-        "weights": { "type": "object", "required": ["format", "dtype"], "properties": { "format": { "enum": ["safetensors", "GGUF", "ONNX", "other"] }, "dtype": { "type": "string" }, "quantization": { "type": ["object", "null"] } }, "additionalProperties": false },
-        "lineage": { "type": "array", "items": { "$ref": "../common/reference.schema.json" } },
-        "compatibility": { "type": "object", "required": ["runtimes", "architectures"], "properties": { "runtimes": { "type": "array", "items": { "type": "string" } }, "architectures": { "type": "array", "items": { "type": "string" } } }, "additionalProperties": false },
-        "artifacts": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["url", "sha256", "size_bytes"], "properties": { "url": { "type": "string", "format": "uri" }, "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }, "size_bytes": { "type": "integer", "minimum": 1 } }, "additionalProperties": false } }
+        "kind": {
+          "const": "ModelRevision"
+        },
+        "id": {
+          "pattern": "^M[0-9]{3}$"
+        },
+        "repository": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 7
+        },
+        "family": {
+          "type": "string"
+        },
+        "modalities": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "required": [
+            "total"
+          ],
+          "properties": {
+            "total": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "active": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "architecture": {
+          "type": "object",
+          "required": [
+            "type",
+            "layers",
+            "hidden_size",
+            "attention_type",
+            "context_window"
+          ],
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "layers": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "hidden_size": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "attention_type": {
+              "enum": [
+                "MHA",
+                "MQA",
+                "GQA",
+                "MLA",
+                "other"
+              ]
+            },
+            "query_heads": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "kv_heads": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "head_dimension": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "context_window": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "positional_encoding": {
+              "type": "string"
+            },
+            "sliding_window": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "moe": {
+          "type": "object"
+        },
+        "tokenizer": {
+          "type": "object",
+          "required": [
+            "repository",
+            "revision"
+          ],
+          "properties": {
+            "repository": {
+              "type": "string"
+            },
+            "revision": {
+              "type": "string"
+            },
+            "vocabulary_size": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "weights": {
+          "type": "object",
+          "required": [
+            "format",
+            "dtype"
+          ],
+          "properties": {
+            "format": {
+              "enum": [
+                "safetensors",
+                "GGUF",
+                "ONNX",
+                "other"
+              ]
+            },
+            "dtype": {
+              "type": "string"
+            },
+            "quantization": {
+              "type": [
+                "object",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "lineage": {
+          "type": "array",
+          "items": {
+            "$ref": "../common/reference.schema.json"
+          }
+        },
+        "compatibility": {
+          "type": "object",
+          "required": [
+            "runtimes",
+            "architectures"
+          ],
+          "properties": {
+            "runtimes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "architectures": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "url",
+              "sha256",
+              "size_bytes"
+            ],
+            "properties": {
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "size_bytes": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        }
       }
     }
   ],

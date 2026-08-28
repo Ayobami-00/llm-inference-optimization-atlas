@@ -3,19 +3,96 @@
   "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/quality/quality-contract.schema.json",
   "title": "Quality contract",
   "allOf": [
-    { "$ref": "../common/artifact.schema.json" },
+    {
+      "$ref": "../common/artifact.schema.json"
+    },
     {
       "type": "object",
-      "required": ["gate", "dimensions", "aggregation", "missing_result", "frozen_before_experiment"],
+      "required": [
+        "gate",
+        "dimensions",
+        "aggregation",
+        "missing_result",
+        "frozen_before_experiment"
+      ],
       "properties": {
-        "kind": { "const": "QualityContract" },
-        "id": { "pattern": "^QC[0-9]{3}$" },
-        "gate": { "enum": ["Q0", "Q1", "Q2"] },
-        "reference_configuration": { "$ref": "../common/reference.schema.json" },
-        "dimensions": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["id", "name", "evaluator", "direction", "minimum", "allowed_regression"], "properties": { "id": { "type": "string" }, "name": { "type": "string" }, "evaluator": { "$ref": "../common/reference.schema.json" }, "direction": { "enum": ["higher_is_better", "lower_is_better", "exact"] }, "minimum": { "type": "number" }, "allowed_regression": { "type": "number", "minimum": 0 }, "weight": { "type": "number", "minimum": 0 } }, "additionalProperties": false } },
-        "aggregation": { "enum": ["all_dimensions", "weighted", "none"] },
-        "missing_result": { "enum": ["fail", "ineligible"] },
-        "frozen_before_experiment": { "const": true }
+        "kind": {
+          "const": "QualityContract"
+        },
+        "id": {
+          "pattern": "^QC[0-9]{3}$"
+        },
+        "gate": {
+          "enum": [
+            "Q0",
+            "Q1",
+            "Q2"
+          ]
+        },
+        "reference_configuration": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "dimensions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "evaluator",
+              "direction",
+              "minimum",
+              "allowed_regression"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "evaluator": {
+                "$ref": "../common/reference.schema.json"
+              },
+              "direction": {
+                "enum": [
+                  "higher_is_better",
+                  "lower_is_better",
+                  "exact"
+                ]
+              },
+              "minimum": {
+                "type": "number"
+              },
+              "allowed_regression": {
+                "type": "number",
+                "minimum": 0
+              },
+              "weight": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "aggregation": {
+          "enum": [
+            "all_dimensions",
+            "weighted",
+            "none"
+          ]
+        },
+        "missing_result": {
+          "enum": [
+            "fail",
+            "ineligible"
+          ]
+        },
+        "frozen_before_experiment": {
+          "const": true
+        }
       }
     }
   ],

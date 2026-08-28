@@ -5,48 +5,108 @@
   "$defs": {
     "quantity": {
       "type": "object",
-      "required": ["value", "unit"],
+      "required": [
+        "value",
+        "unit"
+      ],
       "properties": {
-        "value": { "type": "number" },
-        "unit": { "type": "string", "minLength": 1 },
-        "uncertainty": { "type": "number", "minimum": 0 }
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uncertainty": {
+          "type": "number",
+          "minimum": 0
+        }
       },
       "additionalProperties": false
     },
     "percentiles": {
       "type": "object",
       "properties": {
-        "p50": { "type": "number" },
-        "p90": { "type": "number" },
-        "p95": { "type": "number" },
-        "p99": { "type": "number" }
+        "p50": {
+          "type": "number"
+        },
+        "p90": {
+          "type": "number"
+        },
+        "p95": {
+          "type": "number"
+        },
+        "p99": {
+          "type": "number"
+        }
       },
       "minProperties": 1,
       "additionalProperties": false
     },
     "distribution": {
       "type": "object",
-      "required": ["count", "minimum", "maximum", "mean", "unit"],
+      "required": [
+        "count",
+        "minimum",
+        "maximum",
+        "mean",
+        "unit"
+      ],
       "properties": {
-        "count": { "type": "integer", "minimum": 0 },
-        "minimum": { "type": "number" },
-        "maximum": { "type": "number" },
-        "mean": { "type": "number" },
-        "standard_deviation": { "type": "number", "minimum": 0 },
-        "percentiles": { "$ref": "#/$defs/percentiles" },
-        "unit": { "type": "string", "minLength": 1 }
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "mean": {
+          "type": "number"
+        },
+        "standard_deviation": {
+          "type": "number",
+          "minimum": 0
+        },
+        "percentiles": {
+          "$ref": "#/$defs/percentiles"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        }
       },
       "additionalProperties": false
     },
     "confidence_interval": {
       "type": "object",
-      "required": ["level", "lower", "upper", "method"],
+      "required": [
+        "level",
+        "lower",
+        "upper",
+        "method"
+      ],
       "properties": {
-        "level": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 },
-        "lower": { "type": "number" },
-        "upper": { "type": "number" },
-        "method": { "type": "string" },
-        "resamples": { "type": "integer", "minimum": 1 }
+        "level": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 1
+        },
+        "lower": {
+          "type": "number"
+        },
+        "upper": {
+          "type": "number"
+        },
+        "method": {
+          "type": "string"
+        },
+        "resamples": {
+          "type": "integer",
+          "minimum": 1
+        }
       },
       "additionalProperties": false
     }

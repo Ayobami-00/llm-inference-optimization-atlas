@@ -3,14 +3,88 @@
   "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/graph/graph-manifest.schema.json",
   "title": "Compiled evidence graph manifest",
   "type": "object",
-  "required": ["graph_version", "generated_at", "repository_commit", "scope", "counts", "files"],
+  "required": [
+    "graph_version",
+    "generated_at",
+    "repository_commit",
+    "scope",
+    "counts",
+    "files"
+  ],
   "properties": {
-    "graph_version": { "const": 1 },
-    "generated_at": { "type": "string", "format": "date-time" },
-    "repository_commit": { "type": "string" },
-    "scope": { "type": "object", "required": ["type"], "properties": { "type": { "enum": ["global", "study"] }, "study": { "type": "string" } }, "additionalProperties": false },
-    "counts": { "type": "object", "required": ["nodes", "edges"], "properties": { "nodes": { "type": "integer", "minimum": 0 }, "edges": { "type": "integer", "minimum": 0 }, "entities": { "type": "integer", "minimum": 0 } }, "additionalProperties": false },
-    "files": { "type": "object", "required": ["graph", "indexes", "views"], "properties": { "graph": { "type": "string" }, "indexes": { "type": "string" }, "views": { "type": "array", "items": { "type": "string" } } }, "additionalProperties": false }
+    "graph_version": {
+      "const": 1
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "repository_commit": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "global",
+            "study"
+          ]
+        },
+        "study": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "counts": {
+      "type": "object",
+      "required": [
+        "nodes",
+        "edges"
+      ],
+      "properties": {
+        "nodes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "edges": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "entities": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "files": {
+      "type": "object",
+      "required": [
+        "graph",
+        "indexes",
+        "views"
+      ],
+      "properties": {
+        "graph": {
+          "type": "string"
+        },
+        "indexes": {
+          "type": "string"
+        },
+        "views": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
   },
   "additionalProperties": false
 }

@@ -4,39 +4,39 @@
   "metrics": {
     "MET001": {
       "unit": "count",
-      "value": 6.0
+      "value": 6
     },
     "MET002": {
       "unit": "count",
-      "value": 6.0
+      "value": 6
     },
     "MET003": {
       "unit": "count",
-      "value": 0.0
+      "value": 0
     },
     "MET004": {
       "unit": "count",
-      "value": 0.0
+      "value": 0
     },
     "MET005": {
       "unit": "count",
-      "value": 0.0
+      "value": 0
     },
     "MET006": {
       "unit": "count",
-      "value": 0.0
+      "value": 0
     },
     "MET007": {
       "unit": "token",
-      "value": 1555.0
+      "value": 1555
     },
     "MET008": {
       "unit": "token",
-      "value": 278.0
+      "value": 278
     },
     "MET009": {
       "unit": "token",
-      "value": 1833.0
+      "value": 1833
     },
     "MET010": {
       "distribution": {
@@ -63,13 +63,13 @@
     "MET012": {
       "distribution": {
         "count": 6,
-        "mean": 0.0,
-        "p50": 0.0,
-        "p90": 0.0,
-        "p95": 0.0
+        "mean": 0,
+        "p50": 0,
+        "p90": 0,
+        "p95": 0
       },
       "unit": "ms",
-      "value": 0.0
+      "value": 0
     },
     "MET013": {
       "distribution": {
@@ -130,11 +130,11 @@
     },
     "MET023": {
       "unit": "byte",
-      "value": 546193408.0
+      "value": 546193408
     },
     "MET024": {
       "unit": "byte",
-      "value": 546193408.0
+      "value": 546193408
     },
     "MET025": {
       "unit": "ratio",
@@ -142,11 +142,11 @@
     },
     "MET028": {
       "unit": "ratio",
-      "value": 0.0
+      "value": 0
     },
     "MET029": {
       "unit": "ratio",
-      "value": 1.0
+      "value": 1
     },
     "MET030": {
       "unit": "ratio",
@@ -154,7 +154,7 @@
     },
     "MET042": {
       "unit": "ratio",
-      "value": 0.0
+      "value": 0
     },
     "MET091": {
       "unit": "ratio",
@@ -162,7 +162,7 @@
     },
     "MET096": {
       "unit": "ratio",
-      "value": 1.0
+      "value": 1
     }
   },
   "profile": "full",

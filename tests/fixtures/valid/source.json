@@ -11,7 +11,9 @@
   "authors": [
     {
       "name": "Atlas maintainers",
-      "roles": ["curator"],
+      "roles": [
+        "curator"
+      ],
       "conflicts": []
     }
   ],
@@ -26,7 +28,11 @@
   },
   "extensions": {},
   "type": "paper",
-  "source_authors": ["Woosuk Kwon", "Zhuohan Li", "Siyuan Zhuang"],
+  "source_authors": [
+    "Woosuk Kwon",
+    "Zhuohan Li",
+    "Siyuan Zhuang"
+  ],
   "url": "https://arxiv.org/abs/2309.06180",
   "identifiers": {
     "arxiv": "2309.06180"
@@ -35,6 +41,9 @@
     "year": 2023,
     "venue": "SOSP"
   },
-  "topics": ["paged-kv-cache", "memory-management"],
+  "topics": [
+    "paged-kv-cache",
+    "memory-management"
+  ],
   "relevance": "Defines the PagedAttention mechanism and vLLM system design."
 }

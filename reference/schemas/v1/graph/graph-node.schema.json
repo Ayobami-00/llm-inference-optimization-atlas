@@ -3,18 +3,72 @@
   "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/graph/graph-node.schema.json",
   "title": "Evidence graph node",
   "type": "object",
-  "required": ["id", "type", "label", "status", "source_path", "artifact_ref", "summary", "tags"],
+  "required": [
+    "id",
+    "type",
+    "label",
+    "status",
+    "source_path",
+    "artifact_ref",
+    "summary",
+    "tags"
+  ],
   "properties": {
-    "id": { "type": "string" },
-    "type": { "enum": ["workload_archetype", "study", "workload", "characteristic", "traffic", "quality_contract", "slo", "model", "hardware", "runtime", "configuration", "bottleneck", "optimization", "hypothesis", "experiment", "run", "comparison", "finding", "decision", "replication", "source"] },
-    "label": { "type": "string" },
-    "status": { "type": "string" },
-    "source_path": { "type": "string" },
-    "artifact_ref": { "$ref": "../common/reference.schema.json" },
-    "summary": { "type": "string" },
-    "tags": { "type": "array", "items": { "type": "string" } },
-    "study": { "type": "string" },
-    "detail_path": { "type": "string" }
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "enum": [
+        "workload_archetype",
+        "study",
+        "workload",
+        "characteristic",
+        "traffic",
+        "quality_contract",
+        "slo",
+        "model",
+        "hardware",
+        "runtime",
+        "configuration",
+        "bottleneck",
+        "optimization",
+        "hypothesis",
+        "experiment",
+        "run",
+        "comparison",
+        "finding",
+        "decision",
+        "replication",
+        "source"
+      ]
+    },
+    "label": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "source_path": {
+      "type": "string"
+    },
+    "artifact_ref": {
+      "$ref": "../common/reference.schema.json"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "study": {
+      "type": "string"
+    },
+    "detail_path": {
+      "type": "string"
+    }
   },
   "additionalProperties": false
 }

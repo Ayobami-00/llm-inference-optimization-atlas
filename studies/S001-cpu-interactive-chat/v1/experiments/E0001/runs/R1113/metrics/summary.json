@@ -4,39 +4,39 @@
   "metrics": {
     "MET001": {
       "unit": "count",
-      "value": 12.0
+      "value": 12
     },
     "MET002": {
       "unit": "count",
-      "value": 12.0
+      "value": 12
     },
     "MET003": {
       "unit": "count",
-      "value": 0.0
+      "value": 0
     },
     "MET004": {
       "unit": "count",
-      "value": 0.0
+      "value": 0
     },
     "MET005": {
       "unit": "count",
-      "value": 0.0
+      "value": 0
     },
     "MET006": {
       "unit": "count",
-      "value": 0.0
+      "value": 0
     },
     "MET007": {
       "unit": "token",
-      "value": 704.0
+      "value": 704
     },
     "MET008": {
       "unit": "token",
-      "value": 645.0
+      "value": 645
     },
     "MET009": {
       "unit": "token",
-      "value": 1349.0
+      "value": 1349
     },
     "MET010": {
       "distribution": {
@@ -63,13 +63,13 @@
     "MET012": {
       "distribution": {
         "count": 12,
-        "mean": 0.0,
-        "p50": 0.0,
-        "p90": 0.0,
-        "p95": 0.0
+        "mean": 0,
+        "p50": 0,
+        "p90": 0,
+        "p95": 0
       },
       "unit": "ms",
-      "value": 0.0
+      "value": 0
     },
     "MET013": {
       "distribution": {
@@ -130,11 +130,11 @@
     },
     "MET023": {
       "unit": "byte",
-      "value": 636403712.0
+      "value": 636403712
     },
     "MET024": {
       "unit": "byte",
-      "value": 679886848.0
+      "value": 679886848
     },
     "MET025": {
       "unit": "ratio",
@@ -142,11 +142,11 @@
     },
     "MET028": {
       "unit": "ratio",
-      "value": 0.0
+      "value": 0
     },
     "MET029": {
       "unit": "ratio",
-      "value": 1.0
+      "value": 1
     },
     "MET030": {
       "unit": "ratio",
@@ -158,7 +158,7 @@
     },
     "MET096": {
       "unit": "ratio",
-      "value": 1.0
+      "value": 1
     }
   },
   "profile": "full",

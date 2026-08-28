@@ -44,7 +44,7 @@
     }
   ],
   "dimensions": {
-    "sandbox_completion": 1.0,
+    "sandbox_completion": 1,
     "unit_test_pass_rate": 0.8333333333333334
   },
   "gate": "Q1",

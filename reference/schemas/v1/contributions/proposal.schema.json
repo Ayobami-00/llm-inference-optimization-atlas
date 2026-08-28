@@ -3,21 +3,89 @@
   "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/contributions/proposal.schema.json",
   "title": "Contribution proposal",
   "allOf": [
-    { "$ref": "../common/artifact.schema.json" },
+    {
+      "$ref": "../common/artifact.schema.json"
+    },
     {
       "type": "object",
-      "required": ["proposal_type", "summary", "motivation", "scope", "artifacts", "resources", "risks", "approval"],
+      "required": [
+        "proposal_type",
+        "summary",
+        "motivation",
+        "scope",
+        "artifacts",
+        "resources",
+        "risks",
+        "approval"
+      ],
       "properties": {
-        "kind": { "const": "Proposal" },
-        "id": { "pattern": "^P[0-9]{4}$" },
-        "proposal_type": { "enum": ["study", "experiment", "replication", "finding_challenge", "methodology"] },
-        "summary": { "type": "string" },
-        "motivation": { "type": "string" },
-        "scope": { "type": "object" },
-        "artifacts": { "type": "array", "minItems": 1, "items": { "type": "string" } },
-        "resources": { "type": "object" },
-        "risks": { "type": "array", "items": { "type": "string" } },
-        "approval": { "type": "object", "required": ["state"], "properties": { "state": { "enum": ["pending", "approved", "rejected"] }, "issue_url": { "type": "string", "format": "uri" }, "approved_by": { "type": "string" }, "approved_at": { "type": "string", "format": "date-time" } }, "additionalProperties": false }
+        "kind": {
+          "const": "Proposal"
+        },
+        "id": {
+          "pattern": "^P[0-9]{4}$"
+        },
+        "proposal_type": {
+          "enum": [
+            "study",
+            "experiment",
+            "replication",
+            "finding_challenge",
+            "methodology"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "motivation": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "object"
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "resources": {
+          "type": "object"
+        },
+        "risks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "approval": {
+          "type": "object",
+          "required": [
+            "state"
+          ],
+          "properties": {
+            "state": {
+              "enum": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            },
+            "issue_url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "approved_by": {
+              "type": "string"
+            },
+            "approved_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "additionalProperties": false
+        }
       }
     }
   ],

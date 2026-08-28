@@ -3,31 +3,69 @@
   "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/metrics/result-tables.schema.json",
   "title": "Canonical Parquet table contracts",
   "type": "object",
-  "required": ["requests", "samples"],
+  "required": [
+    "requests",
+    "samples"
+  ],
   "properties": {
-    "requests": { "$ref": "#/$defs/table" },
-    "samples": { "$ref": "#/$defs/table" },
-    "events": { "$ref": "#/$defs/table" }
+    "requests": {
+      "$ref": "#/$defs/table"
+    },
+    "samples": {
+      "$ref": "#/$defs/table"
+    },
+    "events": {
+      "$ref": "#/$defs/table"
+    }
   },
   "$defs": {
     "column": {
       "type": "object",
-      "required": ["name", "arrow_type", "nullable"],
+      "required": [
+        "name",
+        "arrow_type",
+        "nullable"
+      ],
       "properties": {
-        "name": { "type": "string" },
-        "arrow_type": { "type": "string" },
-        "nullable": { "type": "boolean" },
-        "unit": { "type": "string" },
-        "description": { "type": "string" }
+        "name": {
+          "type": "string"
+        },
+        "arrow_type": {
+          "type": "string"
+        },
+        "nullable": {
+          "type": "boolean"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
       },
       "additionalProperties": false
     },
     "table": {
       "type": "object",
-      "required": ["columns", "primary_key"],
+      "required": [
+        "columns",
+        "primary_key"
+      ],
       "properties": {
-        "columns": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/column" } },
-        "primary_key": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+        "columns": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/column"
+          }
+        },
+        "primary_key": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
       },
       "additionalProperties": false
     }
