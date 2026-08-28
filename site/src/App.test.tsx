@@ -92,6 +92,7 @@ describe("Atlas explorer", () => {
   it("switches graph views and opens entity evidence", async () => {
     render(<App />);
     expect(await screen.findByRole("heading", { name: "Story" })).toBeInTheDocument();
+    expect(screen.getByText("LLM optimizations Inference Atlas")).toBeInTheDocument();
     expect(screen.getByRole("generic", { name: "Graph reading order" })).toHaveTextContent(
       "StartWorkload→Decision",
     );

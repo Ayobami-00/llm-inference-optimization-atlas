@@ -301,7 +301,7 @@ export function App() {
         <a className="brand" href={import.meta.env.BASE_URL} aria-label="Atlas home">
           <span className="brand-mark">A</span>
           <span>
-            <strong>Inference Atlas</strong>
+            <strong>LLM optimizations Inference Atlas</strong>
             <small>Evidence before intuition</small>
           </span>
         </a>
