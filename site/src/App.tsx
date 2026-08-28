@@ -389,12 +389,12 @@ export function App() {
               <p className="eyebrow">
                 {atlas.manifest.scope.type === "global" ? "Global evidence graph" : "Study graph"}
               </p>
-              <h2>{activeView.description}</h2>
+              <p>
+                <strong>{activeView.node_ids.length}</strong> entities ·{" "}
+                <strong>{activeView.edge_ids.length}</strong> explicit relations
+              </p>
             </div>
-            <p>
-              <strong>{activeView.node_ids.length}</strong> entities ·{" "}
-              <strong>{activeView.edge_ids.length}</strong> explicit relations
-            </p>
+            <h2 className="stage-description">{activeView.description}</h2>
           </div>
           <div className="stage-actions">
             {decisionNode && ["story", "deployment"].includes(viewId) && (
