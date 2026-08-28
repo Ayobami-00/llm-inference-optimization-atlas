@@ -5,6 +5,10 @@ test("navigates views, searches, and resolves source details", async ({ page }) 
   await page.goto("./");
   await expect(page.getByRole("link", { name: "Atlas home" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Story" })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Graph views" }).getByRole("button")).toHaveCount(5);
+  await page.getByRole("searchbox", { name: "Search evidence" }).focus();
+  await expect(page.getByText("Visible in Story")).toBeVisible();
+  await page.keyboard.press("Escape");
   await expect(page.getByRole("button", { name: "Why this decision?" })).toHaveCount(0);
   await page.getByRole("navigation", { name: "Graph views" }).getByRole("button", { name: /Optimization/ }).click();
   await expect(page.getByRole("heading", { name: "Optimization", exact: true })).toBeVisible();
@@ -39,13 +43,15 @@ test("presents a study as a guided story and groups replicate runs", async ({ pa
     .getByRole("navigation", { name: "Graph node navigator" })
     .getByRole("button", { name: /E0009/ });
   await experiment.focus();
-  await expect(page.getByRole("tooltip")).toContainText("Select to expand");
-  await page.keyboard.press("Enter");
-  await expect(page.getByLabel("Interactive evidence graph")).toHaveAttribute(
-    "data-expanded-node",
-    "atlas://experiment/E0009@v1",
+  await expect(page.getByRole("tooltip")).toContainText(
+    "Select to open complete experiment details",
   );
-  await expect(page.getByRole("complementary", { name: "Evidence details" })).toHaveCount(0);
+  await page.keyboard.press("Enter");
+  const details = page.getByRole("complementary", { name: "Evidence details" });
+  await expect(details).toBeVisible();
+  await expect(details.getByRole("heading", { name: "Experiment record" })).toBeVisible();
+  await expect(details.getByText("Expected mechanism")).toBeVisible();
+  await page.getByRole("button", { name: "Close details" }).click();
 
   await page
     .getByRole("navigation", { name: "Graph views" })

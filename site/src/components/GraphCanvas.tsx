@@ -1,14 +1,7 @@
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import type {
-  EntityDetail,
-  GraphData,
-  GraphEdge,
-  GraphNode,
-  GraphPresentation,
-  GraphView,
-} from "../types";
+import type { GraphData, GraphEdge, GraphNode, GraphPresentation, GraphView } from "../types";
 
 const colors: Record<string, string> = {
   workload_archetype: "#e8b35a",
@@ -34,6 +27,18 @@ const colors: Record<string, string> = {
   source: "#77827d",
 };
 
+const optimizationLayout: GraphPresentation = {
+  stages: [
+    { label: "Optimizations", types: ["optimization"] },
+    { label: "Bottlenecks", types: ["bottleneck"] },
+    { label: "Experiments", types: ["experiment"] },
+    { label: "Comparisons", types: ["comparison"] },
+    { label: "Findings", types: ["finding"] },
+  ],
+  intro: "",
+  relations: [],
+};
+
 interface Props {
   graph: GraphData;
   view: GraphView;
@@ -41,12 +46,7 @@ interface Props {
   selectedTypes: Set<string>;
   showNegative: boolean;
   highlighted: Set<string>;
-  selected: GraphNode | null;
-  detail: EntityDetail | null;
-  detailLoading: boolean;
-  inlineDetails: boolean;
   onSelect: (node: GraphNode) => void;
-  onCollapse: () => void;
   onReady: (core: Core) => void;
 }
 
@@ -59,41 +59,9 @@ function artifactCode(reference: string): string {
   return reference.split("/").at(-1)?.replace(/@v\d+$/, "") ?? reference;
 }
 
-function compactLabel(value: string, limit = 46): string {
-  if (value.length <= limit) return value;
-  const shortened = value.slice(0, limit - 1);
-  const boundary = shortened.lastIndexOf(" ");
-  return `${shortened.slice(0, boundary > 25 ? boundary : limit - 1)}…`;
-}
-
 function displayIdentifier(node: CanvasNode): string {
   if (node.synthetic) return `R×${node.member_ids?.length ?? 0}`;
   return artifactCode(node.artifact_ref);
-}
-
-function relevantDetail(node: CanvasNode, detail: EntityDetail | null): string {
-  if (!detail || detail.node.id !== node.id) return node.summary;
-  const artifact = detail.artifact;
-  const candidates: unknown[] = [];
-  if (node.type === "experiment") candidates.push(artifact.expected_mechanism, artifact.question);
-  if (node.type === "comparison") candidates.push(artifact.conclusion, artifact.status);
-  if (node.type === "finding") candidates.push(artifact.observation, artifact.statement);
-  if (node.type === "decision") candidates.push(artifact.pareto_rationale, artifact.outcome);
-  if (node.type === "hypothesis") candidates.push(artifact.falsifiable_statement, artifact.observation);
-  if (node.type === "study") candidates.push(artifact.product_brief);
-  if (node.type === "workload") candidates.push(artifact.product_brief);
-  const value = candidates.find((candidate) => typeof candidate === "string" && candidate.trim());
-  return typeof value === "string" && value.trim() !== node.label.trim() ? value : node.summary;
-}
-
-function expandedLabel(
-  node: CanvasNode,
-  detail: EntityDetail | null,
-  detailLoading: boolean,
-): string {
-  const meta = `${node.type.replaceAll("_", " ")} · ${node.status}`.toUpperCase();
-  const insight = detailLoading ? "Loading evidence…" : relevantDetail(node, detail);
-  return `${displayIdentifier(node)}\n${compactLabel(node.label, 52)}\n${meta}\n${compactLabel(insight, 112)}`;
 }
 
 function isNegative(node: GraphNode): boolean {
@@ -171,7 +139,6 @@ function runGroups(
 function layeredPositions(
   nodes: CanvasNode[],
   presentation: GraphPresentation,
-  expandedId: string | undefined,
 ): Map<string, { x: number; y: number }> {
   const positions = new Map<string, { x: number; y: number }>();
   presentation.stages.forEach((stage, rank) => {
@@ -183,18 +150,17 @@ function layeredPositions(
       ? [ranked.filter((_, index) => index % 2 === 0), ranked.filter((_, index) => index % 2 === 1)]
       : [ranked];
     columns.forEach((column, columnIndex) => {
-      const heights = column.map((node) => (node.id === expandedId ? 146 : 56));
-      const totalHeight =
-        heights.reduce((sum, height) => sum + height, 0) +
-        Math.max(0, column.length - 1) * 30;
+      const nodeHeight = 64;
+      const verticalGap = presentation.compact_runs ? 48 : 36;
+      const horizontalGap = presentation.compact_runs ? 390 : 320;
+      const totalHeight = column.length * nodeHeight + Math.max(0, column.length - 1) * verticalGap;
       let cursor = -totalHeight / 2;
-      column.forEach((node, index) => {
-        const height = heights[index];
+      column.forEach((node) => {
         positions.set(node.id, {
-          x: rank * 300 + (usesSubcolumns ? (columnIndex === 0 ? -78 : 78) : 0),
-          y: cursor + height / 2,
+          x: rank * horizontalGap + (usesSubcolumns ? (columnIndex === 0 ? -96 : 96) : 0),
+          y: cursor + nodeHeight / 2,
         });
-        cursor += height + 30;
+        cursor += nodeHeight + verticalGap;
       });
     });
   });
@@ -208,12 +174,7 @@ export function GraphCanvas({
   selectedTypes,
   showNegative,
   highlighted,
-  selected,
-  detail,
-  detailLoading,
-  inlineDetails,
   onSelect,
-  onCollapse,
   onReady,
 }: Props) {
   const container = useRef<HTMLDivElement>(null);
@@ -225,13 +186,12 @@ export function GraphCanvas({
     type: string;
     x: number;
     y: number;
-    expanded: boolean;
     synthetic: boolean;
   } | null>(null);
   const viewNodes = useMemo(() => new Set(view.node_ids), [view]);
   const viewEdges = useMemo(() => new Set(view.edge_ids), [view]);
   const presentation = view.filters.presentation;
-  const expandedId = inlineDetails ? selected?.id : undefined;
+  const layoutPresentation = presentation ?? (view.id === "optimization" ? optimizationLayout : undefined);
 
   useEffect(() => {
     setExpandedRunGroups(new Set());
@@ -264,8 +224,8 @@ export function GraphCanvas({
         )
         .map((edge) => edge.target),
     );
-    const positions = presentation
-      ? layeredPositions(visibleNodes, presentation, expandedId)
+    const positions = layoutPresentation
+      ? layeredPositions(visibleNodes, layoutPresentation)
       : new Map();
     const nodeElements: ElementDefinition[] = visibleNodes.map((node) => {
       const matches =
@@ -277,15 +237,11 @@ export function GraphCanvas({
         data: {
           ...node,
           color: colors[node.type] ?? "#c8d0c8",
-          displayLabel:
-            node.id === expandedId
-              ? expandedLabel(node, detail, detailLoading)
-              : displayIdentifier(node),
+          displayLabel: displayIdentifier(node),
         },
         position: positions.get(node.id),
         classes: [
-          presentation ? "guided-node" : "dot",
-          node.id === expandedId ? "expanded" : "",
+          layoutPresentation ? "guided-node" : "dot",
           node.synthetic ? "run-group" : "",
           selectedConfigurations.has(node.id) ? "selected-config" : "",
           highlighted.has(node.id) ? "path" : "",
@@ -339,11 +295,9 @@ export function GraphCanvas({
     return [...nodeElements, ...edgeElements];
   }, [
     expandedRunGroups,
-    expandedId,
-    detail,
-    detailLoading,
     graph,
     highlighted,
+    layoutPresentation,
     presentation,
     query,
     selectedTypes,
@@ -354,7 +308,7 @@ export function GraphCanvas({
 
   useEffect(() => {
     if (!container.current) return;
-    const layered = Boolean(presentation);
+    const layered = Boolean(layoutPresentation);
     const narrow = container.current.clientWidth < 700;
     const cy = cytoscape({
       container: container.current,
@@ -389,26 +343,6 @@ export function GraphCanvas({
             height: "64px",
             "font-size": 8.2,
             "text-max-width": "60px",
-          },
-        },
-        {
-          selector: "node.expanded",
-          style: {
-            shape: "roundrectangle",
-            width: "230px",
-            height: "146px",
-            "border-width": 3,
-            "font-size": 10.5,
-            "font-weight": 650,
-            "line-height": 1.35,
-            "text-max-width": "198px",
-            "text-wrap": "wrap",
-            "text-justification": "left",
-            "text-halign": "center",
-            "text-valign": "center",
-            "overlay-color": "#17231f",
-            "overlay-opacity": 0.04,
-            "overlay-padding": 8,
           },
         },
         {
@@ -502,32 +436,37 @@ export function GraphCanvas({
             name: view.default_layout === "dagre" ? "breadthfirst" : "cose",
             animate: false,
             fit: true,
-            padding: 54,
+            padding: 60,
+            idealEdgeLength: view.id === "optimization" ? 135 : 120,
+            nodeRepulsion: view.id === "optimization" ? 550_000 : 450_000,
+            componentSpacing: view.id === "optimization" ? 120 : 100,
+            gravity: 0.14,
+            numIter: 1_200,
           },
     });
     core.current = cy;
-    if (layered && expandedId) {
-      const expandedNode = cy.getElementById(expandedId);
-      if (expandedNode.length) {
-        cy.zoom(Math.max(cy.zoom(), 0.78));
-        cy.center(expandedNode);
-      }
-    } else if (layered && narrow) {
+    if (layered && narrow) {
       cy.zoom(0.72);
-      const firstStage = presentation?.stages[0];
+      const firstStage = layoutPresentation?.stages[0];
       const start = cy
         .nodes()
         .filter((node) => Boolean(firstStage?.types.includes(node.data("type"))));
       cy.center(start.length ? start : cy.nodes());
+    } else {
+      const minimumReadableZoom = layered
+        ? layoutPresentation?.compact_runs
+          ? 0.58
+          : 0.58
+        : 0;
+      if (cy.zoom() < minimumReadableZoom) {
+        cy.zoom(minimumReadableZoom);
+        cy.center(cy.nodes());
+      }
     }
     cy.on("tap", "node", (event) => {
       const data = event.target.data() as CanvasNode;
       if (data.synthetic) {
         setExpandedRunGroups((current) => new Set(current).add(data.id));
-        return;
-      }
-      if (inlineDetails && data.id === expandedId) {
-        onCollapse();
         return;
       }
       onSelect(data);
@@ -541,7 +480,6 @@ export function GraphCanvas({
         type: data.type,
         x: position.x,
         y: position.y,
-        expanded: data.id === expandedId,
         synthetic: Boolean(data.synthetic),
       });
     };
@@ -559,16 +497,7 @@ export function GraphCanvas({
       cy.destroy();
       core.current = null;
     };
-  }, [
-    elements,
-    expandedId,
-    inlineDetails,
-    onCollapse,
-    onReady,
-    onSelect,
-    presentation,
-    view.default_layout,
-  ]);
+  }, [elements, layoutPresentation, onReady, onSelect, view.default_layout, view.id]);
 
   const accessibleNodes = elements.filter(
     (element): element is ElementDefinition & { data: CanvasNode } =>
@@ -576,7 +505,7 @@ export function GraphCanvas({
   );
 
   return (
-    <div className={`graph-surface${presentation ? " with-presentation" : ""}`}>
+    <div className={`graph-surface${layoutPresentation ? " with-presentation" : ""}`}>
       <div
         className="graph-canvas"
         ref={container}
@@ -584,7 +513,6 @@ export function GraphCanvas({
         aria-label="Interactive evidence graph. Use the node navigator for keyboard access."
         data-rendered-nodes={accessibleNodes.length}
         data-run-groups={elements.filter((element) => element.data.synthetic === true).length}
-        data-expanded-node={expandedId ?? ""}
       />
       {tooltip && (
         <div className="node-tooltip" style={{ left: tooltip.x, top: tooltip.y }} role="tooltip">
@@ -593,11 +521,7 @@ export function GraphCanvas({
           <small>
             {tooltip.synthetic
               ? "Select to reveal individual runs"
-              : tooltip.expanded
-                ? "Select to collapse"
-                : inlineDetails
-                  ? "Select to expand"
-                  : `Select to inspect ${tooltip.type.replaceAll("_", " ")}`}
+              : `Select to open complete ${tooltip.type.replaceAll("_", " ")} details`}
           </small>
         </div>
       )}
@@ -618,7 +542,6 @@ export function GraphCanvas({
                   type: node.type,
                   x: position.x,
                   y: position.y,
-                  expanded: node.id === expandedId,
                   synthetic: Boolean(node.synthetic),
                 });
               }}
@@ -629,8 +552,6 @@ export function GraphCanvas({
               onClick={() => {
                 if (node.synthetic) {
                   setExpandedRunGroups((current) => new Set(current).add(node.id));
-                } else if (inlineDetails && node.id === expandedId) {
-                  onCollapse();
                 } else {
                   onSelect(node);
                 }

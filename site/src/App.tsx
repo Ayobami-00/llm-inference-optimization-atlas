@@ -11,7 +11,6 @@ const viewOrder: GraphView["id"][] = [
   "optimization",
   "evidence",
   "deployment",
-  "all",
 ];
 
 function titleCase(value: string): string {
@@ -27,7 +26,7 @@ const viewNarratives: Record<GraphView["id"], [string, string, string]> = {
   story: [
     "This view follows the study from its frozen workload through experiments and comparisons to findings and a deployment decision.",
     "Each branch represents a research question and connects the measured result to its carefully scoped interpretation.",
-    "Read from left to right, then select any circle to expand the evidence that matters without leaving the canvas.",
+    "Read from left to right, then select any circle to open its complete evidence record without moving the graph.",
   ],
   bottleneck: [
     "This view maps observed workload and system pressure to the bottlenecks that may explain it.",
@@ -70,6 +69,12 @@ function entityPrefix(type: string, nodes: GraphNode[]): string {
   const representative = nodes.find((node) => node.type === type);
   const identifier = representative ? artifactCode(representative.artifact_ref) : "";
   return identifier.match(/^[A-Z]+/)?.[0] ?? type.slice(0, 3).toUpperCase();
+}
+
+function isNegativeNode(node: GraphNode): boolean {
+  return node.tags.some((tag) =>
+    ["degradation", "no_significant_effect", "inconclusive", "contradicted"].includes(tag),
+  );
 }
 
 function initialView(): GraphView["id"] {
@@ -117,6 +122,225 @@ function EffectList({ detail }: { detail: EntityDetail }) {
   );
 }
 
+const coreArtifactFields = new Set([
+  "$schema",
+  "schema_version",
+  "kind",
+  "id",
+  "version",
+  "slug",
+  "title",
+  "description",
+  "status",
+  "authors",
+  "created_at",
+  "updated_at",
+  "license",
+  "citations",
+  "provenance",
+  "extensions",
+]);
+
+const artifactFieldPriority = [
+  "question",
+  "observation",
+  "falsifiable_statement",
+  "statement",
+  "outcome",
+  "selected_configuration",
+  "mechanism",
+  "expected_mechanism",
+  "baseline",
+  "candidates",
+  "changed_factors",
+  "frozen_factors",
+  "design",
+  "analysis",
+  "primary_metric",
+  "secondary_metrics",
+  "guardrail_metrics",
+  "quality_metrics",
+  "effects",
+  "scope",
+  "conditions",
+  "boundaries",
+  "limitations",
+  "caveats",
+];
+
+function DetailValue({ value, depth = 0 }: { value: unknown; depth?: number }) {
+  if (value === null || value === undefined || value === "") {
+    return <span className="detail-empty">Not specified</span>;
+  }
+  if (typeof value === "boolean") {
+    return <span className={`boolean-value ${value ? "true" : "false"}`}>{value ? "Yes" : "No"}</span>;
+  }
+  if (typeof value === "number") {
+    return <data className="number-value">{value.toLocaleString()}</data>;
+  }
+  if (typeof value === "string") {
+    if (/^https?:\/\//.test(value)) {
+      return (
+        <a href={value} target="_blank" rel="noreferrer">
+          {value} ↗
+        </a>
+      );
+    }
+    if (value.startsWith("atlas://")) return <code>{value}</code>;
+    return <span className={value.length > 100 ? "long-value" : undefined}>{value}</span>;
+  }
+  if (Array.isArray(value)) {
+    if (value.length === 0) return <span className="detail-empty">None recorded</span>;
+    const primitives = value.every(
+      (item) => item === null || !["object", "function"].includes(typeof item),
+    );
+    if (primitives) {
+      return (
+        <ul className="detail-chip-list">
+          {value.map((item, index) => (
+            <li key={`${String(item)}-${index}`}>
+              <DetailValue value={item} depth={depth + 1} />
+            </li>
+          ))}
+        </ul>
+      );
+    }
+    return (
+      <div className="detail-object-list">
+        {value.map((item, index) => (
+          <article key={index}>
+            <span className="object-index">{String(index + 1).padStart(2, "0")}</span>
+            <DetailValue value={item} depth={depth + 1} />
+          </article>
+        ))}
+      </div>
+    );
+  }
+  if (typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>);
+    if (entries.length === 0) return <span className="detail-empty">No values recorded</span>;
+    return (
+      <dl className={`detail-nested depth-${Math.min(depth, 3)}`}>
+        {entries.map(([key, nestedValue]) => (
+          <div key={key}>
+            <dt>{titleCase(key)}</dt>
+            <dd>
+              <DetailValue value={nestedValue} depth={depth + 1} />
+            </dd>
+          </div>
+        ))}
+      </dl>
+    );
+  }
+  return <span>{String(value)}</span>;
+}
+
+function ArtifactFields({ detail }: { detail: EntityDetail }) {
+  const entries = Object.entries(detail.artifact);
+  const specific = entries
+    .filter(([key]) => !coreArtifactFields.has(key))
+    .sort(([left], [right]) => {
+      const leftRank = artifactFieldPriority.indexOf(left);
+      const rightRank = artifactFieldPriority.indexOf(right);
+      return (leftRank < 0 ? 10_000 : leftRank) - (rightRank < 0 ? 10_000 : rightRank);
+    });
+  const record = entries.filter(([key]) => coreArtifactFields.has(key));
+  return (
+    <>
+      <section className="drawer-section artifact-details">
+        <div className="drawer-section-heading">
+          <div>
+            <p className="eyebrow">Node-specific details</p>
+            <h3>{titleCase(detail.node.type)} record</h3>
+          </div>
+          <span>{specific.length} fields</span>
+        </div>
+        <div className="artifact-field-grid">
+          {specific.map(([key, value]) => (
+            <article
+              className={typeof value === "object" && value !== null ? "complex-field" : ""}
+              key={key}
+            >
+              <h4>{titleCase(key)}</h4>
+              <DetailValue value={value} />
+            </article>
+          ))}
+        </div>
+      </section>
+      <section className="drawer-section artifact-details record-details">
+        <div className="drawer-section-heading">
+          <div>
+            <p className="eyebrow">Canonical record</p>
+            <h3>Identity and provenance</h3>
+          </div>
+          <span>{record.length} fields</span>
+        </div>
+        <div className="artifact-field-grid">
+          {record.map(([key, value]) => (
+            <article
+              className={typeof value === "object" && value !== null ? "complex-field" : ""}
+              key={key}
+            >
+              <h4>{titleCase(key)}</h4>
+              <DetailValue value={value} />
+            </article>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+function RelationDetails({
+  title,
+  edges,
+  direction,
+}: {
+  title: string;
+  edges: EntityDetail["incoming"];
+  direction: "incoming" | "outgoing";
+}) {
+  if (edges.length === 0) return null;
+  return (
+    <div className="relation-group">
+      <h3>{title}</h3>
+      {edges.map((edge) => (
+        <article className="relation-card" key={edge.id}>
+          <div className="relation-card-heading">
+            <strong>{relationLabel(edge.relation)}</strong>
+            <span>{edge.assertion_level}</span>
+          </div>
+          <code>{artifactCode(direction === "incoming" ? edge.source : edge.target)}</code>
+          <dl>
+            <div>
+              <dt>Confidence</dt>
+              <dd>{edge.confidence}</dd>
+            </div>
+            <div>
+              <dt>Evidence</dt>
+              <dd>
+                <DetailValue value={edge.evidence} />
+              </dd>
+            </div>
+            <div>
+              <dt>Scope</dt>
+              <dd>
+                <DetailValue value={edge.scope} />
+              </dd>
+            </div>
+            <div>
+              <dt>Provenance</dt>
+              <dd>
+                <DetailValue value={edge.provenance} />
+              </dd>
+            </div>
+          </dl>
+        </article>
+      ))}
+    </div>
+  );
+}
+
 function EntityDrawer({
   detail,
   loading,
@@ -143,21 +367,34 @@ function EntityDrawer({
         <div className="drawer-loading">Resolving evidence…</div>
       ) : (
         <>
-          <p className="eyebrow">{titleCase(detail.node.type)}</p>
-          <h2>{detail.node.label}</h2>
-          <p className="drawer-summary">{detail.node.summary}</p>
-          <div className="status-row">
-            <span>{detail.node.status}</span>
-            <code>{detail.node.artifact_ref.split("/").at(-1)}</code>
-          </div>
+          <header className="drawer-identity">
+            <div>
+              <p className="eyebrow">{titleCase(detail.node.type)}</p>
+              <code>{artifactCode(detail.node.artifact_ref)}</code>
+            </div>
+            <h2>{detail.node.label}</h2>
+            <p className="drawer-summary">{detail.node.summary}</p>
+            <div className="status-row">
+              <span>{detail.node.status}</span>
+              <code>{detail.node.artifact_ref}</code>
+              {detail.node.study && <code>{artifactCode(detail.node.study)}</code>}
+            </div>
+          </header>
           {detail.node.type === "decision" && (
             <button className="primary-action" onClick={onWhy}>
               Why this decision?
             </button>
           )}
           <EffectList detail={detail} />
+          <ArtifactFields detail={detail} />
           <section className="drawer-section">
-            <p className="eyebrow">Evidence links</p>
+            <div className="drawer-section-heading">
+              <div>
+                <p className="eyebrow">Evidence links</p>
+                <h3>Recorded relationships</h3>
+              </div>
+              <span>{detail.incoming.length + detail.outgoing.length} edges</span>
+            </div>
             <dl className="link-stats">
               <div>
                 <dt>Incoming</dt>
@@ -172,14 +409,14 @@ function EntityDrawer({
                 <dd>{detail.referenced_by.length}</dd>
               </div>
             </dl>
-            <ul className="relation-list">
-              {[...detail.incoming, ...detail.outgoing].slice(0, 12).map((edge) => (
-                <li key={edge.id}>
-                  <span>{edge.relation.replaceAll("_", " ")}</span>
-                  <small>{edge.assertion_level}</small>
-                </li>
-              ))}
-            </ul>
+            <RelationDetails title="Incoming evidence" edges={detail.incoming} direction="incoming" />
+            <RelationDetails title="Outgoing evidence" edges={detail.outgoing} direction="outgoing" />
+            {detail.referenced_by.length > 0 && (
+              <div className="relation-group referenced-by">
+                <h3>Referenced by</h3>
+                <DetailValue value={detail.referenced_by} />
+              </div>
+            )}
           </section>
           {detail.node.type === "source" && (
             <section className="drawer-section">
@@ -194,6 +431,7 @@ function EntityDrawer({
           )}
           <section className="drawer-section provenance">
             <p className="eyebrow">Repository provenance</p>
+            <p>The canonical source file for this node is versioned in Git.</p>
             <a
               href={`https://github.com/Ayobami-00/llm-inference-optimization-atlas/blob/${revision}/${detail.node.source_path}`}
               target="_blank"
@@ -213,6 +451,7 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
   const [viewId, setViewId] = useState<GraphView["id"]>(initialView);
   const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState<Set<string>>(new Set());
   const [showNegative, setShowNegative] = useState(true);
   const [selected, setSelected] = useState<GraphNode | null>(null);
@@ -248,6 +487,7 @@ export function App() {
     (node: GraphNode) => {
       setSelected(node);
       setQuery("");
+      setSearchOpen(false);
       setHighlighted(new Set());
       setDeepLink(node, viewId);
       window.requestAnimationFrame(() => {
@@ -255,7 +495,6 @@ export function App() {
         if (!element?.length) return;
         core.current?.elements().unselect();
         element.select();
-        core.current?.center(element);
       });
     },
     [viewId],
@@ -301,12 +540,38 @@ export function App() {
   }, [activeView, atlas]);
 
   const matches = useMemo(() => {
-    if (!atlas || !query.trim()) return [];
-    const needle = query.toLowerCase();
-    return atlas.graph.nodes
-      .filter((node) => `${node.label} ${node.summary}`.toLowerCase().includes(needle))
-      .slice(0, 8);
-  }, [atlas, query]);
+    if (!atlas || !activeView) return [];
+    const needle = query.trim().toLowerCase();
+    const activeIds = new Set(activeView.node_ids);
+    const typeRank = new Map<string, number>();
+    activeView.filters.presentation?.stages.forEach((stage, stageIndex) => {
+      stage.types.forEach((type, typeIndex) => typeRank.set(type, stageIndex * 100 + typeIndex));
+    });
+    const searchable = (node: GraphNode) =>
+      `${artifactCode(node.artifact_ref)} ${node.label} ${node.summary} ${node.type} ${node.tags.join(" ")}`
+        .toLowerCase()
+        .includes(needle);
+    const visible = atlas.graph.nodes
+      .filter(
+        (node) =>
+          activeIds.has(node.id) &&
+          (selectedTypes.size === 0 || selectedTypes.has(node.type)) &&
+          (showNegative || !isNegativeNode(node)) &&
+          (!needle || searchable(node)),
+      )
+      .sort(
+        (left, right) =>
+          (typeRank.get(left.type) ?? 10_000) - (typeRank.get(right.type) ?? 10_000) ||
+          artifactCode(left.artifact_ref).localeCompare(artifactCode(right.artifact_ref)),
+      );
+    const elsewhere = needle
+      ? atlas.graph.nodes.filter((node) => !activeIds.has(node.id) && searchable(node))
+      : [];
+    return [
+      ...visible.map((node) => ({ node, current: true })),
+      ...elsewhere.map((node) => ({ node, current: false })),
+    ].slice(0, 12);
+  }, [activeView, atlas, query, selectedTypes, showNegative]);
 
   const toggleType = (type: string) => {
     setSelectedTypes((current) => {
@@ -364,39 +629,51 @@ export function App() {
     viewId === "story" && atlas.manifest.scope.type === "global"
       ? globalStoryNarrative
       : viewNarratives[viewId];
-  const selectedInline = Boolean(
-    presentation &&
-      selected &&
-      activeView.node_ids.includes(selected.id) &&
-      presentation.stages.some((stage) => stage.types.includes(selected.type)),
-  );
 
   return (
     <div className="atlas-shell">
       <header className="topbar">
         <a className="brand" href={import.meta.env.BASE_URL} aria-label="Atlas home">
-          <span className="brand-mark">A</span>
-          <span>
-            <strong>LLM optimizations Inference Atlas</strong>
-            <small>Evidence before intuition</small>
-          </span>
+          <strong>LLM optimization Inference Atlas</strong>
         </a>
-        <div className="search-wrap">
+        <div
+          className="search-wrap"
+          onFocus={() => setSearchOpen(true)}
+          onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+              setSearchOpen(false);
+            }
+          }}
+        >
           <label htmlFor="atlas-search">Search evidence</label>
           <input
             id="atlas-search"
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                setSearchOpen(false);
+                event.currentTarget.blur();
+              }
+            }}
             placeholder="Workloads, bottlenecks, optimizations…"
           />
-          {matches.length > 0 && (
+          {searchOpen && matches.length > 0 && (
             <ul className="search-results">
-              {matches.map((node) => (
+              <li className="search-result-heading">
+                {query.trim() ? "Matching nodes" : `Visible in ${activeView.name}`}
+              </li>
+              {matches.map(({ node, current }) => (
                 <li key={node.id}>
                   <button onClick={() => selectNode(node)}>
-                    <span>{node.label}</span>
-                    <small>{titleCase(node.type)}</small>
+                    <span>
+                      <code>{artifactCode(node.artifact_ref)}</code>
+                      {node.label}
+                    </span>
+                    <small>
+                      {titleCase(node.type)} · {current ? activeView.name : "Atlas"}
+                    </small>
                   </button>
                 </li>
               ))}
@@ -555,12 +832,7 @@ export function App() {
             selectedTypes={selectedTypes}
             showNegative={showNegative}
             highlighted={highlighted}
-            selected={selected}
-            detail={detail}
-            detailLoading={detailLoading}
-            inlineDetails={Boolean(presentation)}
             onSelect={selectNode}
-            onCollapse={clearSelection}
             onReady={graphReady}
           />
         </div>
@@ -581,22 +853,20 @@ export function App() {
           )}
           <div className="canvas-note">
             <span>
-              Drag to pan · scroll to zoom · select a circle to {presentation ? "expand" : "inspect"}
+              Drag to pan · scroll to zoom · select a circle to open its complete record
             </span>
             <span>Generated {atlas.manifest.generated_at.slice(0, 10)}</span>
           </div>
         </footer>
       </main>
 
-      {!selectedInline && (
-        <EntityDrawer
-          detail={detail}
-          loading={detailLoading}
-          repositoryRevision={atlas.manifest.repository_commit}
-          onClose={clearSelection}
-          onWhy={highlightDecisionPath}
-        />
-      )}
+      <EntityDrawer
+        detail={detail}
+        loading={detailLoading}
+        repositoryRevision={atlas.manifest.repository_commit}
+        onClose={clearSelection}
+        onWhy={highlightDecisionPath}
+      />
     </div>
   );
 }

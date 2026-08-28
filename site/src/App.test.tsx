@@ -72,14 +72,34 @@ const detail: EntityDetail = {
   referenced_by: [],
 };
 
+const centerGraph = vi.fn();
+const graphCore = {
+  elements: () => ({ unselect: vi.fn() }),
+  getElementById: () => ({ length: 1, select: vi.fn() }),
+  center: centerGraph,
+};
+
 vi.mock("./data", () => ({
   loadAtlas: vi.fn(() => Promise.resolve(atlas)),
   loadEntity: vi.fn(() => Promise.resolve(detail)),
 }));
 
 vi.mock("./components/GraphCanvas", () => ({
-  GraphCanvas: ({ onSelect }: { onSelect: (value: typeof node) => void }) => (
-    <button onClick={() => onSelect(node)}>Select graph node</button>
+  GraphCanvas: ({
+    onSelect,
+    onReady,
+  }: {
+    onSelect: (value: typeof node) => void;
+    onReady: (value: typeof graphCore) => void;
+  }) => (
+    <button
+      onClick={() => {
+        onReady(graphCore);
+        onSelect(node);
+      }}
+    >
+      Select graph node
+    </button>
   ),
 }));
 
@@ -88,12 +108,14 @@ import { App } from "./App";
 describe("Atlas explorer", () => {
   beforeEach(() => {
     window.history.replaceState({}, "", "/llm-inference-optimization-atlas/");
+    centerGraph.mockClear();
   });
 
   it("switches graph views and opens entity evidence", async () => {
     render(<App />);
     expect(await screen.findByRole("heading", { name: "Story" })).toBeInTheDocument();
-    expect(screen.getByText("LLM optimizations Inference Atlas")).toBeInTheDocument();
+    expect(screen.getByText("LLM optimization Inference Atlas")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /All/ })).not.toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
         name: "Follow the evaluated workload from study design to deployment decision.",
@@ -116,13 +138,20 @@ describe("Atlas explorer", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Select graph node" }));
     await waitFor(() => expect(screen.getByRole("heading", { name: "Paged KV cache" })).toBeVisible());
+    expect(screen.getByRole("heading", { name: "Optimization record" })).toBeVisible();
+    expect(screen.getByText("Paged allocation avoids contiguous reservation.")).toBeVisible();
+    expect(centerGraph).not.toHaveBeenCalled();
     expect(window.location.search).toContain("node=atlas%3A%2F%2Foptimization%2FOPT023%40v1");
   });
 
-  it("offers keyboard-addressable search results", async () => {
+  it("offers visible nodes before filtering keyboard-addressable search results", async () => {
     render(<App />);
     await screen.findByRole("heading", { name: "Story" });
-    fireEvent.change(screen.getByRole("searchbox", { name: "Search evidence" }), {
+    const search = screen.getByRole("searchbox", { name: "Search evidence" });
+    fireEvent.focus(search);
+    expect(screen.getByText("Visible in Story")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /OPT023.*Paged KV cache/ })).toBeInTheDocument();
+    fireEvent.change(search, {
       target: { value: "paged" },
     });
     expect(screen.getByRole("button", { name: /Paged KV cache/ })).toBeInTheDocument();
