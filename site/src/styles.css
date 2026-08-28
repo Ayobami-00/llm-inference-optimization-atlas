@@ -1128,6 +1128,26 @@ input:focus-visible {
   color: #765018;
 }
 
+.record-reference {
+  color: #765018;
+  font-weight: 750;
+  text-decoration: underline;
+  text-decoration-color: #cfa45a;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.record-reference:hover,
+.record-reference:focus-visible {
+  color: #3c6d58;
+  text-decoration-color: currentColor;
+}
+
+.unresolved-reference {
+  color: #7a4035;
+  font-weight: 750;
+}
+
 .detail-empty {
   color: #748079 !important;
   font-style: italic;
@@ -1313,7 +1333,8 @@ input:focus-visible {
   text-transform: uppercase;
 }
 
-.relation-card > code {
+.relation-card > code,
+.relation-card > .record-reference {
   display: block;
   margin: 5px 0 9px;
   color: #765018;

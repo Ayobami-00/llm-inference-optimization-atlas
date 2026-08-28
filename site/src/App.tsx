@@ -1,5 +1,13 @@
 import type { Core } from "cytoscape";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { GraphCanvas } from "./components/GraphCanvas";
 import { loadAtlas, loadEntity } from "./data";
@@ -63,6 +71,46 @@ const globalStoryNarrative: [string, string, string] = [
 
 function artifactCode(reference: string): string {
   return reference.split("/").at(-1)?.replace(/@v\d+$/, "") ?? reference;
+}
+
+const repositoryUrl = "https://github.com/Ayobami-00/llm-inference-optimization-atlas";
+
+interface ReferenceContextValue {
+  nodes: ReadonlyMap<string, GraphNode>;
+  revision: string;
+}
+
+const ReferenceContext = createContext<ReferenceContextValue>({
+  nodes: new Map(),
+  revision: "main",
+});
+
+function repositoryRecordUrl(node: GraphNode, revision: string): string {
+  return `${repositoryUrl}/blob/${revision}/${node.source_path}`;
+}
+
+function RecordReference({ reference }: { reference: string }) {
+  const { nodes, revision } = useContext(ReferenceContext);
+  const node = nodes.get(reference);
+  if (!node) {
+    return (
+      <code className="unresolved-reference" title={`Unresolved Atlas reference: ${reference}`}>
+        {artifactCode(reference)}
+      </code>
+    );
+  }
+  return (
+    <a
+      className="record-reference"
+      href={repositoryRecordUrl(node, revision)}
+      target="_blank"
+      rel="noreferrer"
+      title={`${artifactCode(reference)} · ${node.source_path}`}
+      aria-label={`Open ${node.label} in the repository`}
+    >
+      {node.label}
+    </a>
+  );
 }
 
 function entityPrefix(type: string, nodes: GraphNode[]): string {
@@ -186,7 +234,7 @@ function DetailValue({ value, depth = 0 }: { value: unknown; depth?: number }) {
         </a>
       );
     }
-    if (value.startsWith("atlas://")) return <code>{value}</code>;
+    if (value.startsWith("atlas://")) return <RecordReference reference={value} />;
     return <span className={value.length > 100 ? "long-value" : undefined}>{value}</span>;
   }
   if (Array.isArray(value)) {
@@ -310,7 +358,7 @@ function RelationDetails({
             <strong>{relationLabel(edge.relation)}</strong>
             <span>{edge.assertion_level}</span>
           </div>
-          <code>{artifactCode(direction === "incoming" ? edge.source : edge.target)}</code>
+          <RecordReference reference={direction === "incoming" ? edge.source : edge.target} />
           <dl>
             <div>
               <dt>Confidence</dt>
@@ -345,12 +393,14 @@ function EntityDrawer({
   detail,
   loading,
   repositoryRevision,
+  referenceNodes,
   onClose,
   onWhy,
 }: {
   detail: EntityDetail | null;
   loading: boolean;
   repositoryRevision: string;
+  referenceNodes: ReadonlyMap<string, GraphNode>;
   onClose: () => void;
   onWhy: () => void;
 }) {
@@ -359,90 +409,100 @@ function EntityDrawer({
     ? "main"
     : repositoryRevision.slice(0, 40);
   return (
-    <aside className="entity-drawer" aria-label="Evidence details" aria-live="polite">
-      <button className="drawer-close" onClick={onClose} aria-label="Close details">
-        Close ×
-      </button>
-      {loading || !detail ? (
-        <div className="drawer-loading">Resolving evidence…</div>
-      ) : (
-        <>
-          <header className="drawer-identity">
-            <div>
-              <p className="eyebrow">{titleCase(detail.node.type)}</p>
-              <code>{artifactCode(detail.node.artifact_ref)}</code>
-            </div>
-            <h2>{detail.node.label}</h2>
-            <p className="drawer-summary">{detail.node.summary}</p>
-            <div className="status-row">
-              <span>{detail.node.status}</span>
-              <code>{detail.node.artifact_ref}</code>
-              {detail.node.study && <code>{artifactCode(detail.node.study)}</code>}
-            </div>
-          </header>
-          {detail.node.type === "decision" && (
-            <button className="primary-action" onClick={onWhy}>
-              Why this decision?
-            </button>
-          )}
-          <EffectList detail={detail} />
-          <ArtifactFields detail={detail} />
-          <section className="drawer-section">
-            <div className="drawer-section-heading">
+    <ReferenceContext.Provider value={{ nodes: referenceNodes, revision }}>
+      <aside className="entity-drawer" aria-label="Evidence details" aria-live="polite">
+        <button className="drawer-close" onClick={onClose} aria-label="Close details">
+          Close ×
+        </button>
+        {loading || !detail ? (
+          <div className="drawer-loading">Resolving evidence…</div>
+        ) : (
+          <>
+            <header className="drawer-identity">
               <div>
-                <p className="eyebrow">Evidence links</p>
-                <h3>Recorded relationships</h3>
+                <p className="eyebrow">{titleCase(detail.node.type)}</p>
+                <code>{artifactCode(detail.node.artifact_ref)}</code>
               </div>
-              <span>{detail.incoming.length + detail.outgoing.length} edges</span>
-            </div>
-            <dl className="link-stats">
-              <div>
-                <dt>Incoming</dt>
-                <dd>{detail.incoming.length}</dd>
+              <h2>{detail.node.label}</h2>
+              <p className="drawer-summary">{detail.node.summary}</p>
+              <div className="status-row">
+                <span>{detail.node.status}</span>
+                <RecordReference reference={detail.node.artifact_ref} />
+                {detail.node.study && <RecordReference reference={detail.node.study} />}
               </div>
-              <div>
-                <dt>Outgoing</dt>
-                <dd>{detail.outgoing.length}</dd>
-              </div>
-              <div>
-                <dt>Referenced by</dt>
-                <dd>{detail.referenced_by.length}</dd>
-              </div>
-            </dl>
-            <RelationDetails title="Incoming evidence" edges={detail.incoming} direction="incoming" />
-            <RelationDetails title="Outgoing evidence" edges={detail.outgoing} direction="outgoing" />
-            {detail.referenced_by.length > 0 && (
-              <div className="relation-group referenced-by">
-                <h3>Referenced by</h3>
-                <DetailValue value={detail.referenced_by} />
-              </div>
+            </header>
+            {detail.node.type === "decision" && (
+              <button className="primary-action" onClick={onWhy}>
+                Why this decision?
+              </button>
             )}
-          </section>
-          {detail.node.type === "source" && (
+            <EffectList detail={detail} />
+            <ArtifactFields detail={detail} />
             <section className="drawer-section">
-              <p className="eyebrow">Source record</p>
-              {typeof detail.artifact.url === "string" && (
-                <a href={detail.artifact.url} target="_blank" rel="noreferrer">
-                  Open authoritative source ↗
-                </a>
+              <div className="drawer-section-heading">
+                <div>
+                  <p className="eyebrow">Evidence links</p>
+                  <h3>Recorded relationships</h3>
+                </div>
+                <span>{detail.incoming.length + detail.outgoing.length} edges</span>
+              </div>
+              <dl className="link-stats">
+                <div>
+                  <dt>Incoming</dt>
+                  <dd>{detail.incoming.length}</dd>
+                </div>
+                <div>
+                  <dt>Outgoing</dt>
+                  <dd>{detail.outgoing.length}</dd>
+                </div>
+                <div>
+                  <dt>Referenced by</dt>
+                  <dd>{detail.referenced_by.length}</dd>
+                </div>
+              </dl>
+              <RelationDetails
+                title="Incoming evidence"
+                edges={detail.incoming}
+                direction="incoming"
+              />
+              <RelationDetails
+                title="Outgoing evidence"
+                edges={detail.outgoing}
+                direction="outgoing"
+              />
+              {detail.referenced_by.length > 0 && (
+                <div className="relation-group referenced-by">
+                  <h3>Referenced by</h3>
+                  <DetailValue value={detail.referenced_by} />
+                </div>
               )}
-              <p>{String(detail.artifact.relevance ?? "")}</p>
             </section>
-          )}
-          <section className="drawer-section provenance">
-            <p className="eyebrow">Repository provenance</p>
-            <p>The canonical source file for this node is versioned in Git.</p>
-            <a
-              href={`https://github.com/Ayobami-00/llm-inference-optimization-atlas/blob/${revision}/${detail.node.source_path}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {detail.node.source_path} ↗
-            </a>
-          </section>
-        </>
-      )}
-    </aside>
+            {detail.node.type === "source" && (
+              <section className="drawer-section">
+                <p className="eyebrow">Source record</p>
+                {typeof detail.artifact.url === "string" && (
+                  <a href={detail.artifact.url} target="_blank" rel="noreferrer">
+                    Open authoritative source ↗
+                  </a>
+                )}
+                <p>{String(detail.artifact.relevance ?? "")}</p>
+              </section>
+            )}
+            <section className="drawer-section provenance">
+              <p className="eyebrow">Repository provenance</p>
+              <p>The canonical source file for this node is versioned in Git.</p>
+              <a
+                href={`https://github.com/Ayobami-00/llm-inference-optimization-atlas/blob/${revision}/${detail.node.source_path}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {detail.node.source_path} ↗
+              </a>
+            </section>
+          </>
+        )}
+      </aside>
+    </ReferenceContext.Provider>
   );
 }
 
@@ -520,6 +580,15 @@ export function App() {
 
   const activeView = atlas?.views[viewId];
   const presentation = activeView?.filters.presentation;
+  const referenceNodes = useMemo(() => {
+    const nodes = new Map<string, GraphNode>();
+    if (!atlas) return nodes;
+    for (const node of [...atlas.referenceNodes, ...atlas.graph.nodes]) {
+      nodes.set(node.id, node);
+      nodes.set(node.artifact_ref, node);
+    }
+    return nodes;
+  }, [atlas]);
   const typeCounts = useMemo(() => {
     if (!atlas || !activeView) return [];
     const ids = new Set(activeView.node_ids);
@@ -864,6 +933,7 @@ export function App() {
         detail={detail}
         loading={detailLoading}
         repositoryRevision={atlas.manifest.repository_commit}
+        referenceNodes={referenceNodes}
         onClose={clearSelection}
         onWhy={highlightDecisionPath}
       />

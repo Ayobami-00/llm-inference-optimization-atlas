@@ -108,6 +108,7 @@ export interface AtlasData {
   root: string;
   manifest: GraphManifest;
   graph: GraphData;
+  referenceNodes: GraphNode[];
   indexes: GraphIndexes;
   views: Record<GraphView["id"], GraphView>;
 }

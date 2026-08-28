@@ -28,6 +28,21 @@ test("has no automatically detectable serious accessibility violations", async (
   expect(results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact ?? ""))).toEqual([]);
 });
 
+test("renders canonical references as named repository links", async ({ page }) => {
+  await page.goto("./?view=story&node=atlas%3A%2F%2Fworkload%2FW001%40v1");
+  const details = page.getByRole("complementary", { name: "Evidence details" });
+  await expect(details).toBeVisible();
+  const optimization = details.getByRole("link", {
+    name: "Open Continuous batching in the repository",
+  }).first();
+  await expect(optimization).toHaveText("Continuous batching");
+  await expect(optimization).toHaveAttribute(
+    "href",
+    /reference\/ontology\/v1\/optimizations\/0o2-admission-scheduling-and-batching\.yaml$/,
+  );
+  await expect(details).not.toContainText("atlas://");
+});
+
 test("presents a study as a guided story and groups replicate runs", async ({ page }) => {
   await page.goto("./studies/S003-cpu-enterprise-rag/v1/");
   await expect(page.getByRole("heading", { name: "Story" })).toBeVisible();
@@ -38,6 +53,17 @@ test("presents a study as a guided story and groups replicate runs", async ({ pa
   );
   await expect(page.getByRole("button", { name: "Why this decision?" })).toBeVisible();
   await expect(page.getByLabel("Relation legend")).toContainText("supports");
+
+  const workload = page
+    .getByRole("navigation", { name: "Graph node navigator" })
+    .getByRole("button", { name: /WS003/ });
+  await workload.click();
+  const workloadDetails = page.getByRole("complementary", { name: "Evidence details" });
+  const archetype = workloadDetails.getByRole("link", {
+    name: "Open Enterprise RAG in the repository",
+  });
+  await expect(archetype).toHaveAttribute("href", /reference\/ontology\/v1\/workloads\.yaml$/);
+  await page.getByRole("button", { name: "Close details" }).click();
 
   const experiment = page
     .getByRole("navigation", { name: "Graph node navigator" })

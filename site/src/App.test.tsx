@@ -15,6 +15,16 @@ const node = {
   detail_path: "entities/OPT023@v1.json",
 };
 
+const referencedNode = {
+  ...node,
+  id: "atlas://optimization/OPT007@v1",
+  label: "Continuous batching",
+  source_path: "reference/ontology/v1/optimizations/scheduling.yaml",
+  artifact_ref: "atlas://optimization/OPT007@v1",
+  summary: "Continuously fill available batch slots.",
+  detail_path: "entities/OPT007@v1.json",
+};
+
 const view = {
   id: "bottleneck" as const,
   name: "Bottleneck",
@@ -53,6 +63,7 @@ const atlas: AtlasData = {
     files: { graph: "graph.json", indexes: "indexes.json", views: [] },
   },
   graph: { graph_version: 1, nodes: [node], edges: [] },
+  referenceNodes: [node, referencedNode],
   indexes: { by_type: {}, by_status: {}, by_study: {}, by_tag: {}, referenced_by: {} },
   views: {
     story: storyView,
@@ -66,7 +77,10 @@ const atlas: AtlasData = {
 
 const detail: EntityDetail = {
   node,
-  artifact: { mechanism: "Paged allocation avoids contiguous reservation." },
+  artifact: {
+    mechanism: "Paged allocation avoids contiguous reservation.",
+    candidate_optimizations: [referencedNode.artifact_ref, "atlas://optimization/OPT999@v1"],
+  },
   incoming: [],
   outgoing: [],
   referenced_by: [],
@@ -140,6 +154,16 @@ describe("Atlas explorer", () => {
     await waitFor(() => expect(screen.getByRole("heading", { name: "Paged KV cache" })).toBeVisible());
     expect(screen.getByRole("heading", { name: "Optimization record" })).toBeVisible();
     expect(screen.getByText("Paged allocation avoids contiguous reservation.")).toBeVisible();
+    const recordLink = screen.getByRole("link", {
+      name: "Open Continuous batching in the repository",
+    });
+    expect(recordLink).toHaveTextContent("Continuous batching");
+    expect(recordLink).toHaveAttribute(
+      "href",
+      "https://github.com/Ayobami-00/llm-inference-optimization-atlas/blob/0123456789abcdef/reference/ontology/v1/optimizations/scheduling.yaml",
+    );
+    expect(screen.queryByText(referencedNode.artifact_ref)).not.toBeInTheDocument();
+    expect(screen.getByTitle(/Unresolved Atlas reference/)).toHaveTextContent("OPT999");
     expect(centerGraph).not.toHaveBeenCalled();
     expect(window.location.search).toContain("node=atlas%3A%2F%2Foptimization%2FOPT023%40v1");
   });
