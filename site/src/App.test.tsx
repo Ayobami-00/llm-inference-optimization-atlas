@@ -88,6 +88,7 @@ const detail: EntityDetail = {
 
 const centerGraph = vi.fn();
 const graphCore = {
+  container: () => null,
   elements: () => ({ unselect: vi.fn() }),
   getElementById: () => ({ length: 1, select: vi.fn() }),
   center: centerGraph,

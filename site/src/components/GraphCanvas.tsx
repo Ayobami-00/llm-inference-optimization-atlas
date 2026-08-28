@@ -332,8 +332,9 @@ export function GraphCanvas({
             "border-width": 2,
             color: "#17231f",
             label: "data(displayLabel)",
-            "font-family": "IBM Plex Sans, ui-sans-serif, system-ui",
-            "font-size": 8.5,
+            "font-family":
+              "Avenir Next, Segoe UI Variable, Segoe UI, Helvetica Neue, Arial, sans-serif",
+            "font-size": 9.5,
             "font-weight": 800,
             "text-halign": "center",
             "text-valign": "center",
@@ -349,7 +350,7 @@ export function GraphCanvas({
             shape: "ellipse",
             width: "64px",
             height: "64px",
-            "font-size": 8.2,
+            "font-size": 9.5,
             "text-max-width": "60px",
           },
         },
@@ -357,7 +358,7 @@ export function GraphCanvas({
           selector: "node.run-group",
           style: {
             "border-style": "dashed",
-            "font-size": 9,
+            "font-size": 10,
           },
         },
         {
@@ -384,7 +385,7 @@ export function GraphCanvas({
           style: {
             label: "data(displayRelation)",
             color: "#25342e",
-            "font-size": 8.5,
+            "font-size": 9.5,
             "font-weight": 650,
             "text-background-color": "#ffffff",
             "text-background-opacity": 0.96,
@@ -540,6 +541,7 @@ export function GraphCanvas({
         aria-label="Interactive evidence graph. Use the node navigator for keyboard access."
         data-rendered-nodes={accessibleNodes.length}
         data-run-groups={elements.filter((element) => element.data.synthetic === true).length}
+        data-highlighted-elements={highlighted.size}
       />
       {tooltip && (
         <div className="node-tooltip" style={{ left: tooltip.x, top: tooltip.y }} role="tooltip">

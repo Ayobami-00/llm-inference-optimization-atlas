@@ -1,9 +1,13 @@
 :root {
   color: #17231f;
   background: #ffffff;
-  font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+  font-family: var(--font-sans);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  --font-sans: "Avenir Next", "Segoe UI Variable", "Segoe UI", "Helvetica Neue", Arial,
+    sans-serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --ink: #17231f;
   --panel: #f6f8f4;
   --panel-soft: #edf2ed;
@@ -52,6 +56,11 @@ body,
 body {
   min-height: 100vh;
   overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 button,
@@ -1043,9 +1052,25 @@ input:focus-visible {
   border: 1px solid var(--signal);
   border-radius: 6px;
   color: var(--ink);
+  font-size: 13px;
   font-weight: 700;
   background: var(--signal);
   cursor: pointer;
+}
+
+.decision-path-action {
+  display: grid;
+  gap: 8px;
+}
+
+.decision-path-action p {
+  padding: 9px 11px;
+  margin: 0;
+  border-left: 3px solid var(--mint);
+  color: #486057;
+  font-size: 12px;
+  line-height: 1.5;
+  background: #edf6f0;
 }
 
 .drawer-section {
@@ -1513,6 +1538,149 @@ input:focus-visible {
   font-family: Georgia, serif;
   font-size: clamp(36px, 6vw, 72px);
   font-weight: 400;
+}
+
+/* A compact editorial type system: expressive headings, quiet metadata, and
+   a readable minimum size for every interactive or explanatory label. */
+.brand strong {
+  font-size: 16px;
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.rail-intro h1,
+.entity-drawer h2,
+.drawer-section-heading h3,
+.relation-group h3,
+.link-stats dd,
+.fatal-state h1 {
+  font-family: var(--font-display);
+}
+
+.rail-intro h1 {
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
+.entity-drawer h2 {
+  font-size: 33px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
+.drawer-section-heading h3,
+.relation-group h3 {
+  font-weight: 500;
+}
+
+.revision-pill,
+.view-nav button span,
+.type-filters small,
+.entity-key code,
+.node-tooltip strong,
+.drawer-identity code,
+.number-value,
+.object-index,
+.provenance {
+  font-family: var(--font-mono);
+}
+
+.search-wrap input,
+.view-nav button {
+  font-size: 13px;
+}
+
+.search-results code,
+.search-result-heading,
+.eyebrow,
+.view-nav button span,
+.filter-heading button,
+.type-filters small,
+.negative-toggle,
+.key-label,
+.entity-key code,
+.entity-key button span,
+.stage-flow span,
+.relation-legend,
+.canvas-note,
+.node-tooltip strong,
+.node-tooltip small,
+.drawer-close,
+.status-row span,
+.status-row code,
+.drawer-section-heading > span,
+.artifact-field-grid h4,
+.boolean-value,
+.detail-chip-list li,
+.detail-chip-list .record-reference,
+.object-index,
+.detail-nested dt,
+.link-stats dt,
+.relation-card-heading span,
+.relation-card dt,
+.relation-list small,
+.provenance {
+  font-size: 10px;
+}
+
+.rail-intro > p:last-child,
+.stage-heading p,
+.reading-guide > p,
+.view-summary p,
+.node-tooltip span,
+.type-filters span {
+  font-size: 12px;
+}
+
+.view-summary p,
+.reading-guide > p,
+.drawer-summary {
+  font-family: var(--font-display);
+}
+
+.view-summary p {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.reading-guide > p {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.drawer-summary {
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.drawer-section {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.artifact-field-grid article > span,
+.artifact-field-grid article > code,
+.artifact-field-grid article > data,
+.artifact-field-grid article > a {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.detail-nested dd,
+.relation-card dd,
+.relation-card > code,
+.relation-card > .record-reference,
+.relation-list span,
+.effect strong,
+.effect span {
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.relation-card-heading strong {
+  font-size: 12px;
 }
 
 @media (max-width: 900px) {

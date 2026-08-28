@@ -28,6 +28,21 @@ test("has no automatically detectable serious accessibility violations", async (
   expect(results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact ?? ""))).toEqual([]);
 });
 
+test("offers a branded and recoverable not-found page", async ({ page }) => {
+  await page.goto("./404.html");
+  await expect(page.getByRole("heading", { name: "This path is not in the Atlas." })).toBeVisible();
+  await expect(page.getByText("404 · This route has no evidence record")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Return to the Atlas" })).toHaveAttribute(
+    "href",
+    "/llm-inference-optimization-atlas/",
+  );
+  await expect(page.locator("#requested-path")).toContainText("404.html");
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(
+    results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact ?? "")),
+  ).toEqual([]);
+});
+
 test("renders canonical references as named repository links", async ({ page }) => {
   await page.goto("./?view=story&node=atlas%3A%2F%2Fworkload%2FW001%40v1");
   const details = page.getByRole("complementary", { name: "Evidence details" });
@@ -61,6 +76,26 @@ test("preserves zoom and keeps the selected node beside the drawer", async ({ pa
 
   await expect.poll(async () => Number(await canvas.getAttribute("data-zoom"))).toBeCloseTo(zoomed, 3);
   await expect(canvas).toHaveAttribute("data-selected-node-visible", "true");
+});
+
+test("highlights the supporting path from a decision drawer", async ({ page }) => {
+  await page.goto("./studies/S003-cpu-enterprise-rag/v1/");
+  const decision = page
+    .getByRole("navigation", { name: "Graph node navigator" })
+    .getByRole("button", { name: /DEC0003/ });
+  await decision.focus();
+  await page.keyboard.press("Enter");
+
+  const details = page.getByRole("complementary", { name: "Evidence details" });
+  const why = details.getByRole("button", { name: "Why this decision?" });
+  await why.click();
+  await expect(
+    details.getByRole("button", { name: "Decision path highlighted" }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(details.getByText(/Supporting findings and the selected configuration/)).toBeVisible();
+  await expect
+    .poll(async () => Number(await page.getByLabel("Interactive evidence graph").getAttribute("data-highlighted-elements")))
+    .toBeGreaterThan(1);
 });
 
 test("presents a guided study story and expands replicate runs", async ({ page }) => {

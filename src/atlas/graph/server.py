@@ -3,6 +3,7 @@ from __future__ import annotations
 import functools
 import http.server
 import webbrowser
+from http import HTTPStatus
 from pathlib import Path
 
 PROJECT_BASE = "/llm-inference-optimization-atlas/"
@@ -13,6 +14,25 @@ class AtlasRequestHandler(http.server.SimpleHTTPRequestHandler):
         if path.startswith(PROJECT_BASE):
             path = "/" + path[len(PROJECT_BASE) :]
         return super().translate_path(path)
+
+    def send_error(
+        self,
+        code: int,
+        message: str | None = None,
+        explain: str | None = None,
+    ) -> None:
+        if code == HTTPStatus.NOT_FOUND:
+            page = Path(self.directory or ".") / "404.html"
+            if page.is_file():
+                content = page.read_bytes()
+                self.send_response(code, message)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(content)))
+                self.end_headers()
+                if self.command != "HEAD":
+                    self.wfile.write(content)
+                return
+        super().send_error(code, message, explain)
 
 
 def serve_site(

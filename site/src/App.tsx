@@ -442,6 +442,7 @@ function EntityDrawer({
   loading,
   repositoryRevision,
   referenceNodes,
+  pathHighlighted,
   onClose,
   onWhy,
 }: {
@@ -449,6 +450,7 @@ function EntityDrawer({
   loading: boolean;
   repositoryRevision: string;
   referenceNodes: ReadonlyMap<string, GraphNode>;
+  pathHighlighted: boolean;
   onClose: () => void;
   onWhy: () => void;
 }) {
@@ -480,9 +482,18 @@ function EntityDrawer({
               </div>
             </header>
             {detail.node.type === "decision" && (
-              <button className="primary-action" onClick={onWhy}>
-                Why this decision?
-              </button>
+              <div className="decision-path-action">
+                <button
+                  className="primary-action"
+                  onClick={() => onWhy()}
+                  aria-pressed={pathHighlighted}
+                >
+                  {pathHighlighted ? "Decision path highlighted" : "Why this decision?"}
+                </button>
+                {pathHighlighted && (
+                  <p>Supporting findings and the selected configuration are highlighted on the graph.</p>
+                )}
+              </div>
             )}
             <EffectList detail={detail} />
             <ArtifactFields detail={detail} />
@@ -734,9 +745,17 @@ export function App() {
       }
     }
     setHighlighted(included);
-    core.current?.elements().removeClass("path");
-    for (const id of included) core.current?.getElementById(id).addClass("path");
-    core.current?.fit(core.current.elements(".path"), 70);
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        const current = core.current;
+        if (!current) return;
+        current.elements().removeClass("path");
+        for (const id of included) current.getElementById(id).addClass("path");
+        const path = current.elements(".path");
+        if (path.length) current.fit(path, 70);
+        revealNodeBesideDrawer(current, decision.id);
+      });
+    });
   };
 
   if (error) {
@@ -942,7 +961,7 @@ export function App() {
           </div>
           {presentation && (
             <div className="reading-guide" aria-label="Graph reading order">
-              <div className="stage-flow">
+              <div className="stage-flow" tabIndex={0} aria-label="Graph stage overview">
                 <span className="guide-start">Start</span>
                 {presentation.stages.map((stage, index) => (
                   <span key={stage.label}>
@@ -996,6 +1015,7 @@ export function App() {
         loading={detailLoading}
         repositoryRevision={atlas.manifest.repository_commit}
         referenceNodes={referenceNodes}
+        pathHighlighted={Boolean(detail && highlighted.has(detail.node.id) && highlighted.size > 1)}
         onClose={clearSelection}
         onWhy={highlightDecisionPath}
       />

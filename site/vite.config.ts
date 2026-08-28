@@ -55,7 +55,6 @@ function atlasData(): Plugin {
           }
         }
       }
-      fs.writeFileSync(path.join(outputRoot, "404.html"), index);
     },
   };
 }
