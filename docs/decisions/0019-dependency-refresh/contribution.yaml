@@ -15,4 +15,5 @@ artifacts:
   - site/vite.config.ts
   - .github/workflows/ci.yml
   - .github/workflows/pages.yml
+  - .github/labels.yml
 closes_issue: true

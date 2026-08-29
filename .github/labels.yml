@@ -1,3 +1,6 @@
+- name: dependencies
+  color: 0366d6
+  description: Dependency updates and maintenance.
 - name: proposal:needs-triage
   color: d4c5f9
   description: Proposal awaits automated and maintainer review.
