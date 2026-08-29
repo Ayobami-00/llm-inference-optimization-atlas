@@ -19,7 +19,10 @@ provenance:
   method: contributor-authored
   source_paths: []
   generated: false
-extensions: {}
+extensions:
+  atlas.scaffold:
+    complete: false
+    fields: [question, factors, protocol, metrics, analysis, stopping_rule]
 study: atlas://study/S000@v1
 question: "How does the changed factor affect the primary metric under the frozen conditions?"
 hypothesis: atlas://hypothesis/HYP000@v1

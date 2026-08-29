@@ -1,7 +1,7 @@
 # V1 templates
 
-- `study/`: study metadata and contracts.
-- `experiment/`: controlled experiment and configuration skeletons.
+- `study/`: study metadata plus workload, quality, SLO, input, and execution scaffolds.
+- `experiment/`: controlled experiment, hypothesis, runtime, and resolved configuration scaffolds.
 - `execution-bundle/`: unconstrained implementation code behind a small lifecycle interface.
 - `finding/`: evidence-scoped claim skeleton.
 - `decision/`: deployment decision, including no-recommendation outcomes.

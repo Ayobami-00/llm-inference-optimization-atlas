@@ -18,6 +18,11 @@ from rich.table import Table
 from atlas import __version__
 from atlas.comparisons import ComparisonError, compare_all, compare_experiment
 from atlas.constants import EXIT_EXECUTION, EXIT_EXTERNAL, EXIT_INTEGRITY, EXIT_VALIDATION
+from atlas.contributions import (
+    ContributionError,
+    contribution_status,
+    start_contribution,
+)
 from atlas.execution import (
     ExecutionError,
     bundle_plan,
@@ -32,10 +37,13 @@ from atlas.execution.cache import inspect_cache, prune_cache
 from atlas.execution.evidence import promote_evidence, validate_evidence
 from atlas.graph import GraphCompiler, GraphError
 from atlas.graph.server import serve_site
+from atlas.identities import next_identifiers
 from atlas.ontology import check_ontology
 from atlas.proposals import (
+    ProposalIssueError,
     check_pull_request_approval,
     create_github_issue,
+    materialize_issue_proposal,
     new_proposal,
     render_proposal,
     validate_issue_event,
@@ -45,9 +53,9 @@ from atlas.proposals.service import ProposalError
 from atlas.schemas import SchemaCatalog
 from atlas.site import SiteBuildError, build_site
 from atlas.sources import build_source_catalog, check_sources
-from atlas.studies import StudyError, new_experiment, new_study
+from atlas.studies import StudyError, new_experiment, new_study, resolve_configurations
 from atlas.utilities.repository import find_repository_root, repository_relative
-from atlas.utilities.serialization import load_data
+from atlas.utilities.serialization import load_data, yaml_writer
 from atlas.validation import ValidationReport, Validator
 from atlas.validation.ids import check_ids
 
@@ -63,6 +71,10 @@ ontology_app = typer.Typer(no_args_is_help=True, help="Validate the inference on
 sources_app = typer.Typer(no_args_is_help=True, help="Validate external source records.")
 ids_app = typer.Typer(no_args_is_help=True, help="Validate artifact identities and references.")
 proposal_app = typer.Typer(no_args_is_help=True, help="Create and review contribution proposals.")
+contribution_app = typer.Typer(
+    no_args_is_help=True,
+    help="Start approved contributions and inspect publication readiness.",
+)
 study_app = typer.Typer(no_args_is_help=True, help="Create and inspect Atlas studies.")
 experiment_app = typer.Typer(no_args_is_help=True, help="Create controlled experiments.")
 execution_app = typer.Typer(no_args_is_help=True, help="Prepare and run execution bundles.")
@@ -77,6 +89,7 @@ app.add_typer(ontology_app, name="ontology")
 app.add_typer(sources_app, name="sources")
 app.add_typer(ids_app, name="ids")
 app.add_typer(proposal_app, name="proposal")
+app.add_typer(contribution_app, name="contribution")
 app.add_typer(study_app, name="study")
 app.add_typer(experiment_app, name="experiment")
 app.add_typer(execution_app, name="execution")
@@ -260,6 +273,25 @@ def ids_check(ctx: typer.Context) -> None:
     _exit_for_report(report.ok)
 
 
+@ids_app.command("next")
+def ids_next(
+    ctx: typer.Context,
+    kind: Annotated[str, typer.Argument(help="Artifact kind or identity prefix.")],
+    count: Annotated[int, typer.Option("--count", min=1)] = 1,
+) -> None:
+    """Preview the next available canonical artifact identities."""
+
+    try:
+        identifiers = next_identifiers(find_repository_root(), kind, count=count)
+    except ValueError as error:
+        raise typer.BadParameter(str(error)) from error
+    _emit(
+        ctx,
+        {"ok": True, "kind": kind, "count": count, "identifiers": identifiers},
+        title="Next artifact identities",
+    )
+
+
 def _github_annotations(report: ValidationReport) -> None:
     for issue in report.issues:
         level = "error" if issue.severity == "error" else "warning"
@@ -300,15 +332,122 @@ def proposal_new(
     ctx: typer.Context,
     proposal_type: Annotated[str, typer.Argument(help="Proposal type.")],
     output: Annotated[Path, typer.Option("--output", "-o")] = Path("proposal.yaml"),
+    guided: Annotated[
+        bool,
+        typer.Option("--guided", help="Prompt for proposal fields instead of editing YAML."),
+    ] = False,
 ) -> None:
     """Create a proposal from a V1 reference template."""
     try:
         path = new_proposal(find_repository_root(), proposal_type, output)
     except ProposalError as error:
         raise typer.BadParameter(str(error)) from error
+    if guided:
+        data = load_data(path)
+        if not isinstance(data, dict):
+            raise typer.BadParameter(f"Proposal must be an object: {path}")
+        normalized_type = str(data.get("proposal_type"))
+        if normalized_type not in {"study", "experiment"}:
+            path.unlink(missing_ok=True)
+            raise typer.BadParameter(
+                "Guided authoring currently supports study and experiment proposals"
+            )
+        title = typer.prompt("Proposal title")
+        summary = typer.prompt("One-sentence summary")
+        motivation = typer.prompt("Evidence gap or deployment decision")
+        author = typer.prompt("Contributor name")
+        github = typer.prompt("GitHub username", default="")
+        conflicts = typer.prompt("Conflict disclosure", default="None declared")
+        data.update(
+            {
+                "title": title,
+                "description": summary,
+                "summary": summary,
+                "motivation": motivation,
+                "authors": [
+                    {
+                        "name": author,
+                        **({"github": github} if github else {}),
+                        "roles": ["proposer"],
+                        "conflicts": (
+                            [] if conflicts.lower() in {"none", "none declared"} else [conflicts]
+                        ),
+                    }
+                ],
+            }
+        )
+
+        def entries(label: str, default: str) -> list[str]:
+            return [
+                value.strip()
+                for value in typer.prompt(label, default=default).split(";")
+                if value.strip()
+            ]
+
+        if normalized_type == "study":
+            archetype = typer.prompt("Workload archetype ID", default="W001")
+            traffic = entries("Traffic regime IDs (semicolon-separated)", "T001")
+            models = entries("Model references (semicolon-separated)", "atlas://model/M001@v1")
+            hardware = entries(
+                "Hardware references (semicolon-separated)", "atlas://hardware/HW001@v1"
+            )
+            runtimes = entries(
+                "Runtime references (semicolon-separated)", "atlas://runtime/RT001@v1"
+            )
+            data["scope"] = {
+                "archetype": (
+                    archetype
+                    if archetype.startswith("atlas://")
+                    else f"atlas://workload/{archetype}@v1"
+                ),
+                "traffic_regimes": [
+                    value if value.startswith("atlas://") else f"atlas://traffic/{value}@v1"
+                    for value in traffic
+                ],
+                "models": models,
+                "hardware": hardware,
+                "runtimes": runtimes,
+                "research_questions": entries(
+                    "Research questions (semicolon-separated)",
+                    "How does the intervention affect the primary metric?",
+                ),
+                "included": entries("Included scope (semicolon-separated)", "CPU inference"),
+                "excluded": entries("Excluded scope (semicolon-separated)", "GPU inference"),
+            }
+        else:
+            study_id = typer.prompt("Existing study ID", default="S001")
+            data["scope"] = {
+                "study": (
+                    study_id if study_id.startswith("atlas://") else f"atlas://study/{study_id}@v1"
+                ),
+                "hypothesis": typer.prompt("Falsifiable hypothesis"),
+                "changed_factors": entries(
+                    "Changed factors (semicolon-separated)", "inference thread budget"
+                ),
+                "frozen_factors": entries(
+                    "Frozen factors (semicolon-separated)",
+                    "workload; model revision; hardware; runtime build",
+                ),
+                "quality_gate": typer.prompt("Quality gate", default="Q1"),
+                "replicates": typer.prompt("Independent replicates", default=3, type=int),
+                "primary_metric": typer.prompt(
+                    "Primary metric reference", default="atlas://metric/MET001@v1"
+                ),
+            }
+        data["resources"] = {
+            "compute": typer.prompt("Compute and wall-time estimate"),
+            "downloads": typer.prompt("Download estimate", default="Uses existing study cache"),
+            "storage": typer.prompt("Storage estimate", default="Less than 1 GB of draft evidence"),
+        }
+        data["risks"] = entries(
+            "Risks (semicolon-separated)",
+            "Findings may transfer only to the measured setup",
+        )
+        with path.open("w") as stream:
+            yaml_writer().dump(data, stream)
     _emit(
         ctx,
-        {"ok": True, "type": proposal_type, "path": str(path)},
+        {"ok": True, "type": proposal_type, "path": str(path), "guided": guided},
         title="Proposal created",
     )
 
@@ -322,6 +461,36 @@ def proposal_validate(
     report = validate_proposal(find_repository_root(), path)
     _emit(ctx, report.as_dict(), title="Proposal validation")
     _exit_for_report(report.ok)
+
+
+@proposal_app.command("pull")
+def proposal_pull(
+    ctx: typer.Context,
+    issue_url: Annotated[str, typer.Argument(help="Approved Atlas proposal issue URL.")],
+    output: Annotated[Path | None, typer.Option("--output", "-o")] = None,
+    token: Annotated[
+        str | None,
+        typer.Option("--token", envvar="GITHUB_TOKEN", help="Optional GitHub API token."),
+    ] = None,
+) -> None:
+    """Materialize an approved GitHub issue as canonical P#### YAML."""
+
+    root = find_repository_root()
+    try:
+        path, proposal = materialize_issue_proposal(root, issue_url, output=output, token=token)
+    except ProposalIssueError as error:
+        Console(stderr=True).print(f"[red]{error}[/]")
+        raise typer.Exit(EXIT_EXTERNAL) from error
+    _emit(
+        ctx,
+        {
+            "ok": True,
+            "proposal": proposal["id"],
+            "proposal_type": proposal["proposal_type"],
+            "path": repository_relative(path, root),
+        },
+        title="Approved proposal materialized",
+    )
 
 
 @proposal_app.command("validate-issue")
@@ -413,15 +582,106 @@ def study_new(
     )
 
 
+@study_app.command("resolve")
+def study_resolve(
+    ctx: typer.Context,
+    study: Annotated[str, typer.Argument(help="Study ID or directory slug.")],
+) -> None:
+    """Refresh configuration hashes after freezing referenced artifacts."""
+
+    root = find_repository_root()
+    try:
+        paths = resolve_configurations(root, study)
+    except StudyError as error:
+        raise typer.BadParameter(str(error)) from error
+    _emit(
+        ctx,
+        {
+            "ok": True,
+            "study": study,
+            "configurations": [repository_relative(path, root) for path in paths],
+        },
+        title="Configurations resolved",
+    )
+
+
+@contribution_app.command("start")
+def contribution_start(
+    ctx: typer.Context,
+    issue_url: Annotated[str, typer.Argument(help="Approved proposal issue URL.")],
+    token: Annotated[
+        str | None,
+        typer.Option("--token", envvar="GITHUB_TOKEN", help="Optional GitHub API token."),
+    ] = None,
+) -> None:
+    """Materialize and scaffold an approved study or experiment contribution."""
+
+    try:
+        result = start_contribution(find_repository_root(), issue_url, token=token)
+    except ContributionError as error:
+        Console(stderr=True).print(f"[red]{error}[/]")
+        raise typer.Exit(EXIT_EXTERNAL) from error
+    _emit(ctx, result.as_dict(), title="Contribution started")
+
+
+@contribution_app.command("status")
+def contribution_status_command(
+    ctx: typer.Context,
+    study: Annotated[str, typer.Argument(help="Study ID or directory slug.")],
+    check: Annotated[
+        bool,
+        typer.Option("--check", help="Exit with validation status when publication is not ready."),
+    ] = False,
+) -> None:
+    """Show the next actionable step from proposal through publication."""
+
+    try:
+        report = contribution_status(find_repository_root(), study)
+    except ContributionError as error:
+        raise typer.BadParameter(str(error)) from error
+    payload = report.as_dict()
+    if _state(ctx).json_output:
+        typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        console = Console()
+        color = "green" if report.ready else "yellow"
+        state = "ready for review" if report.ready else "in progress"
+        console.print(f"[{color}]Contribution status: {state}[/]")
+        console.print(f"[bold]{report.study}[/]  {report.path}")
+        table = Table(box=None, pad_edge=False)
+        table.add_column("Stage", style="bold")
+        table.add_column("Status")
+        table.add_column("Details")
+        next_stage = next((stage.name for stage in report.stages if not stage.complete), None)
+        for stage in report.stages:
+            if stage.complete:
+                status = "[green]✓ complete[/]"
+            elif stage.name == next_stage:
+                status = "[yellow]→ next[/]"
+            else:
+                status = "[dim]○ waiting[/]"
+            table.add_row(stage.name, status, stage.detail)
+        console.print()
+        console.print(table)
+        console.print()
+        console.print(f"[bold]Next:[/] {report.next_action}")
+    if check and not report.ready:
+        raise typer.Exit(EXIT_VALIDATION)
+
+
 @experiment_app.command("new")
 def experiment_new(
     ctx: typer.Context,
     study: Annotated[str, typer.Argument(help="Study ID or directory slug.")],
+    proposal: Annotated[
+        str | None,
+        typer.Option("--proposal", help="Approved experiment proposal path or P#### ID."),
+    ] = None,
 ) -> None:
     """Create an experiment hierarchy inside a study."""
     root = find_repository_root()
     try:
-        path = new_experiment(root, study)
+        path = new_experiment(root, study, proposal)
     except StudyError as error:
         raise typer.BadParameter(str(error)) from error
     _emit(

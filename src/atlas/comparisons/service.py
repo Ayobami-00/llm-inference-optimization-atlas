@@ -7,7 +7,7 @@ from typing import Any
 
 import numpy as np
 
-from atlas.studies.service import _next_identifier
+from atlas.identities import next_identifier
 from atlas.utilities.serialization import load_data, yaml_writer
 
 
@@ -265,7 +265,7 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
                 }
             )
         overall = results[0] if len(set(results)) == 1 else "mixed"
-        comparison_id = _next_identifier(root, "CMP", 4)
+        comparison_id = next_identifier(root, "comparison")
         timestamp = datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
         comparison = {
             "$schema": (

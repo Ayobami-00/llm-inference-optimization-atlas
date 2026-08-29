@@ -10,6 +10,7 @@ body:
       value: |
         <!-- atlas-proposal-form:v1:study -->
         A study proposal is reviewed before implementation. Keep scope falsifiable and explicit.
+        Prefer a guided local draft? Run `uv run atlas proposal new study --guided` and create the issue from it.
   - type: input
     id: proposal-title
     attributes:

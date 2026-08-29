@@ -11,8 +11,9 @@ from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 from typing import Any
 
+from atlas.proposals.issue import proposal_from_issue
 from atlas.schemas import SchemaCatalog
-from atlas.utilities.serialization import yaml_loader
+from atlas.utilities.serialization import canonical_json, yaml_loader
 
 Fetcher = Callable[[str], Any]
 CONTRIBUTION_SCHEMA = (
@@ -127,9 +128,43 @@ def _artifact_changed(manifest_path: str, artifact: str, changed: set[str]) -> b
     parts = PurePosixPath(artifact).parts
     if ".." in parts:
         return False
-    parent = PurePosixPath(manifest_path).parent
-    resolved = str(parent / artifact).rstrip("/")
+    if artifact.startswith(
+        (
+            "studies/",
+            "registry/",
+            "reference/",
+            "docs/",
+            "src/",
+            "tests/",
+            "site/",
+            ".github/",
+        )
+    ):
+        resolved = str(PurePosixPath(artifact)).rstrip("/")
+    else:
+        parent = PurePosixPath(manifest_path).parent
+        resolved = str(parent / artifact).rstrip("/")
     return resolved in changed or any(path.startswith(f"{resolved}/") for path in changed)
+
+
+SEMANTIC_PROPOSAL_FIELDS = (
+    "id",
+    "version",
+    "proposal_type",
+    "title",
+    "description",
+    "authors",
+    "summary",
+    "motivation",
+    "scope",
+    "artifacts",
+    "resources",
+    "risks",
+)
+
+
+def _proposal_semantics(proposal: dict[str, Any]) -> str:
+    return canonical_json({field: proposal.get(field) for field in SEMANTIC_PROPOSAL_FIELDS})
 
 
 def _closes_issue(body: str, number: int, issue_url: str) -> bool:
@@ -253,6 +288,46 @@ def check_pull_request_approval(
                     manifest_path,
                     "/closes_issue",
                     f"PR body must close issue #{issue_number}",
+                )
+            )
+        proposal_path = str(PurePosixPath(manifest_path).parent / "proposal.yaml")
+        try:
+            committed_proposal = _manifest(fetch, repository, proposal_path, revision)
+        except (RuntimeError, ValueError) as error:
+            problems.append(
+                _problem(
+                    proposal_path,
+                    "/",
+                    f"Cannot read the canonical proposal beside contribution.yaml: {error}",
+                )
+            )
+            continue
+        issue_proposal = proposal_from_issue(root, issue)
+        if not issue_proposal.ok or issue_proposal.proposal is None:
+            messages = "; ".join(problem["message"] for problem in issue_proposal.issues)
+            problems.append(
+                _problem(
+                    proposal_path,
+                    "/",
+                    f"Approved issue no longer materializes as a valid proposal: {messages}",
+                )
+            )
+            continue
+        if _proposal_semantics(committed_proposal) != _proposal_semantics(issue_proposal.proposal):
+            problems.append(
+                _problem(
+                    proposal_path,
+                    "/scope",
+                    "Committed proposal does not match the approved issue semantics",
+                )
+            )
+        approval = committed_proposal.get("approval", {})
+        if approval.get("state") != "approved" or approval.get("issue_url") != issue_url:
+            problems.append(
+                _problem(
+                    proposal_path,
+                    "/approval",
+                    "Committed proposal must record the approved issue URL and approved state",
                 )
             )
     if len(proposal_numbers) > 1:

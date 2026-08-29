@@ -19,7 +19,10 @@ provenance:
   method: contributor-authored
   source_paths: []
   generated: false
-extensions: {}
+extensions:
+  atlas.scaffold:
+    complete: false
+    fields: [product_brief, boundaries, candidate_space, completion_criteria]
 archetype: atlas://workload/W001@v1
 proposal:
   id: atlas://proposal/P0000@v1

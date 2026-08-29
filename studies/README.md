@@ -31,6 +31,16 @@ uv run atlas execution run S001-cpu-interactive-chat transformers-cpu --profile 
 Drafts stay under `.atlas/work/`. Inspect and validate them before assigning a
 new run ID with `atlas evidence promote`. Never replace an accepted run in place.
 
+Inspect a study's end-to-end readiness with:
+
+```bash
+uv run atlas contribution status S001-cpu-interactive-chat
+```
+
+The checklist distinguishes approved proposal, frozen design, preregistration,
+execution, accepted evidence, comparison, interpretation, decision, and publication
+readiness.
+
 Build the global and per-study views with:
 
 ```bash

@@ -2,6 +2,10 @@ from __future__ import annotations
 
 import json
 import re
+import urllib.error
+import urllib.parse
+import urllib.request
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -25,6 +29,14 @@ TYPE_VALUES = {
     "finding-challenge": "finding_challenge",
     "methodology": "methodology",
 }
+ISSUE_URL = re.compile(
+    r"^https://github\.com/(?P<owner>[^/]+)/(?P<repository>[^/]+)/issues/(?P<number>[1-9][0-9]*)/?$"
+)
+IssueFetcher = Callable[[str], Any]
+
+
+class ProposalIssueError(RuntimeError):
+    """A GitHub proposal issue could not be read or materialized."""
 
 
 @dataclass(frozen=True)
@@ -83,14 +95,9 @@ def _structured(
     return parsed, []
 
 
-def validate_issue_event(root: Path, event_path: Path) -> ProposalIssue:
-    try:
-        event = json.loads(event_path.read_text())
-    except (OSError, json.JSONDecodeError) as error:
-        return ProposalIssue(False, issues=[_problem("/", f"Cannot read event: {error}")])
-    issue = event.get("issue")
-    if not isinstance(issue, dict):
-        return ProposalIssue(False, issues=[_problem("/issue", "Event has no issue object")])
+def proposal_from_issue(root: Path, issue: dict[str, Any]) -> ProposalIssue:
+    """Convert a GitHub issue-form payload into its canonical proposal record."""
+
     body = str(issue.get("body") or "")
     marker = FORM_MARKER.search(body)
     if not marker:
@@ -185,3 +192,98 @@ def validate_issue_event(root: Path, event_path: Path) -> ProposalIssue:
     for schema_error in catalog.validate(proposal, PROPOSAL_SCHEMA):
         problems.append(_problem(schema_error.path, schema_error.message, "schema"))
     return ProposalIssue(not problems, proposal=proposal, issues=problems)
+
+
+def validate_issue_event(root: Path, event_path: Path) -> ProposalIssue:
+    try:
+        event = json.loads(event_path.read_text())
+    except (OSError, json.JSONDecodeError) as error:
+        return ProposalIssue(False, issues=[_problem("/", f"Cannot read event: {error}")])
+    issue = event.get("issue")
+    if not isinstance(issue, dict):
+        return ProposalIssue(False, issues=[_problem("/issue", "Event has no issue object")])
+    return proposal_from_issue(root, issue)
+
+
+def _issue_fetcher(token: str | None = None) -> IssueFetcher:
+    def fetch(url: str) -> Any:
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "atlas-contribution-client",
+        }
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+        request = urllib.request.Request(url, headers=headers)
+        try:
+            with urllib.request.urlopen(request, timeout=30) as response:
+                return json.loads(response.read())
+        except (urllib.error.URLError, json.JSONDecodeError) as error:
+            raise ProposalIssueError(f"GitHub issue request failed: {error}") from error
+
+    return fetch
+
+
+def fetch_issue_proposal(
+    root: Path,
+    issue_url: str,
+    *,
+    token: str | None = None,
+    fetcher: IssueFetcher | None = None,
+    require_approved: bool = True,
+) -> dict[str, Any]:
+    """Fetch, validate, and materialize a proposal from its GitHub issue."""
+
+    match = ISSUE_URL.fullmatch(issue_url)
+    if not match:
+        raise ProposalIssueError(
+            "Issue URL must look like https://github.com/OWNER/REPOSITORY/issues/123"
+        )
+    owner = urllib.parse.quote(match.group("owner"), safe="")
+    repository = urllib.parse.quote(match.group("repository"), safe="")
+    number = int(match.group("number"))
+    fetch = fetcher or _issue_fetcher(token)
+    payload = fetch(f"https://api.github.com/repos/{owner}/{repository}/issues/{number}")
+    if not isinstance(payload, dict):
+        raise ProposalIssueError("GitHub issue response is not an object")
+    result = proposal_from_issue(root, payload)
+    if not result.ok or result.proposal is None:
+        details = "; ".join(issue["message"] for issue in result.issues)
+        raise ProposalIssueError(f"Proposal issue is invalid: {details}")
+    labels = {
+        str(label.get("name")) for label in payload.get("labels", []) if isinstance(label, dict)
+    }
+    if require_approved and "proposal:approved" not in labels:
+        raise ProposalIssueError("Proposal issue does not have the proposal:approved label")
+    proposal = result.proposal
+    if "proposal:approved" in labels:
+        proposal["approval"] = {"state": "approved", "issue_url": issue_url}
+    return proposal
+
+
+def materialize_issue_proposal(
+    root: Path,
+    issue_url: str,
+    *,
+    output: Path | None = None,
+    token: str | None = None,
+    fetcher: IssueFetcher | None = None,
+) -> tuple[Path, dict[str, Any]]:
+    """Write an approved issue as canonical YAML without silently replacing a draft."""
+
+    from atlas.utilities.serialization import load_data, yaml_writer
+
+    proposal = fetch_issue_proposal(root, issue_url, token=token, fetcher=fetcher)
+    destination = output or root / ".atlas" / "work" / "proposals" / f"{proposal['id']}.yaml"
+    destination = destination if destination.is_absolute() else root / destination
+    if destination.exists():
+        existing = load_data(destination)
+        if existing != proposal:
+            raise ProposalIssueError(
+                f"Refusing to overwrite a different materialized proposal: {destination}"
+            )
+        return destination, proposal
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with destination.open("w") as stream:
+        yaml_writer().dump(proposal, stream)
+    return destination, proposal

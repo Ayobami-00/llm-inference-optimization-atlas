@@ -9,18 +9,35 @@ records, and tooling changes.
 Evidence-bearing work starts with the matching schema-backed GitHub issue form:
 
 1. Submit a new study, experiment, replication, finding challenge, or methodology
-   proposal.
+   proposal. Use the GitHub form directly, or avoid hand-editing YAML with:
+
+   ```bash
+   uv run atlas proposal new study --guided --output proposal.yaml
+   uv run atlas proposal validate proposal.yaml
+   uv run atlas proposal create-issue proposal.yaml
+   ```
+
 2. Resolve validation feedback and wait for `proposal:approved`.
 3. Create `feat/<issue>-<slug>`, `fix/<issue>-<slug>`,
    `chore/<issue>-<slug>`, or `docs/<issue>-<slug>`.
-4. Scaffold from the approved proposal with the Atlas CLI.
-5. Add `contribution.yaml` linking the proposal ID, issue URL, approval, and scope.
+4. Materialize and scaffold directly from the approved issue:
+
+   ```bash
+   uv run atlas contribution start https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/123
+   uv run atlas contribution status S004
+   ```
+
+5. Review the generated `contribution.yaml` and keep its declared artifact paths aligned
+   with the approved contribution.
 6. Produce draft evidence under `.atlas/work/`, validate it, and promote only new
    immutable accepted run IDs.
 7. Submit a pull request using the repository template.
 
-The approval gate checks issue identity, proposal type, scope, and the live
-`proposal:approved` label. Bootstrap studies S001–S003 exercise this same flow.
+The scaffold creates `contribution.yaml`. The approval gate checks issue identity,
+proposal type, exact committed proposal semantics, declared changed paths, branch
+name, closure syntax, and the live `proposal:approved` label. Editing an approved
+issue removes that approval until the changed scope is reviewed again. Bootstrap
+studies S001–S003 exercise this same flow.
 
 ## Evidence review is separate from interpretation review
 
@@ -53,6 +70,7 @@ uv run atlas ids check
 uv run atlas validate --all --strict
 uv run atlas graph build --all
 npm run test:e2e --prefix site
+uv run atlas contribution status S003
 ```
 
 Ordinary checks do not download models. See

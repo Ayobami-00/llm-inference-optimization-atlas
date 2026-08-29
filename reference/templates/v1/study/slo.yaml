@@ -1,0 +1,29 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/slo/slo-profile.schema.json
+schema_version: 1
+kind: SLOProfile
+id: SLO000
+version: 1
+slug: replace-with-slo-slug
+title: "Replace with SLO profile title"
+description: "Freeze the latency, reliability, and capacity eligibility envelope."
+status: draft
+authors: [{name: "Replace with contributor", roles: [investigator], conflicts: []}]
+created_at: '1970-01-01T00:00:00Z'
+updated_at: '1970-01-01T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance: {method: approved-proposal-scaffold, source_paths: [], generated: true}
+extensions:
+  atlas.scaffold:
+    complete: false
+    fields: [request_classes, thresholds, reliability, capacity]
+request_classes:
+  - name: replace-with-request-class
+    constraints:
+      - {metric: server_ttft, percentile: p95, operator: lte, threshold: 1000, unit: ms}
+reliability:
+  minimum_success_rate: 0.99
+  maximum_error_rate: 0.01
+  maximum_timeout_rate: 0.01
+capacity: {minimum_slo_goodput: 0, unit: request/s}
+frozen_before_experiment: true

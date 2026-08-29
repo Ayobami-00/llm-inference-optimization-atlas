@@ -23,6 +23,7 @@ are implementation and contributor guidance.
 
 ## Contributing
 
+- [Add a study](contributing/add-a-study.md)
 - [Proposal-to-PR workflow](contributing/proposal-to-pr.md)
 - [Add or evolve an external source](contributing/add-a-source.md)
 

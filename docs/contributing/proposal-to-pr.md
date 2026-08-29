@@ -13,15 +13,16 @@ expected evidence, resource needs, licensing, and safety constraints.
 For local drafting:
 
 ```bash
-uv run atlas proposal new study --output proposal.yaml
+uv run atlas proposal new study --guided --output proposal.yaml
 uv run atlas proposal validate proposal.yaml
 uv run atlas proposal render proposal.yaml
 uv run atlas proposal create-issue proposal.yaml
 ```
 
 The final command is an external write and asks for confirmation. Automation
-labels a valid proposal `proposal:valid`; only maintainers apply
-`proposal:approved`.
+labels a valid proposal `proposal:valid`, comments with field-specific corrections
+when it is invalid, and only maintainers apply `proposal:approved`. Any subsequent
+semantic edit removes approval and requires review again.
 
 ## 2. Branch and scaffold
 
@@ -34,9 +35,24 @@ chore/<issue>-<slug>
 docs/<issue>-<slug>
 ```
 
-Create a study with `atlas study new <proposal-path-or-P####>`, or add an
-experiment with `atlas experiment new <study>`. Complete `contribution.yaml`
-with the approved issue, proposal ID/type, scope, and contributor declarations.
+Start from the approved issue URL:
+
+```bash
+uv run atlas contribution start https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/123
+uv run atlas contribution status S004
+```
+
+The command materializes the issue as canonical `P####` YAML and creates the
+study or proposal-aware experiment scaffold. A study scaffold includes workload,
+quality, SLO, input, and execution guidance. An experiment scaffold allocates its
+experiment, hypothesis, baseline/candidate configuration, and runtime-configuration
+IDs together. Use `atlas ids next <kind> [--count N]` for additional artifacts.
+After editing runtime settings or another referenced record, run
+`atlas study resolve <study>` to refresh every configuration's resolved hashes.
+
+Within an already approved new-study contribution, add preregistered experiments
+with `atlas experiment new <study>`. To add an experiment to a merged study later,
+open an experiment proposal and use `atlas contribution start <approved-issue-url>`.
 
 ## 3. Implement and produce evidence
 
@@ -62,6 +78,10 @@ determinism, frontend behavior, accessibility, locks, and dependencies without
 downloading real models.
 
 The approval workflow verifies the issue still has `proposal:approved` and that
-`contribution.yaml` matches its type and scope. Reviewers may accept run evidence
-while requesting narrower findings. Merge closes the proposal and rebuilds the
-global and per-study Pages projections.
+the committed `proposal.yaml` exactly matches the approved issue's questions,
+scope, artifacts, resources, and risks. Reviewers may accept run evidence while
+requesting narrower findings. Merge closes the proposal and rebuilds the global
+and per-study Pages projections.
+
+At any point, `atlas contribution status <study>` reports the first unfinished
+stage. Add `--check` when CI or a script should fail until publication-ready.

@@ -1,0 +1,34 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/configuration.schema.json
+schema_version: 1
+kind: Configuration
+id: CFG000
+version: 1
+slug: replace-with-configuration-slug
+title: "Replace with configuration title"
+description: "Materialize one fully resolved experimental condition."
+status: draft
+authors: [{name: "Replace with contributor", roles: [investigator], conflicts: []}]
+created_at: '1970-01-01T00:00:00Z'
+updated_at: '1970-01-01T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance: {method: approved-proposal-scaffold, source_paths: [], generated: true}
+extensions:
+  atlas.scaffold:
+    complete: false
+    fields: [condition, resolved_hashes]
+workload: atlas://workload-spec/WS000@v1
+quality: atlas://quality-contract/QC000@v1
+slo: atlas://slo/SLO000@v1
+model: atlas://model/M000@v1
+hardware: atlas://hardware/HW000@v1
+runtime: atlas://runtime/RT000@v1
+runtime_configuration: atlas://runtime-configuration/RTCFG000@v1
+resolved_hashes:
+  workload: '0000000000000000000000000000000000000000000000000000000000000000'
+  quality: '0000000000000000000000000000000000000000000000000000000000000000'
+  slo: '0000000000000000000000000000000000000000000000000000000000000000'
+  model: '0000000000000000000000000000000000000000000000000000000000000000'
+  hardware: '0000000000000000000000000000000000000000000000000000000000000000'
+  runtime: '0000000000000000000000000000000000000000000000000000000000000000'
+  runtime_configuration: '0000000000000000000000000000000000000000000000000000000000000000'

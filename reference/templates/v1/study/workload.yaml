@@ -1,0 +1,51 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/workloads/workload-spec.schema.json
+schema_version: 1
+kind: WorkloadSpec
+id: WS000
+version: 1
+slug: replace-with-workload-slug
+title: "Replace with workload title"
+description: "Describe the frozen workload replay."
+status: draft
+authors: [{name: "Replace with contributor", roles: [investigator], conflicts: []}]
+created_at: '1970-01-01T00:00:00Z'
+updated_at: '1970-01-01T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance: {method: approved-proposal-scaffold, source_paths: [], generated: true}
+extensions:
+  atlas.scaffold:
+    complete: false
+    fields: [semantic, request_shape, locality, traffic, replay]
+archetype: atlas://workload/W001@v1
+product_brief: "Describe the product behavior represented by this workload."
+semantic:
+  source_type: generated
+  license: Apache-2.0
+  fingerprint: replace-with-input-sha256
+  sampling: {method: replace-with-sampling-method}
+  filters: []
+  transformations: []
+traffic:
+  profiles: [atlas://traffic/T001@v1]
+request_shape:
+  classes:
+    - name: replace-with-request-class
+      weight: 1
+      input_tokens: {expected_range: [1, 1]}
+      output_tokens: {maximum: 1}
+      context_tokens: {expected_range: [1, 1]}
+locality:
+  prefix_reuse: 0
+  session_reuse: 0
+  document_reuse: 0
+  temporal_locality: "Describe ordering and temporal reuse."
+  popularity_skew: "Describe any popularity skew."
+replay: {mode: semantic, output_control: natural}
+load_generation:
+  warmup_requests: 3
+  measurement_requests: 12
+  seeds: [101, 202, 303]
+server_state: warm_empty_cache
+quality_contract: atlas://quality-contract/QC000@v1
+slo_profile: atlas://slo/SLO000@v1

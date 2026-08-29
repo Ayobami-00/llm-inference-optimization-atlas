@@ -9,6 +9,7 @@ from typer.testing import CliRunner
 
 import atlas.cli as cli
 from atlas.cli import app
+from atlas.proposals import validate_proposal
 
 ROOT = Path(__file__).parents[2]
 runner = CliRunner()
@@ -75,3 +76,66 @@ def test_repository_wide_strict_validation_excludes_test_fixtures() -> None:
     result = runner.invoke(app, ["--json", "validate", "--all", "--strict"])
     assert result.exit_code == 0, result.output
     assert json.loads(result.output)["errors"] == 0
+
+
+def test_identity_preview_returns_consecutive_ids() -> None:
+    result = runner.invoke(app, ["--json", "ids", "next", "experiment", "--count", "2"])
+
+    assert result.exit_code == 0, result.output
+    identifiers = json.loads(result.output)["identifiers"]
+    assert len(identifiers) == 2
+    assert int(identifiers[1][1:]) == int(identifiers[0][1:]) + 1
+
+
+def test_contribution_status_explains_the_complete_study_journey() -> None:
+    result = runner.invoke(app, ["contribution", "status", "S003"])
+
+    assert result.exit_code == 0, result.output
+    assert "Contribution status: ready for review" in result.output
+    assert "Approved proposal" in result.output
+    assert "Accepted evidence" in result.output
+    assert "Publication checks" in result.output
+
+
+def test_proposal_help_exposes_guided_authoring() -> None:
+    result = runner.invoke(app, ["proposal", "new", "--help"])
+
+    assert result.exit_code == 0, result.output
+    assert "--guided" in result.output
+
+
+def test_guided_study_proposal_requires_no_yaml_authoring(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(cli, "find_repository_root", lambda: ROOT)
+    output = tmp_path / "proposal.yaml"
+    answers = [
+        "CPU prompt reuse",
+        "Measure repeated-prefix TTFT on CPU.",
+        "The deployment boundary is unknown.",
+        "Contributor",
+        "contributor",
+        "",
+        "W004",
+        "",
+        "",
+        "",
+        "",
+        "Does prompt reuse reduce TTFT?",
+        "",
+        "",
+        "Local CPU for two hours",
+        "",
+        "",
+        "",
+    ]
+
+    result = runner.invoke(
+        app,
+        ["proposal", "new", "study", "--guided", "--output", str(output)],
+        input="\n".join(answers) + "\n",
+    )
+
+    assert result.exit_code == 0, result.output
+    assert validate_proposal(ROOT, output).ok

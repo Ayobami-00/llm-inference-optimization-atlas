@@ -68,37 +68,52 @@ def validate_proposal(root: Path, path: Path) -> ValidationReport:
 
 
 def render_proposal(data: dict[str, Any]) -> str:
+    proposal_type = str(data.get("proposal_type", "methodology")).replace("_", "-")
+    conflicts = [
+        str(conflict)
+        for author in data.get("authors", [])
+        if isinstance(author, dict)
+        for conflict in author.get("conflicts", [])
+    ]
     lines = [
-        f"# {data.get('title', 'Atlas proposal')}",
+        f"<!-- atlas-proposal-form:v1:{proposal_type} -->",
+        "",
+        "### Proposal title",
+        "",
+        str(data.get("title", "Atlas proposal")),
+        "",
+        "### Summary",
         "",
         str(data.get("summary", data.get("description", ""))),
         "",
-        "## Proposal identity",
-        "",
-        f"- Proposal: `{data.get('id', 'unknown')}@v{data.get('version', 1)}`",
-        f"- Type: `{data.get('proposal_type', 'unknown')}`",
-        f"- Status: `{data.get('approval', {}).get('state', 'pending')}`",
-        "",
-        "## Motivation",
+        "### Motivation",
         "",
         str(data.get("motivation", "")),
         "",
-        "## Scope",
+        "### Scope",
         "",
         "```yaml",
     ]
     stream = io.StringIO()
     yaml_writer().dump(data.get("scope", {}), stream)
-    lines.extend([stream.getvalue().rstrip(), "```", "", "## Planned artifacts", ""])
-    lines.extend(f"- `{artifact}`" for artifact in data.get("artifacts", []))
-    lines.extend(["", "## Resources", "", "```yaml"])
+    lines.extend([stream.getvalue().rstrip(), "```", "", "### Planned artifacts", "", "```yaml"])
+    stream = io.StringIO()
+    yaml_writer().dump(data.get("artifacts", []), stream)
+    lines.extend([stream.getvalue().rstrip(), "```", "", "### Resources", "", "```yaml"])
     stream = io.StringIO()
     yaml_writer().dump(data.get("resources", {}), stream)
-    lines.extend([stream.getvalue().rstrip(), "```", "", "## Risks", ""])
-    risks = data.get("risks", [])
-    lines.extend(f"- {risk}" for risk in risks)
+    lines.extend([stream.getvalue().rstrip(), "```", "", "### Risks", "", "```yaml"])
+    stream = io.StringIO()
+    yaml_writer().dump(data.get("risks", []), stream)
     lines.extend(
         [
+            stream.getvalue().rstrip(),
+            "```",
+            "",
+            "### Conflict disclosure",
+            "",
+            "; ".join(conflicts) if conflicts else "None declared",
+            "",
             "",
             "<!-- atlas-proposal",
             f"id: {data.get('id', 'unknown')}",
