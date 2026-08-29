@@ -54,7 +54,7 @@ def test_issue_forms_are_schema_backed_and_labels_are_declared() -> None:
         assert labels == required_sections
 
 
-def test_workflows_have_explicit_permissions_and_versioned_actions() -> None:
+def test_workflows_have_explicit_permissions_and_pinned_actions() -> None:
     workflows = sorted((GITHUB / "workflows").glob("*.yml"))
     assert {path.name for path in workflows} == {
         "approval-gate.yml",
@@ -71,7 +71,10 @@ def test_workflows_have_explicit_permissions_and_versioned_actions() -> None:
             "permissions" in job for job in workflow["jobs"].values()
         )
         for action in re.findall(r"uses:\s*([^\s]+)", path.read_text()):
-            assert re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+@v[1-9][0-9]*", action)
+            assert re.fullmatch(
+                r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+@(?:v[1-9][0-9]*|[0-9a-f]{40})",
+                action,
+            )
 
 
 def test_approval_gate_never_checks_out_or_executes_pull_request_code() -> None:
