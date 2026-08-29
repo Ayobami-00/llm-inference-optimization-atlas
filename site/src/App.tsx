@@ -679,9 +679,9 @@ function WelcomeTour({ onStart, onDismiss }: { onStart: () => void; onDismiss: (
             <p className="eyebrow">First time in the Atlas?</p>
             <h2 id="welcome-tour-title">Read one complete evidence story with us.</h2>
             <p className="welcome-lead">
-              Watch the silent 33-second walkthrough, or take the live tour through the real S003
-              enterprise RAG study. See how a workload becomes an experiment, a finding, and a
-              defensible deployment decision.
+              Watch the walkthrough, or take the live tour through the real S003 enterprise RAG
+              study. See how a workload becomes an experiment, a finding, and a defensible
+              deployment decision.
             </p>
             <ol className="welcome-route" aria-label="Guided tour route">
               <li>
@@ -727,8 +727,8 @@ function WelcomeTour({ onStart, onDismiss }: { onStart: () => void; onDismiss: (
               Your browser does not support the Atlas study walkthrough video.
             </video>
             <figcaption id="tour-recording-caption">
-              A silent walkthrough of WS003 → E0009 → CMP0013 → F0013 → DEC0003. Use the live tour
-              to inspect each record.
+              A walkthrough of WS003 → E0009 → CMP0013 → F0013 → DEC0003. Use the live tour to
+              inspect each record.
             </figcaption>
           </figure>
         </div>
@@ -1133,7 +1133,7 @@ export function App() {
           {atlas.manifest.scope.type === "global" && (
             <button className="tour-recording-launch" onClick={() => setWelcomeOpen(true)}>
               <span>Watch walkthrough</span>
-              <small>33-second silent study overview</small>
+              <small>Study walkthrough</small>
             </button>
           )}
         </div>

@@ -189,7 +189,7 @@ describe("Atlas explorer", () => {
     expect(screen.getByRole("button", { name: /Paged KV cache/ })).toBeInTheDocument();
   });
 
-  it("offers the silent study walkthrough from the global homepage", async () => {
+  it("offers the study walkthrough from the global homepage", async () => {
     render(<App />);
     await screen.findByRole("heading", { name: "Story" });
 
@@ -203,6 +203,6 @@ describe("Atlas explorer", () => {
       "src",
       "/llm-inference-optimization-atlas/media/s003-guided-tour.mp4",
     );
-    expect(screen.getByText(/silent walkthrough of WS003/)).toBeVisible();
+    expect(screen.getByText(/walkthrough of WS003/)).toBeVisible();
   });
 });
