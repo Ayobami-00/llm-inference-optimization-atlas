@@ -1,0 +1,49 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: MODEL-TIERS
+version: 1
+title: "Model tiers"
+description: "Capability-oriented model tiers rather than fixed checkpoints."
+entries:
+  - id: MODEL-M0
+    name: "Development model"
+    definition: "Less than four billion parameters for harness and correctness work."
+    status: active
+    aliases: []
+  - id: MODEL-M1
+    name: "Small dense model"
+    definition: "Approximately seven to nine billion dense parameters for exhaustive experiments."
+    status: active
+    aliases: []
+  - id: MODEL-M2
+    name: "Medium dense model"
+    definition: "Approximately twelve to fourteen billion dense parameters for primary characterization."
+    status: active
+    aliases: []
+  - id: MODEL-M3
+    name: "Large dense model"
+    definition: "Approximately thirty to thirty-five billion parameters for scale-up studies."
+    status: active
+    aliases: []
+  - id: MODEL-M4
+    name: "Very large dense model"
+    definition: "Approximately seventy billion or more parameters for selective validation."
+    status: active
+    aliases: []
+  - id: MODEL-M5
+    name: "Mixture-of-experts model"
+    definition: "Sparse model requiring expert-routing and expert-parallelism characterization."
+    status: active
+    aliases: []
+  - id: MODEL-MM1
+    name: "Small multimodal model"
+    definition: "Development-scale vision or video model."
+    status: active
+    aliases: []
+  - id: MODEL-MM2
+    name: "Medium multimodal model"
+    definition: "Primary multimodal characterization model."
+    status: active
+    aliases: []
+

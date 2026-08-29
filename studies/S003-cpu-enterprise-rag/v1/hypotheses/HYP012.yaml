@@ -1,0 +1,45 @@
+%YAML 1.2
+---
+schema_version: 1
+kind: Hypothesis
+id: HYP012
+version: 1
+slug: rag-container-overhead
+title: The pinned container adds measurable fixed overhead while preserving 
+  quality results.
+description: The pinned container adds measurable fixed overhead while 
+  preserving quality results.
+status: active
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered-configuration-matrix
+  source_paths: []
+  generated: true
+extensions: {}
+$schema: 
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/optimizations/hypothesis.schema.json
+observation: What overhead does the pinned container add relative to native host
+  execution?
+statement: The pinned container adds measurable fixed overhead while preserving 
+  quality results.
+intervention: Change model packaging and execution environment from native host 
+  to the pinned container.
+expected_mechanism: Change model packaging and execution environment from native
+  host to the pinned container.
+primary_metric: atlas://metric/MET015@v1
+guardrails:
+  - atlas://metric/MET092@v1
+  - atlas://metric/MET093@v1
+quality_gate: Q1
+falsification_conditions:
+  - Container overhead is not measurable or quality differs.
+background_sources: []

@@ -1,0 +1,89 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: OPTIMIZATIONS-O9
+version: 1
+title: "Parallelism optimizations"
+description: "Data, tensor, pipeline, expert, context, and composed parallelism."
+entries:
+  - id: OPT068
+    name: "Data parallelism"
+    definition: "Data parallelism is a controlled intervention in the parallelism layer."
+    status: active
+    aliases: []
+    parent: O9
+    target_bottlenecks: ["atlas://bottleneck/B015@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0027@v1"]
+  - id: OPT069
+    name: "Tensor parallelism"
+    definition: "Tensor parallelism is a controlled intervention in the parallelism layer."
+    status: active
+    aliases: []
+    parent: O9
+    target_bottlenecks: ["atlas://bottleneck/B015@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0027@v1"]
+  - id: OPT070
+    name: "Pipeline parallelism"
+    definition: "Pipeline parallelism is a controlled intervention in the parallelism layer."
+    status: active
+    aliases: []
+    parent: O9
+    target_bottlenecks: ["atlas://bottleneck/B015@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0027@v1"]
+  - id: OPT071
+    name: "Expert parallelism"
+    definition: "Expert parallelism is a controlled intervention in the parallelism layer."
+    status: active
+    aliases: []
+    parent: O9
+    target_bottlenecks: ["atlas://bottleneck/B015@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0027@v1"]
+  - id: OPT072
+    name: "Context parallelism"
+    definition: "Context parallelism is a controlled intervention in the parallelism layer."
+    status: active
+    aliases: []
+    parent: O9
+    target_bottlenecks: ["atlas://bottleneck/B015@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0027@v1"]
+  - id: OPT073
+    name: "Attention data parallelism"
+    definition: "Attention data parallelism is a controlled intervention in the parallelism layer."
+    status: active
+    aliases: []
+    parent: O9
+    target_bottlenecks: ["atlas://bottleneck/B015@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0027@v1"]
+  - id: OPT074
+    name: "Hybrid DP-TP"
+    definition: "Hybrid DP-TP is a controlled intervention in the parallelism layer."
+    status: active
+    aliases: []
+    parent: O9
+    target_bottlenecks: ["atlas://bottleneck/B015@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0027@v1"]
+  - id: OPT075
+    name: "Hybrid TP-PP-EP"
+    definition: "Hybrid TP-PP-EP is a controlled intervention in the parallelism layer."
+    status: active
+    aliases: []
+    parent: O9
+    target_bottlenecks: ["atlas://bottleneck/B015@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0027@v1"]
+

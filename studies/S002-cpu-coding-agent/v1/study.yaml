@@ -1,0 +1,81 @@
+%YAML 1.2
+---
+$schema: 
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/study.schema.json
+schema_version: 1
+kind: Study
+id: S002
+version: 1
+slug: cpu-coding-agent
+title: CPU coding-agent prefix reuse with llama.cpp
+description: Study Qwen2.5-Coder-0.5B-Instruct Q4_K_M through pinned llama.cpp 
+  CPU HTTP serving across prefix reuse, thread budgets, server slots, and 
+  context growth.
+status: active
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T14:05:21Z'
+updated_at: '2026-08-25T14:05:21Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: approved-proposal-scaffold
+  source_paths:
+    - https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/3
+  generated: true
+  parent_artifacts: [atlas://proposal/P0003@v1]
+extensions: {}
+archetype: atlas://workload/W002@v1
+proposal:
+  id: atlas://proposal/P0003@v1
+  issue_url: 
+    https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/3
+  approval: approved
+product_brief: >-
+  A local coding agent repeatedly extends a compact repository context, sends
+  completion requests to a CPU-only llama.cpp service, and validates generated
+  solutions with unit tests in a locked-down container. Interactive task
+  latency, correctness, and safe reproducibility are the primary constraints.
+research_questions:
+  - What latency benefit does warm prefix reuse provide over cold evaluation?
+  - How do CPU thread budgets 1, 4, and 8 affect token latency and task 
+    completion?
+  - When does a second server slot improve goodput without harmful queueing?
+  - How does controlled 256, 512, and 1024-token context growth change 
+    performance?
+boundaries:
+  included:
+    - Six repository-owned code tasks
+    - Repeated prefixes and incremental context
+    - Unit-test-based Q1 evaluation
+    - Ephemeral no-network non-root Docker execution sandbox
+    - Quick and three-replicate full profiles
+  excluded:
+    - Network access from generated code
+    - GPU or Metal offload
+    - Claims about large production codebases
+contracts:
+  workload: atlas://workload-spec/WS002@v1
+  quality: atlas://quality-contract/QC002@v1
+  slo: atlas://slo/SLO002@v1
+candidate_space:
+  models:
+    - atlas://model/M002@v1
+  hardware:
+    - atlas://hardware/HW001@v1
+  runtimes:
+    - atlas://runtime/RT002@v1
+maintainers:
+  - Ayobami-00
+lifecycle:
+  phase: PHASE-15
+  phase_status: completed
+completion_criteria:
+  - All preregistered experiments have three valid full-profile replicates.
+  - Every finding is supported by eligible comparisons and has an explicit 
+    scope.
+  - A deployment decision or no-recommendation artifact is reviewed.

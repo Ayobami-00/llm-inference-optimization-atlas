@@ -1,0 +1,42 @@
+%YAML 1.2
+---
+schema_version: 1
+kind: Hypothesis
+id: HYP008
+version: 1
+slug: coding-context-growth
+title: Longer controlled context increases TTFT approximately monotonically at 
+  fixed output work.
+description: Longer controlled context increases TTFT approximately 
+  monotonically at fixed output work.
+status: active
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered-configuration-matrix
+  source_paths: []
+  generated: true
+extensions: {}
+$schema: 
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/optimizations/hypothesis.schema.json
+observation: How does controlled context growth affect first-token latency?
+statement: Longer controlled context increases TTFT approximately monotonically 
+  at fixed output work.
+intervention: Change the padded context target to 256, 512, or 1024 tokens.
+expected_mechanism: Change the padded context target to 256, 512, or 1024 
+  tokens.
+primary_metric: atlas://metric/MET010@v1
+guardrails:
+  - atlas://metric/MET091@v1
+quality_gate: Q1
+falsification_conditions:
+  - TTFT does not increase between 256 and 1024 tokens.
+background_sources: []

@@ -1,0 +1,68 @@
+%YAML 1.2
+---
+schema_version: 1
+kind: RuntimeConfiguration
+id: RTCFG012
+version: 1
+slug: warm-prefix-threads4-slot2-context512
+title: Runtime configuration warm-prefix-threads4-slot2-context512
+description: Fully resolved runtime settings for CFG012.
+status: active
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered-configuration-matrix
+  source_paths: []
+  generated: true
+extensions: {}
+$schema: 
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/runtimes/runtime-configuration.schema.json
+runtime_build: atlas://runtime/RT002@v1
+model: atlas://model/M002@v1
+hardware: atlas://hardware/HW001@v1
+scheduling:
+  policy: fifo
+  parallel_slots: 2
+batching:
+  maximum_requests: 1
+  dynamic: false
+cache:
+  prefix_cache: true
+  document_embeddings: not_applicable
+precision:
+  representation: model-native
+decoding:
+  method: greedy
+  temperature: 0
+  maximum_new_tokens: 64
+parallelism:
+  data: 1
+  tensor: 1
+  pipeline: 1
+communication:
+  distributed: false
+memory:
+  context_tokens: 2048
+  offload: false
+threads:
+  generation: 4
+  intra_op: 4
+  inter_op: 1
+api:
+  protocol: http
+  top_k:
+environment:
+  - name: TOKENIZERS_PARALLELISM
+    value: 'false'
+    redacted: false
+  - name: OMP_NUM_THREADS
+    value: '4'
+    redacted: false

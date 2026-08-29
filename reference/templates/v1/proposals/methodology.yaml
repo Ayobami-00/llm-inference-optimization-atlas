@@ -1,0 +1,27 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/contributions/proposal.schema.json
+schema_version: 1
+kind: Proposal
+id: P0000
+version: 1
+slug: replace-with-methodology-proposal
+title: "Propose an Atlas methodology or tooling change"
+description: "Proposal to change protocols, schemas, ontology, validation, execution, graph, or site."
+status: proposed
+authors: [{name: "Replace with contributor", roles: [proposer], conflicts: []}]
+created_at: '1970-01-01T00:00:00Z'
+updated_at: '1970-01-01T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance: {method: contributor-authored, source_paths: [], generated: false}
+extensions: {}
+proposal_type: methodology
+summary: "Describe the contract, protocol, vocabulary, or tool behavior to change."
+motivation: "Explain the current limitation and desired invariant."
+scope:
+  subsystem: schemas
+  breaking_change: false
+  migration: "Describe compatibility and migration consequences."
+artifacts: [methodology_change, tests, documentation]
+resources: {implementation: "Estimate complexity and dependencies."}
+risks: ["Describe scientific-integrity and backward-compatibility risks."]
+approval: {state: pending}

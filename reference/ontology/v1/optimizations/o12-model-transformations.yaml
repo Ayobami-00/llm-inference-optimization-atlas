@@ -1,0 +1,59 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: OPTIMIZATIONS-O12
+version: 1
+title: "Model transformations optimizations"
+description: "Changes that produce a new model revision."
+entries:
+  - id: OPT088
+    name: "Structured pruning"
+    definition: "Structured pruning is a controlled intervention in the model transformations layer."
+    status: active
+    aliases: []
+    parent: O12
+    target_bottlenecks: ["atlas://bottleneck/B001@v1"]
+    quality_impact_class: lossy
+    default_quality_gate: Q2
+    sources: ["atlas://source/SRC0056@v1"]
+  - id: OPT089
+    name: "Knowledge distillation"
+    definition: "Knowledge distillation is a controlled intervention in the model transformations layer."
+    status: active
+    aliases: []
+    parent: O12
+    target_bottlenecks: ["atlas://bottleneck/B001@v1"]
+    quality_impact_class: lossy
+    default_quality_gate: Q2
+    sources: ["atlas://source/SRC0056@v1"]
+  - id: OPT090
+    name: "Architecture distillation"
+    definition: "Architecture distillation is a controlled intervention in the model transformations layer."
+    status: active
+    aliases: []
+    parent: O12
+    target_bottlenecks: ["atlas://bottleneck/B001@v1"]
+    quality_impact_class: lossy
+    default_quality_gate: Q2
+    sources: ["atlas://source/SRC0056@v1"]
+  - id: OPT091
+    name: "MHA-to-GQA conversion"
+    definition: "MHA-to-GQA conversion is a controlled intervention in the model transformations layer."
+    status: active
+    aliases: []
+    parent: O12
+    target_bottlenecks: ["atlas://bottleneck/B001@v1"]
+    quality_impact_class: lossy
+    default_quality_gate: Q2
+    sources: ["atlas://source/SRC0056@v1"]
+  - id: OPT092
+    name: "Workload-specific adaptation"
+    definition: "Workload-specific adaptation is a controlled intervention in the model transformations layer."
+    status: active
+    aliases: []
+    parent: O12
+    target_bottlenecks: ["atlas://bottleneck/B001@v1"]
+    quality_impact_class: lossy
+    default_quality_gate: Q2
+    sources: ["atlas://source/SRC0056@v1"]
+

@@ -1,0 +1,35 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0040
+version: 1
+slug: "deepspeed-ulysses-system-optimizations-for-enabling-training-of"
+title: "DeepSpeed-Ulysses: System Optimizations for Enabling Training of Extreme Long Sequence Transformer Models"
+description: "Authoritative external source for sequence-parallelism, long-context."
+status: active
+authors:
+  - name: Atlas maintainers
+    roles: [curator]
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the primary or official source
+  source_paths: []
+  generated: false
+extensions: {}
+type: paper
+source_authors:
+  - "Jacobs et al."
+url: "https://arxiv.org/abs/2309.14509"
+identifiers:
+  arxiv: "2309.14509"
+published:
+  year: 2023
+topics:
+  - "sequence-parallelism"
+  - "long-context"
+relevance: "Provides external grounding for Atlas concepts related to sequence-parallelism and long-context."
+

@@ -1,0 +1,75 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: WORKLOADS
+version: 1
+title: "Workload archetypes"
+description: "The six initial workload archetypes, defined by system behavior."
+entries:
+  - id: W001
+    name: "Interactive conversational assistant"
+    definition: "Text-first multi-turn assistant with strict first-token latency and variable request shapes."
+    status: active
+    aliases: []
+    modalities: ["text"]
+    interaction_pattern: multi_turn
+    characteristics: ["atlas://workload-characteristic/WC001@v1","atlas://workload-characteristic/WC003@v1","atlas://workload-characteristic/WC006@v1","atlas://workload-characteristic/WC007@v1","atlas://workload-characteristic/WC008@v1","atlas://workload-characteristic/WC011@v1","atlas://workload-characteristic/WC019@v1"]
+    system_pressures: ["atlas://bottleneck/B007@v1","atlas://bottleneck/B008@v1","atlas://bottleneck/B015@v1"]
+    candidate_optimizations: ["atlas://optimization/OPT007@v1","atlas://optimization/OPT008@v1","atlas://optimization/OPT023@v1","atlas://optimization/OPT060@v1"]
+    sources: ["atlas://source/SRC0085@v1","atlas://source/SRC0086@v1","atlas://source/SRC0087@v1"]
+  - id: W002
+    name: "Coding agent"
+    definition: "Closed-loop code agent with growing context, repeated repository prefixes, and tool gaps."
+    status: active
+    aliases: []
+    modalities: ["text","code","tool_call"]
+    interaction_pattern: closed_loop_agent
+    characteristics: ["atlas://workload-characteristic/WC002@v1","atlas://workload-characteristic/WC007@v1","atlas://workload-characteristic/WC008@v1","atlas://workload-characteristic/WC013@v1","atlas://workload-characteristic/WC020@v1","atlas://workload-characteristic/WC027@v1"]
+    system_pressures: ["atlas://bottleneck/B005@v1","atlas://bottleneck/B009@v1","atlas://bottleneck/B015@v1"]
+    candidate_optimizations: ["atlas://optimization/OPT025@v1","atlas://optimization/OPT031@v1","atlas://optimization/OPT087@v1","atlas://optimization/OPT106@v1"]
+    sources: ["atlas://source/SRC0092@v1"]
+  - id: W003
+    name: "Enterprise RAG"
+    definition: "Interactive grounded assistant with retrieval-heavy prompts and document locality."
+    status: active
+    aliases: []
+    modalities: ["text"]
+    interaction_pattern: multi_turn
+    characteristics: ["atlas://workload-characteristic/WC010@v1","atlas://workload-characteristic/WC017@v1","atlas://workload-characteristic/WC020@v1","atlas://workload-characteristic/WC024@v1"]
+    system_pressures: ["atlas://bottleneck/B005@v1","atlas://bottleneck/B010@v1","atlas://bottleneck/B018@v1"]
+    candidate_optimizations: ["atlas://optimization/OPT009@v1","atlas://optimization/OPT025@v1","atlas://optimization/OPT032@v1","atlas://optimization/OPT095@v1"]
+    sources: ["atlas://source/SRC0010@v1","atlas://source/SRC0093@v1"]
+  - id: W004
+    name: "Long-context assistant"
+    definition: "Long-document, repository, or structured-data analysis dominated by prefill and KV capacity."
+    status: active
+    aliases: []
+    modalities: ["text","code","structured_data"]
+    interaction_pattern: single_turn
+    characteristics: ["atlas://workload-characteristic/WC002@v1","atlas://workload-characteristic/WC017@v1","atlas://workload-characteristic/WC020@v1","atlas://workload-characteristic/WC028@v1"]
+    system_pressures: ["atlas://bottleneck/B003@v1","atlas://bottleneck/B004@v1","atlas://bottleneck/B005@v1"]
+    candidate_optimizations: ["atlas://optimization/OPT029@v1","atlas://optimization/OPT072@v1","atlas://optimization/OPT076@v1","atlas://optimization/OPT077@v1"]
+    sources: ["atlas://source/SRC0088@v1","atlas://source/SRC0089@v1"]
+  - id: W005
+    name: "Vision assistant"
+    definition: "Interactive image-and-text assistant with heterogeneous encoder and decoder stages."
+    status: active
+    aliases: []
+    modalities: ["image","text"]
+    interaction_pattern: multi_turn
+    characteristics: ["atlas://workload-characteristic/WC021@v1","atlas://workload-characteristic/WC022@v1","atlas://workload-characteristic/WC023@v1"]
+    system_pressures: ["atlas://bottleneck/B018@v1","atlas://bottleneck/B019@v1","atlas://bottleneck/B022@v1"]
+    candidate_optimizations: ["atlas://optimization/OPT019@v1","atlas://optimization/OPT086@v1","atlas://optimization/OPT098@v1"]
+    sources: ["atlas://source/SRC0090@v1"]
+  - id: W006
+    name: "Video understanding assistant"
+    definition: "Video question answering pipeline with media decoding, frame sampling, encoding, and long prompts."
+    status: active
+    aliases: []
+    modalities: ["video","audio","text"]
+    interaction_pattern: single_turn
+    characteristics: ["atlas://workload-characteristic/WC002@v1","atlas://workload-characteristic/WC021@v1","atlas://workload-characteristic/WC022@v1","atlas://workload-characteristic/WC023@v1"]
+    system_pressures: ["atlas://bottleneck/B018@v1","atlas://bottleneck/B019@v1","atlas://bottleneck/B020@v1"]
+    candidate_optimizations: ["atlas://optimization/OPT006@v1","atlas://optimization/OPT019@v1","atlas://optimization/OPT086@v1"]
+    sources: ["atlas://source/SRC0091@v1"]
+

@@ -1,0 +1,28 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/optimizations/hypothesis.schema.json
+schema_version: 1
+kind: Hypothesis
+id: HYP000
+version: 1
+slug: replace-with-hypothesis-slug
+title: "Replace with a falsifiable hypothesis"
+description: "State the expected effect and its boundary."
+status: draft
+authors: [{name: "Replace with contributor", roles: [investigator], conflicts: []}]
+created_at: '1970-01-01T00:00:00Z'
+updated_at: '1970-01-01T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance: {method: approved-proposal-scaffold, source_paths: [], generated: true}
+extensions:
+  atlas.scaffold:
+    complete: false
+    fields: [statement, intervention, mechanism, metrics, falsification]
+observation: "Describe the observation or evidence gap."
+statement: "State a falsifiable expected effect."
+intervention: "Name the deliberately changed factor."
+expected_mechanism: "Explain why the intervention should affect the primary metric."
+primary_metric: atlas://metric/MET001@v1
+guardrails: []
+quality_gate: Q1
+falsification_conditions: ["State what evidence would falsify the hypothesis."]
+background_sources: []

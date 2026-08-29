@@ -1,0 +1,12 @@
+{"id":"RAG001","question":"How long is a password reset link valid and what verification is required?","relevant_docs":["DOC001"],"answer_keywords":["20 minutes","two"]}
+{"id":"RAG002","question":"What access controls are required before production access is granted?","relevant_docs":["DOC002"],"answer_keywords":["multi-factor","manager"]}
+{"id":"RAG003","question":"How quickly must a commander be assigned for a Severity 1 incident?","relevant_docs":["DOC003"],"answer_keywords":["10 minutes"]}
+{"id":"RAG004","question":"How often should customers receive updates during a Severity 1 incident?","relevant_docs":["DOC004"],"answer_keywords":["hour"]}
+{"id":"RAG005","question":"How long are daily and monthly backups retained?","relevant_docs":["DOC005"],"answer_keywords":["35 days","12 months"]}
+{"id":"RAG006","question":"What should happen after a company laptop is reported lost?","relevant_docs":["DOC008"],"answer_keywords":["one hour","lock"]}
+{"id":"RAG007","question":"What must be completed before onboarding a vendor that handles Confidential data?","relevant_docs":["DOC011"],"answer_keywords":["security review","data-processing"]}
+{"id":"RAG008","question":"When are routine production changes allowed and what must each change include?","relevant_docs":["DOC013","DOC014"],"answer_keywords":["Tuesday","rollback"]}
+{"id":"RAG009","question":"What are the response targets for Priority 1 and Priority 2 support requests?","relevant_docs":["DOC015"],"answer_keywords":["15 minutes","four business hours"]}
+{"id":"RAG010","question":"Which approvals are required for an expense of 6,000 GBP?","relevant_docs":["DOC017"],"answer_keywords":["manager","Finance"]}
+{"id":"RAG011","question":"How quickly must a verified customer deletion request be completed?","relevant_docs":["DOC021"],"answer_keywords":["30 days"]}
+{"id":"RAG012","question":"When is a post-incident review required and what must actions contain?","relevant_docs":["DOC024"],"answer_keywords":["five business days","owners"]}

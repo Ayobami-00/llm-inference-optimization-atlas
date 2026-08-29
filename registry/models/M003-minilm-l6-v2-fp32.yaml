@@ -1,0 +1,47 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/models/model-revision.schema.json
+schema_version: 1
+kind: ModelRevision
+id: M003
+version: 1
+slug: all-minilm-l6-v2-fp32
+title: all-MiniLM-L6-v2 FP32 safetensors
+description: Immutable FP32 sentence-embedding model used as the native host reference.
+status: active
+authors: [{name: Atlas maintainers, roles: [curator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: [atlas://source/SRC0103@v1]
+provenance:
+  method: Hugging Face model API and pinned model configuration
+  source_paths: [https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2]
+  generated: false
+extensions: {}
+repository: sentence-transformers/all-MiniLM-L6-v2
+revision: 1110a243fdf4706b3f48f1d95db1a4f5529b4d41
+family: MiniLM
+modalities: [text]
+parameters: {total: 22713728, active: 22713728}
+architecture:
+  type: bidirectional encoder transformer
+  layers: 6
+  hidden_size: 384
+  attention_type: MHA
+  query_heads: 12
+  kv_heads: 12
+  head_dimension: 32
+  context_window: 512
+  positional_encoding: learned absolute
+  sliding_window: null
+tokenizer:
+  repository: sentence-transformers/all-MiniLM-L6-v2
+  revision: 1110a243fdf4706b3f48f1d95db1a4f5529b4d41
+  vocabulary_size: 30522
+weights: {format: safetensors, dtype: float32, quantization: null}
+compatibility:
+  runtimes: [sentence-transformers, transformers, pytorch]
+  architectures: [aarch64, x86_64]
+artifacts:
+  - url: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/model.safetensors
+    sha256: 53aa51172d142c89d9012cce15ae4d6cc0ca6895895114379cacb4fab128d9db
+    size_bytes: 90868376

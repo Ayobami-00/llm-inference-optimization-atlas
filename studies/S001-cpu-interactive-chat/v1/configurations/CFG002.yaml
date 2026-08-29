@@ -1,0 +1,51 @@
+%YAML 1.2
+---
+schema_version: 1
+kind: Configuration
+id: CFG002
+version: 1
+slug: cold-batch1-threads4-steady
+title: Configuration cold-batch1-threads4-steady
+description: Resolved experimental configuration for 
+  cold-batch1-threads4-steady.
+status: active
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered-configuration-matrix
+  source_paths: []
+  generated: true
+extensions:
+  atlas.condition:
+    state: cold_start
+    batch: 1
+    threads: 4
+    traffic: steady
+    context: 512
+  atlas.pipeline-models: []
+$schema: 
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/configuration.schema.json
+workload: atlas://workload-spec/WS001@v1
+quality: atlas://quality-contract/QC001@v1
+slo: atlas://slo/SLO001@v1
+model: atlas://model/M001@v1
+hardware: atlas://hardware/HW001@v1
+runtime: atlas://runtime/RT001@v1
+runtime_configuration: atlas://runtime-configuration/RTCFG002@v1
+resolved_hashes:
+  workload: 62eb61f0d3283925d0a3d80991f449fe5312fffb59824143f8e80cec0d266c6a
+  quality: 926db624c0ccc7dcb9208f0456ee5ab74b15c81bdd7e3ed75a490d66bb89394b
+  slo: 2552961d1c73b0157254cdade61a3e1b6c5282116f3121b050dc880bc3816c74
+  model: c74d98b832ccaa6fa109696756ad55afb80060a21a1ba7e2b21e7b24c24ee126
+  hardware: a2c5a27db63ba7cd435546ee7a2c49b07552a9a161619a75a8653d8a773c5290
+  runtime: 84eb0e2851a9ac805ed3a2668565553943397a95ff814c48dadea4bf01f70cea
+  runtime_configuration: 
+    9e405357f3840278ea323096a940c6793edc5e1bfefde5bff97029c7f57a8c7b

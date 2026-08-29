@@ -1,0 +1,241 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/workloads/workload-spec.schema.json",
+  "title": "Concrete workload specification",
+  "allOf": [
+    {
+      "$ref": "../common/artifact.schema.json"
+    },
+    {
+      "type": "object",
+      "required": [
+        "archetype",
+        "product_brief",
+        "semantic",
+        "traffic",
+        "request_shape",
+        "locality",
+        "replay",
+        "load_generation",
+        "server_state",
+        "quality_contract",
+        "slo_profile"
+      ],
+      "properties": {
+        "kind": {
+          "const": "WorkloadSpec"
+        },
+        "id": {
+          "pattern": "^WS[0-9]{3}$"
+        },
+        "archetype": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "product_brief": {
+          "type": "string",
+          "minLength": 1
+        },
+        "semantic": {
+          "type": "object",
+          "required": [
+            "source_type",
+            "license",
+            "fingerprint",
+            "sampling",
+            "transformations"
+          ],
+          "properties": {
+            "source_type": {
+              "enum": [
+                "repository_fixture",
+                "public_dataset",
+                "private_dataset",
+                "generated"
+              ]
+            },
+            "source": {
+              "$ref": "../common/reference.schema.json"
+            },
+            "license": {
+              "type": "string"
+            },
+            "fingerprint": {
+              "type": "string"
+            },
+            "sampling": {
+              "type": "object"
+            },
+            "filters": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "transformations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "traffic": {
+          "type": "object",
+          "required": [
+            "profiles"
+          ],
+          "properties": {
+            "source": {
+              "$ref": "../common/reference.schema.json"
+            },
+            "profiles": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "../common/reference.schema.json"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "request_shape": {
+          "type": "object",
+          "required": [
+            "classes"
+          ],
+          "properties": {
+            "classes": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "weight"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "weight": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 1
+                  },
+                  "input_tokens": {
+                    "type": "object"
+                  },
+                  "output_tokens": {
+                    "type": "object"
+                  },
+                  "context_tokens": {
+                    "type": "object"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "locality": {
+          "type": "object",
+          "properties": {
+            "prefix_reuse": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "session_reuse": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "document_reuse": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "temporal_locality": {
+              "type": "string"
+            },
+            "popularity_skew": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "retrieval": {
+          "type": "object"
+        },
+        "multimodal": {
+          "type": "object"
+        },
+        "replay": {
+          "type": "object",
+          "required": [
+            "mode"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                "semantic",
+                "shape"
+              ]
+            },
+            "output_control": {
+              "enum": [
+                "natural",
+                "fixed_tokens",
+                "trace_tokens"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "load_generation": {
+          "type": "object",
+          "required": [
+            "warmup_requests",
+            "measurement_requests",
+            "seeds"
+          ],
+          "properties": {
+            "warmup_requests": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "measurement_requests": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "seeds": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "server_state": {
+          "enum": [
+            "cold_start",
+            "warm_empty_cache",
+            "warm_preloaded_cache",
+            "steady_state"
+          ]
+        },
+        "quality_contract": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "slo_profile": {
+          "$ref": "../common/reference.schema.json"
+        }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

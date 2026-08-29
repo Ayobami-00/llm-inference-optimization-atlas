@@ -1,0 +1,72 @@
+name: Run real-model CPU study
+
+on:
+  workflow_dispatch:
+    inputs:
+      study:
+        description: Study to execute
+        required: true
+        type: choice
+        options:
+          - S001-cpu-interactive-chat
+          - S002-cpu-coding-agent
+          - S003-cpu-enterprise-rag
+      profile:
+        description: Execution profile
+        required: true
+        default: quick
+        type: choice
+        options:
+          - quick
+          - full
+
+permissions:
+  contents: read
+
+concurrency:
+  group: real-model-${{ inputs.study }}-${{ inputs.profile }}
+  cancel-in-progress: false
+
+jobs:
+  execute:
+    name: ${{ inputs.study }} (${{ inputs.profile }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      BUNDLE_S001_CPU_INTERACTIVE_CHAT: transformers-cpu
+      BUNDLE_S002_CPU_CODING_AGENT: llama-cpp-cpu-server
+      BUNDLE_S003_CPU_ENTERPRISE_RAG: docker-cpu-pipeline
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: 0.11.31
+          enable-cache: true
+      - name: Install model execution dependencies
+        run: uv sync --frozen --all-extras
+      - name: Resolve bundle name
+        id: bundle
+        env:
+          STUDY: ${{ inputs.study }}
+        run: |
+          case "$STUDY" in
+            S001-cpu-interactive-chat) bundle="$BUNDLE_S001_CPU_INTERACTIVE_CHAT" ;;
+            S002-cpu-coding-agent) bundle="$BUNDLE_S002_CPU_CODING_AGENT" ;;
+            S003-cpu-enterprise-rag) bundle="$BUNDLE_S003_CPU_ENTERPRISE_RAG" ;;
+            *) printf 'Unknown study: %s\n' "$STUDY" >&2; exit 2 ;;
+          esac
+          printf 'name=%s\n' "$bundle" >> "$GITHUB_OUTPUT"
+      - name: Display and prepare immutable artifacts
+        run: uv run atlas execution prepare "${{ inputs.study }}" "${{ steps.bundle.outputs.name }}" --yes
+      - name: Run study bundle
+        run: uv run atlas execution run "${{ inputs.study }}" "${{ steps.bundle.outputs.name }}" --profile "${{ inputs.profile }}"
+      - name: Upload draft evidence and failure records
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.study }}-${{ inputs.profile }}-draft-evidence
+          path: .atlas/work/
+          if-no-files-found: warn
+          retention-days: 14

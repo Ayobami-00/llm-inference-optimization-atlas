@@ -1,0 +1,80 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/contributions/proposal.schema.json
+schema_version: 1
+kind: Proposal
+id: P0002
+version: 1
+slug: cpu-interactive-chat-optimization-on-apple-m3
+title: CPU interactive chat optimization on Apple M3
+description: >-
+  Study real SmolLM2-135M-Instruct CPU inference on the local Apple M3 across cold/warm state, batch size, thread budget, and compact steady/bursty traces.
+status: proposed
+authors:
+- name: Ayobami-00
+  github: Ayobami-00
+  roles: [ proposer ]
+  conflicts: []
+created_at: '2026-08-25T13:59:05Z'
+updated_at: '2026-08-25T13:59:06Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: github-issue-form
+  source_paths:
+  - https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/2
+  generated: true
+extensions:
+  github.issue-url: https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/2
+proposal_type: study
+summary: >-
+  Study real SmolLM2-135M-Instruct CPU inference on the local Apple M3 across cold/warm state, batch size, thread budget, and compact steady/bursty traces.
+motivation: >-
+  Establish a reproducible exact-machine baseline for interactive CPU serving and determine where batching and threading improve SLO goodput without quality regression.
+scope:
+  study_id: S001
+  slug: cpu-interactive-chat
+  archetype: atlas://workload/W001@v1
+  traffic_regimes:
+  - atlas://traffic/T001@v1
+  - atlas://traffic/T002@v1
+  - atlas://traffic/T003@v1
+  models: [ atlas://model/M001@v1 ]
+  hardware: [ atlas://hardware/HW001@v1 ]
+  runtimes: [ atlas://runtime/RT001@v1 ]
+  research_questions:
+  - How much does warm steady state reduce startup and first-token latency?
+  - Where do batch sizes 1, 2, and 4 trade latency for SLO goodput?
+  - How do CPU thread budgets 1, 4, and 8 affect latency, throughput, and thermal drift?
+  included:
+  - Twelve repository-owned multi-turn conversations
+  - Deterministic Q0 and Q1 quality evaluation
+  - Quick and three-replicate full profiles
+  excluded:
+  - GPU or MPS model execution
+  - Cross-hardware transfer claims
+artifacts:
+- study
+- workload
+- quality_contract
+- slo_profile
+- configurations
+- hypotheses
+- experiments
+- runs
+- comparisons
+- findings
+- decision
+- execution_bundle
+resources:
+  compute: Local Apple M3 CPU; approximately 4-8 hours for the full profile
+  downloads: SmolLM2 weights and tokenizer; approximately 275 MB
+  storage: Less than 2 GB including cache and draft evidence
+risks:
+- 8 GB unified memory increases sensitivity to background applications.
+- Thermal and power state may create drift across long randomized sequences.
+- Findings are exact-setup evidence until independently replicated.
+- Model-generated text must not be interpreted as product-quality chat evaluation.
+approval:
+  state: approved
+  issue_url: https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/2
+  approved_by: Ayobami-00
+  approved_at: '2026-08-25T13:59:06Z'

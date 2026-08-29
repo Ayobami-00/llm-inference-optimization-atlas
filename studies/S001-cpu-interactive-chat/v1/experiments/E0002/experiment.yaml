@@ -1,0 +1,76 @@
+%YAML 1.2
+---
+schema_version: 1
+kind: Experiment
+id: E0002
+version: 1
+slug: batch-size-sweep
+title: Where does CPU batching trade request latency for SLO goodput?
+description: Where does CPU batching trade request latency for SLO goodput?
+status: active
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered-configuration-matrix
+  source_paths: []
+  generated: true
+extensions: {}
+$schema: 
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/experiment.schema.json
+study: atlas://study/S001@v1
+question: Where does CPU batching trade request latency for SLO goodput?
+hypothesis: atlas://hypothesis/HYP002@v1
+design: ablation
+baseline: atlas://configuration/CFG001@v1
+candidates:
+  - atlas://configuration/CFG003@v1
+  - atlas://configuration/CFG004@v1
+changed_factors:
+  - runtime_configuration batching batch_size
+frozen_factors:
+  - workload fixture and seed
+  - model revision except when declared
+  - hardware topology
+  - quality contract
+  - SLO profile
+protocol:
+  warmup:
+    requests: 2
+    excluded: true
+  measurement:
+    requests: 12
+  replicates: 3
+  seeds:
+    - 101
+    - 202
+    - 303
+  ordering: randomized
+metrics:
+  primary:
+    - atlas://metric/MET021@v1
+  secondary:
+    - atlas://metric/MET015@v1
+    - atlas://metric/MET013@v1
+  guardrails:
+    - atlas://metric/MET030@v1
+quality_gate: Q1
+expected_mechanism: Batched matrix operations may improve utilization while 
+  requests wait for the slowest sequence.
+analysis:
+  method: paired_bootstrap
+  resamples: 10000
+  confidence_level: 0.95
+  report_absolute_and_relative: true
+stopping_rule: Complete three valid replicates per configuration unless Q0 fails
+  or a safety limit is reached.
+failure_policy: Retain failed attempts as drafts and exclude invalid runs 
+  without deleting them.
+background_sources: []

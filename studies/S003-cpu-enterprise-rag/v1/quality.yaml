@@ -1,0 +1,49 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/quality/quality-contract.schema.json
+schema_version: 1
+kind: QualityContract
+id: QC003
+version: 1
+slug: cpu-enterprise-rag-quality
+title: Enterprise RAG Q1 contract
+description: Frozen retrieval, answer-concept, citation, and response-format gates.
+status: active
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [investigator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance: {method: preregistered quality contract, source_paths: [], generated: false}
+extensions: {}
+gate: Q1
+dimensions:
+  - id: retrieval-recall
+    name: Mean retrieval recall at configured k
+    evaluator: atlas://evaluator/EV003@v1
+    direction: higher_is_better
+    minimum: 0.9
+    allowed_regression: 0.05
+    weight: 0.35
+  - id: answer-keyword-recall
+    name: Mean frozen answer-concept recall
+    evaluator: atlas://evaluator/EV003@v1
+    direction: higher_is_better
+    minimum: 0.7
+    allowed_regression: 0.05
+    weight: 0.3
+  - id: citation-correctness
+    name: Mean citation precision
+    evaluator: atlas://evaluator/EV003@v1
+    direction: higher_is_better
+    minimum: 0.8
+    allowed_regression: 0.05
+    weight: 0.25
+  - id: parse-and-format
+    name: Required answer and Sources fields
+    evaluator: atlas://evaluator/EV003@v1
+    direction: higher_is_better
+    minimum: 1
+    allowed_regression: 0
+    weight: 0.1
+aggregation: all_dimensions
+missing_result: fail
+frozen_before_experiment: true

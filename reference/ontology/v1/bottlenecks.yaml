@@ -1,0 +1,209 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: BOTTLENECKS
+version: 1
+title: "Inference bottlenecks"
+description: "First-class constraints that connect workload characteristics to candidate optimizations."
+entries:
+  - id: B001
+    name: "Compute saturation"
+    definition: "Arithmetic execution resources are saturated and additional parallel work cannot increase throughput."
+    status: active
+    aliases: []
+    resource: compute
+    stage: decode
+    diagnostic_metrics: ["atlas://metric/MET001@v1"]
+  - id: B002
+    name: "Weight bandwidth"
+    definition: "Moving model weights limits execution rate."
+    status: active
+    aliases: []
+    resource: memory_bandwidth
+    stage: decode
+    diagnostic_metrics: ["atlas://metric/MET002@v1"]
+  - id: B003
+    name: "KV bandwidth"
+    definition: "Reading or writing KV-cache state limits token generation."
+    status: active
+    aliases: []
+    resource: memory_bandwidth
+    stage: decode
+    diagnostic_metrics: ["atlas://metric/MET003@v1"]
+  - id: B004
+    name: "KV capacity"
+    definition: "Active KV-cache state approaches available memory capacity."
+    status: active
+    aliases: []
+    resource: memory_capacity
+    stage: decode
+    diagnostic_metrics: ["atlas://metric/MET004@v1"]
+  - id: B005
+    name: "Prefill compute"
+    definition: "Prompt processing dominates latency or compute."
+    status: active
+    aliases: []
+    resource: compute
+    stage: prefill
+    diagnostic_metrics: ["atlas://metric/MET005@v1"]
+  - id: B006
+    name: "Decode serialization"
+    definition: "Sequential token generation dominates request completion time."
+    status: active
+    aliases: []
+    resource: algorithmic
+    stage: decode
+    diagnostic_metrics: ["atlas://metric/MET006@v1"]
+  - id: B007
+    name: "Scheduler overhead"
+    definition: "Scheduling and batch construction consume material time."
+    status: active
+    aliases: []
+    resource: runtime
+    stage: scheduling
+    diagnostic_metrics: ["atlas://metric/MET007@v1"]
+  - id: B008
+    name: "Queue pressure"
+    definition: "Arrival rate exceeds service capacity and requests wait."
+    status: active
+    aliases: []
+    resource: queue
+    stage: admission
+    diagnostic_metrics: ["atlas://metric/MET008@v1"]
+  - id: B009
+    name: "Redundant prefill"
+    definition: "Repeated prefixes are recomputed instead of reused."
+    status: active
+    aliases: []
+    resource: compute
+    stage: prefill
+    diagnostic_metrics: ["atlas://metric/MET009@v1"]
+  - id: B010
+    name: "Cache miss pressure"
+    definition: "Low hit rate or poor locality causes avoidable recomputation."
+    status: active
+    aliases: []
+    resource: cache
+    stage: state
+    diagnostic_metrics: ["atlas://metric/MET010@v1"]
+  - id: B011
+    name: "Tokenization overhead"
+    definition: "Tokenization or detokenization limits the request path."
+    status: active
+    aliases: []
+    resource: cpu
+    stage: client
+    diagnostic_metrics: ["atlas://metric/MET011@v1"]
+  - id: B012
+    name: "CPU preprocessing"
+    definition: "Host-side transforms limit end-to-end performance."
+    status: active
+    aliases: []
+    resource: cpu
+    stage: preprocessing
+    diagnostic_metrics: ["atlas://metric/MET012@v1"]
+  - id: B013
+    name: "NUMA locality"
+    definition: "Remote memory placement degrades host or accelerator feeding."
+    status: active
+    aliases: []
+    resource: topology
+    stage: host
+    diagnostic_metrics: ["atlas://metric/MET013@v1"]
+  - id: B014
+    name: "PCIe transfer"
+    definition: "Host-device transfers limit or serialize execution."
+    status: active
+    aliases: []
+    resource: interconnect
+    stage: transfer
+    diagnostic_metrics: ["atlas://metric/MET014@v1"]
+  - id: B015
+    name: "Collective communication"
+    definition: "Distributed collectives dominate parallel execution."
+    status: active
+    aliases: []
+    resource: communication
+    stage: distributed
+    diagnostic_metrics: ["atlas://metric/MET015@v1"]
+  - id: B016
+    name: "Network transport"
+    definition: "Cross-node or client-server networking constrains latency or throughput."
+    status: active
+    aliases: []
+    resource: network
+    stage: distributed
+    diagnostic_metrics: ["atlas://metric/MET016@v1"]
+  - id: B017
+    name: "Expert imbalance"
+    definition: "MoE tokens distribute unevenly across experts or workers."
+    status: active
+    aliases: []
+    resource: load_balance
+    stage: moe
+    diagnostic_metrics: ["atlas://metric/MET017@v1"]
+  - id: B018
+    name: "Encoder compute"
+    definition: "A modality or retrieval encoder dominates the pipeline."
+    status: active
+    aliases: []
+    resource: compute
+    stage: encoder
+    diagnostic_metrics: ["atlas://metric/MET018@v1"]
+  - id: B019
+    name: "Media preprocessing"
+    definition: "Image/video/audio decoding and transforms dominate latency."
+    status: active
+    aliases: []
+    resource: cpu
+    stage: preprocessing
+    diagnostic_metrics: ["atlas://metric/MET019@v1"]
+  - id: B020
+    name: "Long-context attention"
+    definition: "Attention cost grows materially with context length."
+    status: active
+    aliases: []
+    resource: compute
+    stage: attention
+    diagnostic_metrics: ["atlas://metric/MET020@v1"]
+  - id: B021
+    name: "Kernel launch gaps"
+    definition: "Idle gaps between kernels reduce device utilization."
+    status: active
+    aliases: []
+    resource: runtime
+    stage: kernel
+    diagnostic_metrics: ["atlas://metric/MET021@v1"]
+  - id: B022
+    name: "Synchronization"
+    definition: "Barriers or dependencies leave compute resources idle."
+    status: active
+    aliases: []
+    resource: runtime
+    stage: distributed
+    diagnostic_metrics: ["atlas://metric/MET022@v1"]
+  - id: B023
+    name: "Model loading"
+    definition: "Loading weights or adapters dominates readiness."
+    status: active
+    aliases: []
+    resource: storage
+    stage: startup
+    diagnostic_metrics: ["atlas://metric/MET023@v1"]
+  - id: B024
+    name: "Thermal throttling"
+    definition: "Sustained load reduces clocks due to thermal constraints."
+    status: active
+    aliases: []
+    resource: power
+    stage: hardware
+    diagnostic_metrics: ["atlas://metric/MET024@v1"]
+  - id: B025
+    name: "Power budget"
+    definition: "Available power constrains sustained performance."
+    status: active
+    aliases: []
+    resource: power
+    stage: hardware
+    diagnostic_metrics: ["atlas://metric/MET025@v1"]
+

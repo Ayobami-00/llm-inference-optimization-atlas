@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/replication.schema.json",
+  "title": "Finding replication",
+  "allOf": [
+    {
+      "$ref": "../common/artifact.schema.json"
+    },
+    {
+      "type": "object",
+      "required": [
+        "finding",
+        "experiment",
+        "held_constant",
+        "transfer_axes",
+        "agreement",
+        "confidence_impact",
+        "boundary_conditions"
+      ],
+      "properties": {
+        "kind": {
+          "const": "Replication"
+        },
+        "id": {
+          "pattern": "^REP[0-9]{4}$"
+        },
+        "finding": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "experiment": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "held_constant": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "transfer_axes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "model",
+              "hardware",
+              "runtime",
+              "traffic",
+              "workload_region"
+            ]
+          }
+        },
+        "agreement": {
+          "enum": [
+            "replicated",
+            "partially_replicated",
+            "not_replicated",
+            "inconclusive"
+          ]
+        },
+        "confidence_impact": {
+          "enum": [
+            "increase",
+            "decrease",
+            "none"
+          ]
+        },
+        "boundary_conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

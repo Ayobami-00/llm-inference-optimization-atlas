@@ -1,0 +1,23 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0107
+version: 1
+slug: llama-cpp-b9637-release
+title: llama.cpp b9637 release
+description: Official signed release metadata and binary digests for RT002.
+status: active
+authors: [{name: Atlas maintainers, roles: [curator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance: {method: curated from the official signed release, source_paths: [], generated: false}
+extensions: {}
+type: official_documentation
+source_authors: [ggml-org maintainers]
+url: https://github.com/ggml-org/llama.cpp/releases/tag/b9637
+published: {year: 2026, publisher: ggml-org}
+upstream: {product: llama.cpp, version: b9637, revision: aedb2a5e9ca3d4064148bbb919e0ddc0c1b70ab3, retrieved_at: '2026-08-25'}
+topics: [runtime, GGUF, cpu, server]
+relevance: Pins the exact llama.cpp source and platform binary digests used by S002.

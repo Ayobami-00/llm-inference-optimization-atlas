@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-reference-and-graph:
+    name: Python, contracts, and graph
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: 0.11.31
+          enable-cache: true
+      - name: Install Python dependencies
+        run: uv sync --frozen --group dev
+      - name: Check formatting and lint
+        run: |
+          uv run ruff format --check .
+          uv run ruff check .
+      - name: Check static types
+        run: uv run mypy src
+      - name: Run Python tests
+        run: uv run pytest
+      - name: Validate contracts and canonical records
+        run: |
+          uv run atlas schema check
+          uv run atlas ontology check
+          uv run atlas sources check --build
+          uv run atlas ids check
+          uv run atlas validate --all --strict --github
+      - name: Compile deterministic graph twice
+        run: |
+          uv run atlas graph build --all
+          sha256sum build/atlas/graph.json > /tmp/atlas-graph.sha256
+          uv run atlas graph build --all
+          sha256sum --check /tmp/atlas-graph.sha256
+
+  frontend:
+    name: Explorer and browser tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: 0.11.31
+          enable-cache: true
+      - name: Install Python dependencies
+        run: uv sync --frozen
+      - name: Compile graph fixtures
+        run: uv run atlas graph build --all
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - name: Install frontend dependencies
+        run: npm ci --prefix site
+      - name: Check types and components
+        run: |
+          npm run typecheck --prefix site
+          npm run test --prefix site
+          npm run build --prefix site
+      - name: Install Chromium
+        working-directory: site
+        run: npx playwright install --with-deps chromium
+      - name: Run browser and accessibility tests
+        run: npm run test:e2e --prefix site
+
+  supply-chain:
+    name: Lock and audit checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: 0.11.31
+      - name: Verify Python lock
+        run: uv lock --check
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Audit production frontend dependencies
+        run: npm audit --prefix site --omit=dev --audit-level=high

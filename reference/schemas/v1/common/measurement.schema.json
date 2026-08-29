@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/measurement.schema.json",
+  "title": "Measurement and statistical primitives",
+  "$defs": {
+    "quantity": {
+      "type": "object",
+      "required": [
+        "value",
+        "unit"
+      ],
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uncertainty": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "percentiles": {
+      "type": "object",
+      "properties": {
+        "p50": {
+          "type": "number"
+        },
+        "p90": {
+          "type": "number"
+        },
+        "p95": {
+          "type": "number"
+        },
+        "p99": {
+          "type": "number"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "distribution": {
+      "type": "object",
+      "required": [
+        "count",
+        "minimum",
+        "maximum",
+        "mean",
+        "unit"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "mean": {
+          "type": "number"
+        },
+        "standard_deviation": {
+          "type": "number",
+          "minimum": 0
+        },
+        "percentiles": {
+          "$ref": "#/$defs/percentiles"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "confidence_interval": {
+      "type": "object",
+      "required": [
+        "level",
+        "lower",
+        "upper",
+        "method"
+      ],
+      "properties": {
+        "level": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 1
+        },
+        "lower": {
+          "type": "number"
+        },
+        "upper": {
+          "type": "number"
+        },
+        "method": {
+          "type": "string"
+        },
+        "resamples": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

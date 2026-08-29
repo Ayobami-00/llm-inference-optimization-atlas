@@ -1,0 +1,36 @@
+- name: proposal:needs-triage
+  color: d4c5f9
+  description: Proposal awaits automated and maintainer review.
+- name: proposal:valid
+  color: 0e8a16
+  description: Proposal issue conforms to the V1 contribution contract.
+- name: proposal:needs-revision
+  color: d93f0b
+  description: Proposal issue needs schema or scope corrections.
+- name: proposal:approved
+  color: 1d76db
+  description: Maintainers approved implementation of the proposal.
+- name: proposal:rejected
+  color: b60205
+  description: Maintainers declined the proposal in its present form.
+- name: proposal:type:study
+  color: 5319e7
+  description: Proposal for a new study.
+- name: proposal:type:experiment
+  color: 5319e7
+  description: Proposal for an experiment in an approved study.
+- name: proposal:type:replication
+  color: 5319e7
+  description: Proposal to replicate accepted evidence.
+- name: proposal:type:challenge
+  color: 5319e7
+  description: Challenge to a finding, method, scope, or interpretation.
+- name: proposal:type:methodology
+  color: 5319e7
+  description: Proposal for methodology or tooling.
+- name: evidence:preliminary
+  color: fbca04
+  description: Evidence is valid but has not completed acceptance review.
+- name: evidence:accepted
+  color: 0e8a16
+  description: Evidence passed integrity and maintainer review.

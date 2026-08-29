@@ -1,0 +1,117 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/execution/execution-bundle.schema.json
+schema_version: 1
+kind: ExecutionBundle
+id: XB003
+version: 1
+slug: docker-cpu-pipeline
+title: ONNX retrieval and SmolLM2 generation CPU pipeline
+description: Runs a real compact RAG pipeline natively and in an immutable-base Docker environment using pinned local-only model artifacts.
+status: active
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [software, investigator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: [atlas://source/SRC0101@v1, atlas://source/SRC0103@v1, atlas://source/SRC0108@v1]
+provenance:
+  method: repository-authored native and container execution bundle with immutable upstream artifacts
+  source_paths: [src/atlas/studies/runners/s003.py, src/atlas/studies/runners/s003_worker.py]
+  generated: false
+extensions: {}
+platforms:
+  - {os: macos, architecture: aarch64}
+  - {os: linux, architecture: x86_64}
+backend: container
+requirements:
+  - {name: python, version: '>=3.12,<3.14'}
+  - {name: docker, version: '>=24'}
+  - {name: base-image, version: 'python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7'}
+  - {name: onnxruntime, version: '==1.29.0'}
+  - {name: torch, version: '==2.13.0'}
+  - {name: transformers, version: '==4.57.6'}
+artifacts:
+  - name: smollm2-config.json
+    url: https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct/resolve/12fd25f77366fa6b3b4b768ec3050bf629380bac/config.json
+    sha256: 8eb740e8bbe4cff95ea7b4588d17a2432deb16e8075bc5828ff7ba9be94d982a
+    size_bytes: 861
+    license: Apache-2.0
+  - name: smollm2-generation-config.json
+    url: https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct/resolve/12fd25f77366fa6b3b4b768ec3050bf629380bac/generation_config.json
+    sha256: 87b916edaaab66b3899b9d0dd0752727dff6666686da0504d89ae0a6e055a013
+    size_bytes: 132
+    license: Apache-2.0
+  - name: smollm2-model.safetensors
+    url: https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct/resolve/12fd25f77366fa6b3b4b768ec3050bf629380bac/model.safetensors
+    sha256: 5af571cbf074e6d21a03528d2330792e532ca608f24ac70a143f6b369968ab8c
+    size_bytes: 269060552
+    license: Apache-2.0
+  - name: smollm2-special-tokens-map.json
+    url: https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct/resolve/12fd25f77366fa6b3b4b768ec3050bf629380bac/special_tokens_map.json
+    sha256: 2b7379f3ae813529281a5c602bc5a11c1d4e0a99107aaa597fe936c1e813ca52
+    size_bytes: 655
+    license: Apache-2.0
+  - name: smollm2-tokenizer.json
+    url: https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct/resolve/12fd25f77366fa6b3b4b768ec3050bf629380bac/tokenizer.json
+    sha256: 9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c
+    size_bytes: 2104556
+    license: Apache-2.0
+  - name: smollm2-tokenizer-config.json
+    url: https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct/resolve/12fd25f77366fa6b3b4b768ec3050bf629380bac/tokenizer_config.json
+    sha256: 4ec77d44f62efeb38d7e044a1db318f6a939438425312dfa333b8382dbad98df
+    size_bytes: 3764
+    license: Apache-2.0
+  - name: minilm-config.json
+    url: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/config.json
+    sha256: 953f9c0d463486b10a6871cc2fd59f223b2c70184f49815e7efbcab5d8908b41
+    size_bytes: 612
+    license: Apache-2.0
+  - name: minilm-model-fp32.onnx
+    url: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/onnx/model.onnx
+    sha256: 6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452
+    size_bytes: 90405214
+    license: Apache-2.0
+  - name: minilm-model-int8-arm64.onnx
+    url: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/onnx/model_qint8_arm64.onnx
+    sha256: 4278337fd0ff3c68bfb6291042cad8ab363e1d9fbc43dcb499fe91c871902474
+    size_bytes: 23026053
+    license: Apache-2.0
+  - name: minilm-special-tokens-map.json
+    url: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/special_tokens_map.json
+    sha256: 303df45a03609e4ead04bc3dc1536d0ab19b5358db685b6f3da123d05ec200e3
+    size_bytes: 112
+    license: Apache-2.0
+  - name: minilm-tokenizer.json
+    url: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/tokenizer.json
+    sha256: be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037
+    size_bytes: 466247
+    license: Apache-2.0
+  - name: minilm-tokenizer-config.json
+    url: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/tokenizer_config.json
+    sha256: acb92769e8195aabd29b7b2137a9e6d6e25c476a4f15aa4355c233426c61576b
+    size_bytes: 350
+    license: Apache-2.0
+  - name: minilm-vocab.txt
+    url: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/vocab.txt
+    sha256: 07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3
+    size_bytes: 231508
+    license: Apache-2.0
+entrypoints:
+  prepare: ./prepare.sh
+  start: ./start.sh
+  run: ./run.sh
+  destroy: ./destroy.sh
+inputs:
+  documents: ../../inputs/documents.jsonl
+  questions: ../../inputs/questions.jsonl
+  configurations: ../../configurations
+outputs:
+  draft_directory: .atlas/work/S003-cpu-enterprise-rag/docker-cpu-pipeline
+  required_files: [run.yaml, environment.json, artifacts.yaml, metrics/summary.json]
+profiles:
+  quick: {replicates: 1, max_requests: 3, purpose: native-container integration smoke test}
+  full: {replicates: 3, max_requests: 12, purpose: accepted exact-setup evidence}
+resources: {minimum_memory_bytes: 3221225472, network_during_run: false, container_cpus: 4}
+timeouts: {prepare_seconds: 3600, run_seconds: 14400, cleanup_seconds: 60}
+cleanup: {required: true, idempotent: true}
+limitations:
+  - The repository-owned fictional corpus is compact and does not model enterprise access control.
+  - Container startup is intentionally attributed to the first measured request in E0012.

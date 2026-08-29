@@ -1,0 +1,47 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/finding.schema.json
+schema_version: 1
+kind: Finding
+id: F0009
+version: 1
+slug: eight-threads-degrade-qwen-coder-tpot
+title: Eight server threads more than doubled Qwen coder TPOT
+description: Accepted negative thread-oversubscription evidence from three paired replicates.
+status: supported
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [analysis], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: contributor interpretation of accepted paired-bootstrap comparison CMP0009
+  source_paths: [studies/S002-cpu-coding-agent/v1/experiments/E0006/comparisons/CMP0009.yaml]
+  generated: false
+extensions: {}
+statement: Increasing the llama.cpp server from four threads to eight increased mean TPOT by 16.17 ms/token (135.1%) on the tested M3.
+scope:
+  workload: atlas://workload-spec/WS002@v1
+  model: atlas://model/M002@v1
+  runtime: atlas://runtime/RT002@v1
+  hardware: atlas://hardware/HW001@v1
+  traffic: [atlas://traffic/T006@v1]
+observation: Mean TPOT increased from 11.97 to 28.14 ms/token with a paired interval of 13.66 to 19.50 ms/token; quality and SLO remained eligible.
+mechanism: For this model and hybrid-core M3 topology, eight inference threads add scheduling and coordination overhead beyond the useful parallelism exposed by decode.
+baseline: atlas://configuration/CFG008@v1
+intervention: atlas://configuration/CFG011@v1
+effects:
+  - metric: atlas://metric/MET013@v1
+    absolute: 16.17002057321006
+    relative: 1.3507456038332688
+    confidence_interval: {lower: 13.656013345246562, upper: 19.500252190356726, level: 0.95}
+    unit: ms/token
+works_when: [The pinned Q4_K_M model runs at batch one on the HW001 hybrid-core CPU without explicit affinity.]
+stops_working_when: [A larger model, affinity policy, or different CPU topology can use eight threads without the measured overhead.]
+interactions: [Performance may interact with P-core/E-core scheduling, affinity, thermal state, and server slots.]
+limitations: [No core-affinity or power-mode sweep was included, so the precise source of excess overhead remains observational.]
+evidence:
+  comparisons: [atlas://comparison/CMP0009@v1]
+  runs: [atlas://run/R2211@v1, atlas://run/R2212@v1, atlas://run/R2213@v1, atlas://run/R2241@v1, atlas://run/R2242@v1, atlas://run/R2243@v1]
+mechanism_sources: []
+evidence_confidence: high
+transferability: exact_setup
+claim_status: supported

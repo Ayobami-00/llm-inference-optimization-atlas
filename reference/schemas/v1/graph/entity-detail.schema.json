@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/graph/entity-detail.schema.json",
+  "title": "Compiled entity details",
+  "type": "object",
+  "required": [
+    "node",
+    "artifact",
+    "incoming",
+    "outgoing",
+    "referenced_by"
+  ],
+  "properties": {
+    "node": {
+      "$ref": "graph-node.schema.json"
+    },
+    "artifact": {
+      "type": "object"
+    },
+    "incoming": {
+      "type": "array",
+      "items": {
+        "$ref": "graph-edge.schema.json"
+      }
+    },
+    "outgoing": {
+      "type": "array",
+      "items": {
+        "$ref": "graph-edge.schema.json"
+      }
+    },
+    "referenced_by": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/reference.schema.json"
+      }
+    }
+  },
+  "additionalProperties": false
+}

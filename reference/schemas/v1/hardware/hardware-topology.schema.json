@@ -1,0 +1,400 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/hardware/hardware-topology.schema.json",
+  "title": "Hardware topology",
+  "allOf": [
+    {
+      "$ref": "../common/artifact.schema.json"
+    },
+    {
+      "type": "object",
+      "required": [
+        "nodes",
+        "topology_edges",
+        "software",
+        "inventory",
+        "redactions"
+      ],
+      "properties": {
+        "kind": {
+          "const": "HardwareTopology"
+        },
+        "id": {
+          "pattern": "^HW[0-9]{3}$"
+        },
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/allOf/1/$defs/node"
+          }
+        },
+        "topology_edges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/allOf/1/$defs/edge"
+          }
+        },
+        "network": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "storage": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "software": {
+          "type": "object",
+          "required": [
+            "os",
+            "kernel",
+            "architecture"
+          ],
+          "properties": {
+            "os": {
+              "type": "string"
+            },
+            "kernel": {
+              "type": "string"
+            },
+            "architecture": {
+              "type": "string"
+            },
+            "drivers": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "firmware": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "cloud": {
+          "type": "object"
+        },
+        "inventory": {
+          "type": "object",
+          "required": [
+            "method",
+            "captured_at"
+          ],
+          "properties": {
+            "method": {
+              "type": "string"
+            },
+            "captured_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "accuracy": {
+              "enum": [
+                "declared",
+                "detected",
+                "measured"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "redactions": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "serial_number",
+              "uuid",
+              "mac_address",
+              "hostname",
+              "username",
+              "private_ip",
+              "cloud_account"
+            ]
+          }
+        }
+      },
+      "$defs": {
+        "node": {
+          "type": "object",
+          "required": [
+            "id",
+            "cpus",
+            "accelerators",
+            "memory_domains"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "cpus": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/allOf/1/$defs/cpu"
+              }
+            },
+            "accelerators": {
+              "type": "array",
+              "items": {
+                "$ref": "#/allOf/1/$defs/accelerator"
+              }
+            },
+            "memory_domains": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/allOf/1/$defs/memory"
+              }
+            },
+            "power": {
+              "type": "object"
+            },
+            "thermal": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
+        },
+        "cpu": {
+          "type": "object",
+          "required": [
+            "id",
+            "vendor",
+            "model",
+            "architecture",
+            "physical_cores",
+            "logical_threads",
+            "isa_extensions",
+            "caches",
+            "numa_nodes",
+            "backends"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "vendor": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            },
+            "microarchitecture": {
+              "type": "string"
+            },
+            "architecture": {
+              "enum": [
+                "x86_64",
+                "aarch64",
+                "riscv64",
+                "other"
+              ]
+            },
+            "sockets": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "physical_cores": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "logical_threads": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "core_groups": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "isa_extensions": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string"
+              }
+            },
+            "vector_width_bits": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "caches": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "numa_nodes": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "frequency": {
+              "type": "object"
+            },
+            "power": {
+              "type": "object"
+            },
+            "backends": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "accelerator": {
+          "type": "object",
+          "required": [
+            "id",
+            "kind",
+            "vendor",
+            "model",
+            "memory",
+            "supported_dtypes",
+            "backends"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "integrated_gpu",
+                "discrete_gpu",
+                "npu",
+                "tpu",
+                "fpga",
+                "asic"
+              ]
+            },
+            "vendor": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            },
+            "architecture": {
+              "type": "string"
+            },
+            "compute_units": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "memory": {
+              "$ref": "#/allOf/1/$defs/memory"
+            },
+            "supported_dtypes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "backends": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "partitioning": {
+              "type": "object"
+            },
+            "power": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
+        },
+        "memory": {
+          "type": "object",
+          "required": [
+            "id",
+            "kind",
+            "capacity_bytes",
+            "shared"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "system",
+                "unified",
+                "device",
+                "remote",
+                "storage"
+              ]
+            },
+            "capacity_bytes": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "bandwidth_bytes_per_second": {
+              "type": "number",
+              "minimum": 0
+            },
+            "latency_nanoseconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "channels": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "shared": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "edge": {
+          "type": "object",
+          "required": [
+            "source",
+            "target",
+            "kind"
+          ],
+          "properties": {
+            "source": {
+              "type": "string"
+            },
+            "target": {
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "shares_memory_with",
+                "pcie",
+                "nvlink",
+                "nvswitch",
+                "infinity_fabric",
+                "numa",
+                "network",
+                "other"
+              ]
+            },
+            "bandwidth_bytes_per_second": {
+              "type": "number",
+              "minimum": 0
+            },
+            "bidirectional": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

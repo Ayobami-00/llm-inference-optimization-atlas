@@ -1,0 +1,35 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0017
+version: 1
+slug: "kvquant-towards-10-million-context-length-llm-inference-with-kv"
+title: "KVQuant: Towards 10 Million Context Length LLM Inference with KV Cache Quantization"
+description: "Authoritative external source for kv-cache, quantization."
+status: active
+authors:
+  - name: Atlas maintainers
+    roles: [curator]
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the primary or official source
+  source_paths: []
+  generated: false
+extensions: {}
+type: paper
+source_authors:
+  - "Hooper et al."
+url: "https://arxiv.org/abs/2401.18079"
+identifiers:
+  arxiv: "2401.18079"
+published:
+  year: 2024
+topics:
+  - "kv-cache"
+  - "quantization"
+relevance: "Provides external grounding for Atlas concepts related to kv-cache and quantization."
+

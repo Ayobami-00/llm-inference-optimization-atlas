@@ -1,0 +1,23 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0102
+version: 1
+slug: qwen25-coder-05b-instruct-gguf-model-card
+title: Qwen2.5-Coder-0.5B-Instruct-GGUF model card and files
+description: Official immutable model metadata for the Atlas coding-agent model.
+status: active
+authors: [{name: Atlas maintainers, roles: [curator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance: {method: curated from the official model repository, source_paths: [], generated: false}
+extensions: {}
+type: official_documentation
+source_authors: [Qwen Team]
+url: https://huggingface.co/Qwen/Qwen2.5-Coder-0.5B-Instruct-GGUF/tree/ebb2015119c907b064c512bf053e945850b5875f
+published: {year: 2024, publisher: Alibaba Cloud}
+upstream: {product: Qwen2.5-Coder-0.5B-Instruct-GGUF, revision: ebb2015119c907b064c512bf053e945850b5875f, retrieved_at: '2026-08-25'}
+topics: [model, code-generation, GGUF, quantization]
+relevance: Defines the immutable Q4_K_M artifact, architecture, tokenizer, and license of M002.

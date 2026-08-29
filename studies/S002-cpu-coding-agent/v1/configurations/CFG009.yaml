@@ -1,0 +1,50 @@
+%YAML 1.2
+---
+schema_version: 1
+kind: Configuration
+id: CFG009
+version: 1
+slug: cold-prefix-threads4-slot1-context512
+title: Configuration cold-prefix-threads4-slot1-context512
+description: Resolved experimental configuration for 
+  cold-prefix-threads4-slot1-context512.
+status: active
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered-configuration-matrix
+  source_paths: []
+  generated: true
+extensions:
+  atlas.condition:
+    prefix_cache: false
+    threads: 4
+    slots: 1
+    context: 512
+  atlas.pipeline-models: []
+$schema: 
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/configuration.schema.json
+workload: atlas://workload-spec/WS002@v1
+quality: atlas://quality-contract/QC002@v1
+slo: atlas://slo/SLO002@v1
+model: atlas://model/M002@v1
+hardware: atlas://hardware/HW001@v1
+runtime: atlas://runtime/RT002@v1
+runtime_configuration: atlas://runtime-configuration/RTCFG009@v1
+resolved_hashes:
+  workload: b28608cfb99b554ff48aa5321ea7baa65691192b61ba015f83d136d58c7e7386
+  quality: 526bd78a324690be95eaf955efbe4f44b4a015b908e49d85ae9e52d7d7ca345f
+  slo: 8cc478b976bb153efdfcba52c68fb0dbf6fc44fd832ea27cc56058359eaa2c32
+  model: e6b94849b74cfd0d1efd8691d8d7c35170eb848d2a6d11bc497843b044fde4d8
+  hardware: a2c5a27db63ba7cd435546ee7a2c49b07552a9a161619a75a8653d8a773c5290
+  runtime: 146e3cf3c9ac1ac94a6ce4fef2587b1193c074c76fd27257fb6e2c4079127e38
+  runtime_configuration: 
+    6ca79265e08143b8381acd53de0fe51f2b619264a5bf20dddd5b85c79082a0e1

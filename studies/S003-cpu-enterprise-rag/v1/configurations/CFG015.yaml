@@ -1,0 +1,53 @@
+%YAML 1.2
+---
+schema_version: 1
+kind: Configuration
+id: CFG015
+version: 1
+slug: onnx-fp32-top3-precomputed-container
+title: Configuration onnx-fp32-top3-precomputed-container
+description: Resolved experimental configuration for 
+  onnx-fp32-top3-precomputed-container.
+status: active
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered-configuration-matrix
+  source_paths: []
+  generated: true
+extensions:
+  atlas.condition:
+    representation: fp32
+    top_k: 3
+    embeddings: precomputed
+    environment: container
+    model: M004
+    runtime: RT003
+  atlas.pipeline-models:
+    - atlas://model/M001@v1
+$schema: 
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/configuration.schema.json
+workload: atlas://workload-spec/WS003@v1
+quality: atlas://quality-contract/QC003@v1
+slo: atlas://slo/SLO003@v1
+model: atlas://model/M004@v1
+hardware: atlas://hardware/HW001@v1
+runtime: atlas://runtime/RT003@v1
+runtime_configuration: atlas://runtime-configuration/RTCFG015@v1
+resolved_hashes:
+  workload: 4179552ee1aa303098a69385ae6cf2dc4d14db73ce3635f72a19ab746fbd12f2
+  quality: dd0720409884d882f2b8dd3992a18ea0fec68f25ec2ab0f3bf04363974397f0e
+  slo: 110f6fdde89e880aa9244a252007d5c7196a1e384ffe3b8f45229863bbb489d5
+  model: a47d5d4ce9c8e2bb7b4589643d99c1cdbc58ce81f4a091ca115f0ebba1cc359f
+  hardware: a2c5a27db63ba7cd435546ee7a2c49b07552a9a161619a75a8653d8a773c5290
+  runtime: 013feab7735bd3af4496ef6d45f401d09dbdecdf005ba1034ff503ed0191f9aa
+  runtime_configuration: 
+    ace955b30a0f40cd7a7c655c199f5525866574de28b04422646f79b1999bfc17

@@ -1,0 +1,35 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0007
+version: 1
+slug: "sglang-efficient-execution-of-structured-language-model-programs"
+title: "SGLang: Efficient Execution of Structured Language Model Programs"
+description: "Authoritative external source for radix-cache, structured-generation."
+status: active
+authors:
+  - name: Atlas maintainers
+    roles: [curator]
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the primary or official source
+  source_paths: []
+  generated: false
+extensions: {}
+type: paper
+source_authors:
+  - "Zheng et al."
+url: "https://arxiv.org/abs/2312.07104"
+identifiers:
+  arxiv: "2312.07104"
+published:
+  year: 2023
+topics:
+  - "radix-cache"
+  - "structured-generation"
+relevance: "Provides external grounding for Atlas concepts related to radix-cache and structured-generation."
+

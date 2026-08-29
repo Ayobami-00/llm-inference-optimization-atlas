@@ -1,0 +1,72 @@
+%YAML 1.2
+---
+$schema:
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/comparison.schema.json
+schema_version: 1
+kind: Comparison
+id: CMP0006
+version: 1
+slug: steady-versus-bursty-cmp0006
+title: How does burst arrival change queue and tail latency? comparison
+description: Controlled effects for atlas://configuration/CFG007@v1 against
+  atlas://configuration/CFG001@v1.
+status: accepted
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T15:44:40Z'
+updated_at: '2026-08-25T15:44:40Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: atlas compare paired-bootstrap effect estimation
+  source_paths:
+    - studies/S001-cpu-interactive-chat/v1/experiments/E0004/runs/R1411
+    - studies/S001-cpu-interactive-chat/v1/experiments/E0004/runs/R1412
+    - studies/S001-cpu-interactive-chat/v1/experiments/E0004/runs/R1413
+    - studies/S001-cpu-interactive-chat/v1/experiments/E0004/runs/R1471
+    - studies/S001-cpu-interactive-chat/v1/experiments/E0004/runs/R1472
+    - studies/S001-cpu-interactive-chat/v1/experiments/E0004/runs/R1473
+  generated: true
+extensions: {}
+experiment: atlas://experiment/E0004@v1
+baseline_runs:
+  - atlas://run/R1411@v1
+  - atlas://run/R1412@v1
+  - atlas://run/R1413@v1
+candidate_runs:
+  - atlas://run/R1471@v1
+  - atlas://run/R1472@v1
+  - atlas://run/R1473@v1
+changed_axes:
+  - workload traffic arrival_process
+compatibility:
+  passed: true
+  checks:
+    - workload identity is frozen
+    - quality identity is frozen
+    - slo identity is frozen
+    - model identity is frozen
+    - hardware identity is frozen
+    - runtime identity is frozen
+method:
+  paired: true
+  confidence_level: 0.95
+  bootstrap_resamples: 10000
+effects:
+  - metric: atlas://metric/MET012@v1
+    baseline: 0.0
+    candidate: 5144.1680523004225
+    absolute: 5144.1680523004225
+    relative: 0.0
+    confidence_interval:
+      lower: 4720.34302791338
+      upper: 5670.17558690665
+      level: 0.95
+    unit: ms
+quality_eligible: true
+slo_eligible: false
+result: degradation

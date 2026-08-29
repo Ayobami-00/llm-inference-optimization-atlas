@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/graph/graph-indexes.schema.json",
+  "title": "Graph search and reverse-reference indexes",
+  "type": "object",
+  "required": [
+    "by_type",
+    "by_status",
+    "by_study",
+    "by_tag",
+    "referenced_by"
+  ],
+  "properties": {
+    "by_type": {
+      "$ref": "#/$defs/index"
+    },
+    "by_status": {
+      "$ref": "#/$defs/index"
+    },
+    "by_study": {
+      "$ref": "#/$defs/index"
+    },
+    "by_tag": {
+      "$ref": "#/$defs/index"
+    },
+    "referenced_by": {
+      "$ref": "#/$defs/index"
+    }
+  },
+  "$defs": {
+    "index": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "uniqueItems": true,
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

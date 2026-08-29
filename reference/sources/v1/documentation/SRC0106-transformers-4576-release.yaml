@@ -1,0 +1,23 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0106
+version: 1
+slug: transformers-4576-release
+title: Transformers 4.57.6 release
+description: Official release metadata for RT001 model loading and generation semantics.
+status: active
+authors: [{name: Atlas maintainers, roles: [curator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance: {method: curated from the official annotated release tag, source_paths: [], generated: false}
+extensions: {}
+type: official_documentation
+source_authors: [Hugging Face]
+url: https://github.com/huggingface/transformers/releases/tag/v4.57.6
+published: {year: 2026, publisher: Hugging Face}
+upstream: {product: Transformers, version: 4.57.6, revision: 753d61104116eefc8ffc977327b441ee0c8d599f, retrieved_at: '2026-08-25'}
+topics: [runtime, transformers, generation]
+relevance: Pins the Transformers release used by native SmolLM2 execution.

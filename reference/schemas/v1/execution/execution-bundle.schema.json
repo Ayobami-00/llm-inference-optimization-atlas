@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/execution/execution-bundle.schema.json",
+  "title": "Reproducible execution bundle",
+  "allOf": [
+    {
+      "$ref": "../common/artifact.schema.json"
+    },
+    {
+      "type": "object",
+      "required": [
+        "platforms",
+        "backend",
+        "requirements",
+        "artifacts",
+        "entrypoints",
+        "inputs",
+        "outputs",
+        "profiles",
+        "resources",
+        "timeouts",
+        "cleanup"
+      ],
+      "properties": {
+        "kind": {
+          "const": "ExecutionBundle"
+        },
+        "platforms": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "os",
+              "architecture"
+            ],
+            "properties": {
+              "os": {
+                "enum": [
+                  "macos",
+                  "linux",
+                  "windows-wsl"
+                ]
+              },
+              "architecture": {
+                "enum": [
+                  "aarch64",
+                  "x86_64"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "backend": {
+          "enum": [
+            "cpu",
+            "cuda",
+            "rocm",
+            "metal",
+            "container",
+            "remote"
+          ]
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "url",
+              "sha256",
+              "size_bytes",
+              "license"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "size_bytes": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "license": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "entrypoints": {
+          "type": "object",
+          "required": [
+            "run"
+          ],
+          "properties": {
+            "prepare": {
+              "type": "string"
+            },
+            "start": {
+              "type": "string"
+            },
+            "healthcheck": {
+              "type": "string"
+            },
+            "run": {
+              "type": "string"
+            },
+            "destroy": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "inputs": {
+          "type": "object"
+        },
+        "outputs": {
+          "type": "object",
+          "required": [
+            "draft_directory"
+          ],
+          "properties": {
+            "draft_directory": {
+              "type": "string"
+            },
+            "required_files": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "profiles": {
+          "type": "object",
+          "required": [
+            "quick",
+            "full"
+          ],
+          "properties": {
+            "quick": {
+              "type": "object"
+            },
+            "full": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
+        },
+        "resources": {
+          "type": "object"
+        },
+        "timeouts": {
+          "type": "object"
+        },
+        "cleanup": {
+          "type": "object",
+          "required": [
+            "required",
+            "idempotent"
+          ],
+          "properties": {
+            "required": {
+              "type": "boolean"
+            },
+            "idempotent": {
+              "const": true
+            }
+          },
+          "additionalProperties": false
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

@@ -1,0 +1,75 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: METRICS-M4
+version: 1
+title: "M4 metrics"
+description: "Canonical M4 metric definitions."
+entries:
+  - id: MET079
+    name: "Accelerator seconds per request"
+    definition: "Accelerator seconds per request measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M4
+    category: economics
+    unit: "s/request"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET080
+    name: "Cost per request"
+    definition: "Cost per request measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M4
+    category: economics
+    unit: "USD/request"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET081
+    name: "Cost per million input tokens"
+    definition: "Cost per million input tokens measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M4
+    category: economics
+    unit: "USD"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET082
+    name: "Cost per million output tokens"
+    definition: "Cost per million output tokens measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M4
+    category: economics
+    unit: "USD"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET083
+    name: "Cost per successful task"
+    definition: "Cost per successful task measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M4
+    category: economics
+    unit: "USD/task"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET084
+    name: "Cost-normalized goodput"
+    definition: "Cost-normalized goodput measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M4
+    category: economics
+    unit: "request/USD"
+    direction: higher_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+

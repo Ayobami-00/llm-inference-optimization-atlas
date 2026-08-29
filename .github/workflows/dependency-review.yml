@@ -1,0 +1,29 @@
+name: Dependency review
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    name: Review dependency changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check dependency graph readiness
+        id: dependency-graph
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/${{ github.repository }}/dependency-graph/sbom" >/dev/null 2>&1; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Dependency review will begin after GitHub generates the initial dependency graph."
+          fi
+      - name: Review dependency changes
+        if: steps.dependency-graph.outputs.ready == 'true'
+        uses: actions/dependency-review-action@v5
+        with:
+          fail-on-severity: high

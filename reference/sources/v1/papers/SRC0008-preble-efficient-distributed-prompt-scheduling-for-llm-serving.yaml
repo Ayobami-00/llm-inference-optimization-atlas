@@ -1,0 +1,35 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0008
+version: 1
+slug: "preble-efficient-distributed-prompt-scheduling-for-llm-serving"
+title: "Preble: Efficient Distributed Prompt Scheduling for LLM Serving"
+description: "Authoritative external source for prefix-aware-routing, distributed-serving."
+status: active
+authors:
+  - name: Atlas maintainers
+    roles: [curator]
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the primary or official source
+  source_paths: []
+  generated: false
+extensions: {}
+type: paper
+source_authors:
+  - "Lee et al."
+url: "https://arxiv.org/abs/2407.00023"
+identifiers:
+  arxiv: "2407.00023"
+published:
+  year: 2024
+topics:
+  - "prefix-aware-routing"
+  - "distributed-serving"
+relevance: "Provides external grounding for Atlas concepts related to prefix-aware-routing and distributed-serving."
+

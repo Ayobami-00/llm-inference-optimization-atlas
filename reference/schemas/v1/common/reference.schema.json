@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/reference.schema.json",
+  "title": "Atlas artifact reference",
+  "type": "string",
+  "pattern": "^atlas://[a-z][a-z0-9-]*/[A-Z][A-Z0-9-]*@v[1-9][0-9]*$"
+}

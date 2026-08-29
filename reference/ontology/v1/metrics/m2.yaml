@@ -1,0 +1,207 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: METRICS-M2
+version: 1
+title: "M2 metrics"
+description: "Canonical M2 metric definitions."
+entries:
+  - id: MET049
+    name: "CPU user utilization"
+    definition: "CPU user utilization measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "ratio"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET050
+    name: "CPU system utilization"
+    definition: "CPU system utilization measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "ratio"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET051
+    name: "CPU frequency"
+    definition: "CPU frequency measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "Hz"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET052
+    name: "Host memory bandwidth"
+    definition: "Host memory bandwidth measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "byte/s"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET053
+    name: "Host memory used"
+    definition: "Host memory used measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "byte"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET054
+    name: "NUMA remote bytes"
+    definition: "NUMA remote bytes measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "byte"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET055
+    name: "Accelerator compute activity"
+    definition: "Accelerator compute activity measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "ratio"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET056
+    name: "Tensor-core activity"
+    definition: "Tensor-core activity measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "ratio"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET057
+    name: "Device memory bandwidth"
+    definition: "Device memory bandwidth measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "byte/s"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET058
+    name: "Device memory used"
+    definition: "Device memory used measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "byte"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET059
+    name: "PCIe bytes"
+    definition: "PCIe bytes measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "byte"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET060
+    name: "Peer-link bytes"
+    definition: "Peer-link bytes measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "byte"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET061
+    name: "Network bytes"
+    definition: "Network bytes measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "byte"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET062
+    name: "RDMA bytes"
+    definition: "RDMA bytes measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "byte"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET063
+    name: "Device clock"
+    definition: "Device clock measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "Hz"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET064
+    name: "Temperature"
+    definition: "Temperature measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "Cel"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET065
+    name: "Power draw"
+    definition: "Power draw measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "W"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET066
+    name: "Thermal throttling time"
+    definition: "Thermal throttling time measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M2
+    category: hardware
+    unit: "ms"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+

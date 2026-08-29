@@ -1,0 +1,159 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: WORKLOAD-CHARACTERISTICS
+version: 1
+title: "Workload characteristics"
+description: "Orthogonal properties used to describe concrete workload behavior."
+entries:
+  - id: WC001
+    name: "Short prompts"
+    definition: "Requests usually contain small input contexts."
+    status: active
+    aliases: []
+  - id: WC002
+    name: "Long prompts"
+    definition: "Requests regularly contain large input contexts."
+    status: active
+    aliases: []
+  - id: WC003
+    name: "Variable input length"
+    definition: "Input length has a broad or heavy-tailed distribution."
+    status: active
+    aliases: []
+  - id: WC004
+    name: "Short outputs"
+    definition: "Responses are generally short relative to their prompts."
+    status: active
+    aliases: []
+  - id: WC005
+    name: "Long outputs"
+    definition: "Responses require sustained autoregressive decoding."
+    status: active
+    aliases: []
+  - id: WC006
+    name: "Variable output length"
+    definition: "Response length is difficult to predict and broadly distributed."
+    status: active
+    aliases: []
+  - id: WC007
+    name: "Multi-turn sessions"
+    definition: "Requests belong to conversations with accumulated history."
+    status: active
+    aliases: []
+  - id: WC008
+    name: "Session prefix reuse"
+    definition: "Successive requests reuse a substantial session prefix."
+    status: active
+    aliases: []
+  - id: WC009
+    name: "Shared system prefix"
+    definition: "Many users share an identical system or policy prefix."
+    status: active
+    aliases: []
+  - id: WC010
+    name: "Document reuse"
+    definition: "Retrieved or supplied documents recur across requests."
+    status: active
+    aliases: []
+  - id: WC011
+    name: "Bursty arrivals"
+    definition: "Offered load contains short periods well above its mean."
+    status: active
+    aliases: []
+  - id: WC012
+    name: "Steady arrivals"
+    definition: "Offered load remains approximately stationary during measurement."
+    status: active
+    aliases: []
+  - id: WC013
+    name: "Tool gaps"
+    definition: "Model invocations are separated by tool execution or user think time."
+    status: active
+    aliases: []
+  - id: WC014
+    name: "High concurrency"
+    definition: "Many requests are simultaneously active."
+    status: active
+    aliases: []
+  - id: WC015
+    name: "Low concurrency"
+    definition: "Only a small number of requests are simultaneously active."
+    status: active
+    aliases: []
+  - id: WC016
+    name: "Open-loop load"
+    definition: "Arrivals do not slow down when the service becomes congested."
+    status: active
+    aliases: []
+  - id: WC017
+    name: "Prefill-heavy"
+    definition: "Prompt processing dominates useful compute or latency."
+    status: active
+    aliases: []
+  - id: WC018
+    name: "Decode-heavy"
+    definition: "Autoregressive decoding dominates useful compute or latency."
+    status: active
+    aliases: []
+  - id: WC019
+    name: "Mixed prefill and decode"
+    definition: "Prefill and decode compete within the same operating window."
+    status: active
+    aliases: []
+  - id: WC020
+    name: "Large KV footprint"
+    definition: "Active requests require substantial KV-cache capacity."
+    status: active
+    aliases: []
+  - id: WC021
+    name: "Heterogeneous modalities"
+    definition: "Requests contain materially different modality pipelines."
+    status: active
+    aliases: []
+  - id: WC022
+    name: "Encoder stage"
+    definition: "A separate encoder contributes significant work or state."
+    status: active
+    aliases: []
+  - id: WC023
+    name: "Preprocessing stage"
+    definition: "CPU-side decoding, tokenization, or transforms are material."
+    status: active
+    aliases: []
+  - id: WC024
+    name: "Retrieval context"
+    definition: "Retrieved passages form a significant part of the prompt."
+    status: active
+    aliases: []
+  - id: WC025
+    name: "Dynamic adapters"
+    definition: "Requests select adapters that may need loading or caching."
+    status: active
+    aliases: []
+  - id: WC026
+    name: "Multi-tenant traffic"
+    definition: "Independent tenants share serving capacity."
+    status: active
+    aliases: []
+  - id: WC027
+    name: "Mixed SLO classes"
+    definition: "Requests with different latency or quality constraints share capacity."
+    status: active
+    aliases: []
+  - id: WC028
+    name: "Heavy-tailed request shapes"
+    definition: "Rare, very large requests materially affect scheduling."
+    status: active
+    aliases: []
+  - id: WC029
+    name: "Cancellations"
+    definition: "Clients can cancel work before generation completes."
+    status: active
+    aliases: []
+  - id: WC030
+    name: "Cold starts"
+    definition: "Model or worker startup is part of the operating concern."
+    status: active
+    aliases: []
+

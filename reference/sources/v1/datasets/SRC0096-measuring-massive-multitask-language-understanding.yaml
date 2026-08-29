@@ -1,0 +1,38 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0096
+version: 1
+slug: "measuring-massive-multitask-language-understanding"
+title: "Measuring Massive Multitask Language Understanding"
+description: "Authoritative external source for quality, knowledge."
+status: active
+authors:
+  - name: Atlas maintainers
+    roles: [curator]
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the primary or official source
+  source_paths: []
+  generated: false
+extensions: {}
+type: benchmark
+source_authors:
+  - "Hendrycks et al."
+url: "https://arxiv.org/abs/2009.03300"
+identifiers:
+  arxiv: "2009.03300"
+published:
+  year: 2020
+upstream:
+  product: "Measuring Massive Multitask Language Understanding"
+  retrieved_at: '2026-08-25'
+topics:
+  - "quality"
+  - "knowledge"
+relevance: "Provides external grounding for Atlas concepts related to quality and knowledge."
+

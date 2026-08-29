@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/runtimes/runtime-build.schema.json",
+  "title": "Immutable runtime build",
+  "allOf": [
+    {
+      "$ref": "../common/artifact.schema.json"
+    },
+    {
+      "type": "object",
+      "required": [
+        "runtime",
+        "upstream",
+        "language",
+        "frameworks",
+        "backends",
+        "build",
+        "capabilities"
+      ],
+      "properties": {
+        "kind": {
+          "const": "RuntimeBuild"
+        },
+        "id": {
+          "pattern": "^RT[0-9]{3}$"
+        },
+        "runtime": {
+          "type": "string"
+        },
+        "upstream": {
+          "type": "object",
+          "required": [
+            "repository",
+            "version",
+            "commit"
+          ],
+          "properties": {
+            "repository": {
+              "type": "string",
+              "format": "uri"
+            },
+            "version": {
+              "type": "string"
+            },
+            "commit": {
+              "type": "string",
+              "minLength": 7
+            }
+          },
+          "additionalProperties": false
+        },
+        "language": {
+          "type": "object"
+        },
+        "frameworks": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "backends": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "collectives": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "kernels": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "container": {
+          "type": "object",
+          "properties": {
+            "image": {
+              "type": "string"
+            },
+            "digest": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "build": {
+          "type": "object",
+          "required": [
+            "flags",
+            "artifact_sha256"
+          ],
+          "properties": {
+            "compiler": {
+              "type": "string"
+            },
+            "flags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "patches": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "artifact_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "additionalProperties": false
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

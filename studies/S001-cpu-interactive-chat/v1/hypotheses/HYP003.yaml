@@ -1,0 +1,42 @@
+%YAML 1.2
+---
+schema_version: 1
+kind: Hypothesis
+id: HYP003
+version: 1
+slug: cpu-thread-budget
+title: The four-thread budget is at or near the latency optimum on this 
+  hybrid-core CPU.
+description: The four-thread budget is at or near the latency optimum on this 
+  hybrid-core CPU.
+status: active
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered-configuration-matrix
+  source_paths: []
+  generated: true
+extensions: {}
+$schema: 
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/optimizations/hypothesis.schema.json
+observation: How do one, four, and eight CPU threads affect decode latency?
+statement: The four-thread budget is at or near the latency optimum on this 
+  hybrid-core CPU.
+intervention: Compare one, four, and eight intra-op threads.
+expected_mechanism: Compare one, four, and eight intra-op threads.
+primary_metric: atlas://metric/MET013@v1
+guardrails:
+  - atlas://metric/MET025@v1
+  - atlas://metric/MET030@v1
+quality_gate: Q1
+falsification_conditions:
+  - One or eight threads has a confidently lower TPOT than four threads.
+background_sources: []

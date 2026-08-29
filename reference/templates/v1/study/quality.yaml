@@ -1,0 +1,31 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/quality/quality-contract.schema.json
+schema_version: 1
+kind: QualityContract
+id: QC000
+version: 1
+slug: replace-with-quality-slug
+title: "Replace with quality contract title"
+description: "Freeze workload-specific correctness and regression thresholds."
+status: draft
+authors: [{name: "Replace with contributor", roles: [investigator], conflicts: []}]
+created_at: '1970-01-01T00:00:00Z'
+updated_at: '1970-01-01T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance: {method: approved-proposal-scaffold, source_paths: [], generated: true}
+extensions:
+  atlas.scaffold:
+    complete: false
+    fields: [gate, dimensions, evaluators, thresholds]
+gate: Q1
+dimensions:
+  - id: replace-with-quality-dimension
+    name: "Replace with a measurable quality dimension"
+    evaluator: atlas://evaluator/EV001@v1
+    direction: higher_is_better
+    minimum: 1
+    allowed_regression: 0
+    weight: 1
+aggregation: all_dimensions
+missing_result: fail
+frozen_before_experiment: true

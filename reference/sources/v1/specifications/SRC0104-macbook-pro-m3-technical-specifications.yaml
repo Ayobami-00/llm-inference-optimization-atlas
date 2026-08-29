@@ -1,0 +1,23 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0104
+version: 1
+slug: macbook-pro-m3-technical-specifications
+title: MacBook Pro 14-inch M3 November 2023 technical specifications
+description: Official CPU, GPU, unified-memory, and bandwidth specification for HW001.
+status: active
+authors: [{name: Atlas maintainers, roles: [curator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance: {method: curated from the official product specification, source_paths: [], generated: false}
+extensions: {}
+type: specification
+source_authors: [Apple]
+url: https://support.apple.com/en-ca/117735
+published: {year: 2023, publisher: Apple}
+upstream: {product: MacBook Pro 14-inch M3, retrieved_at: '2026-08-25'}
+topics: [hardware, apple-silicon, unified-memory]
+relevance: Grounds the public topology facts recorded for the exact local M3 configuration.

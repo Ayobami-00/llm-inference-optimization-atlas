@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/configuration.schema.json",
+  "title": "Resolved experiment configuration",
+  "allOf": [
+    {
+      "$ref": "../common/artifact.schema.json"
+    },
+    {
+      "type": "object",
+      "required": [
+        "workload",
+        "quality",
+        "slo",
+        "model",
+        "hardware",
+        "runtime",
+        "runtime_configuration",
+        "resolved_hashes"
+      ],
+      "properties": {
+        "kind": {
+          "const": "Configuration"
+        },
+        "id": {
+          "pattern": "^CFG[0-9]{3}$"
+        },
+        "workload": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "quality": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "slo": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "model": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "hardware": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "runtime": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "runtime_configuration": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "resolved_hashes": {
+          "type": "object",
+          "minProperties": 7,
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

@@ -1,0 +1,167 @@
+{
+  "elapsed_seconds": 12.362473875007709,
+  "measurement_requests": 12,
+  "metrics": {
+    "MET001": {
+      "unit": "count",
+      "value": 12
+    },
+    "MET002": {
+      "unit": "count",
+      "value": 12
+    },
+    "MET003": {
+      "unit": "count",
+      "value": 0
+    },
+    "MET004": {
+      "unit": "count",
+      "value": 0
+    },
+    "MET005": {
+      "unit": "count",
+      "value": 0
+    },
+    "MET006": {
+      "unit": "count",
+      "value": 0
+    },
+    "MET007": {
+      "unit": "token",
+      "value": 704
+    },
+    "MET008": {
+      "unit": "token",
+      "value": 645
+    },
+    "MET009": {
+      "unit": "token",
+      "value": 1349
+    },
+    "MET010": {
+      "distribution": {
+        "count": 12,
+        "mean": 85.40323267031151,
+        "p50": 81.15927100880072,
+        "p90": 97.76845860324102,
+        "p95": 99.42126045061741
+      },
+      "unit": "ms",
+      "value": 85.40323267031151
+    },
+    "MET011": {
+      "distribution": {
+        "count": 12,
+        "mean": 85.40323267031151,
+        "p50": 81.15927100880072,
+        "p90": 97.76845860324102,
+        "p95": 99.42126045061741
+      },
+      "unit": "ms",
+      "value": 85.40323267031151
+    },
+    "MET012": {
+      "distribution": {
+        "count": 12,
+        "mean": 0,
+        "p50": 0,
+        "p90": 0,
+        "p95": 0
+      },
+      "unit": "ms",
+      "value": 0
+    },
+    "MET013": {
+      "distribution": {
+        "count": 12,
+        "mean": 17.69864710937816,
+        "p50": 17.55980464536512,
+        "p90": 18.307396252792042,
+        "p95": 18.363609264372684
+      },
+      "unit": "ms/token",
+      "value": 17.69864710937816
+    },
+    "MET014": {
+      "distribution": {
+        "count": 12,
+        "mean": 17.69864710937816,
+        "p50": 17.55980464536512,
+        "p90": 18.307396252792042,
+        "p95": 18.363609264372684
+      },
+      "unit": "ms",
+      "value": 17.69864710937816
+    },
+    "MET015": {
+      "distribution": {
+        "count": 12,
+        "mean": 1029.0329167546588,
+        "p50": 1189.6122500038473,
+        "p90": 1238.3209544059355,
+        "p95": 1250.6649229522736
+      },
+      "unit": "ms",
+      "value": 1029.0329167546588
+    },
+    "MET016": {
+      "unit": "request/s",
+      "value": 0.9706795032553723
+    },
+    "MET017": {
+      "unit": "request/s",
+      "value": 0.9706795032553723
+    },
+    "MET018": {
+      "unit": "token/s",
+      "value": 56.94653085764851
+    },
+    "MET019": {
+      "unit": "token/s",
+      "value": 52.17402329997626
+    },
+    "MET020": {
+      "unit": "token/s",
+      "value": 109.12055415762477
+    },
+    "MET021": {
+      "unit": "request/s",
+      "value": 0.7280096274415292
+    },
+    "MET023": {
+      "unit": "byte",
+      "value": 659783680
+    },
+    "MET024": {
+      "unit": "byte",
+      "value": 724271104
+    },
+    "MET025": {
+      "unit": "ratio",
+      "value": 0.991
+    },
+    "MET028": {
+      "unit": "ratio",
+      "value": 0
+    },
+    "MET029": {
+      "unit": "ratio",
+      "value": 1
+    },
+    "MET030": {
+      "unit": "ratio",
+      "value": 0.75
+    },
+    "MET093": {
+      "unit": "ratio",
+      "value": 0.8333333333333334
+    },
+    "MET096": {
+      "unit": "ratio",
+      "value": 1
+    }
+  },
+  "profile": "full",
+  "slo_passed": true,
+  "warmup_requests": 2
+}

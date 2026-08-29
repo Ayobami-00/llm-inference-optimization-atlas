@@ -1,0 +1,13 @@
+%YAML 1.2
+---
+$schema: 
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/contributions/contribution-manifest.schema.json
+proposal: atlas://proposal/P0003@v1
+issue_url: 
+  https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/3
+approval_label: proposal:approved
+contribution_type: study
+artifacts:
+  - proposal.yaml
+  - study.yaml
+closes_issue: true

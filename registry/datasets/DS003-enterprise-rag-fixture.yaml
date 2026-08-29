@@ -1,0 +1,58 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/workloads/dataset-revision.schema.json
+schema_version: 1
+kind: DatasetRevision
+id: DS003
+version: 1
+slug: enterprise-rag-fixture
+title: Atlas enterprise RAG fixture
+description: Twenty-four fictional enterprise documents and twelve frozen grounded questions.
+status: active
+authors: [{name: Atlas maintainers, roles: [dataset-author], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: repository-authored synthetic fixture
+  source_paths:
+    - studies/S003-cpu-enterprise-rag/v1/inputs/documents.jsonl
+    - studies/S003-cpu-enterprise-rag/v1/inputs/questions.jsonl
+  generated: false
+extensions: {}
+dataset_type: repository_fixture
+tasks: [dense-retrieval, grounded-question-answering, citation-generation]
+modalities: [text]
+languages: [en]
+terms:
+  license: Apache-2.0
+  redistribution: true
+  commercial_use: true
+  attribution: Retain the repository license and provenance.
+  restrictions: []
+composition:
+  records: 36
+  units: documents and questions
+  splits: {documents: 24, measurement_questions: 12}
+  statistics: {domains: 6, questions_with_two_relevant_documents: 1}
+sampling: {method: exhaustive, replacement: false}
+transformations: []
+fingerprint:
+  algorithm: sha256
+  value: 3941c5a37a350ad21dc18f4c796d4a4f660100113b28dc6b07f8c27158ea713b
+files:
+  - path: studies/S003-cpu-enterprise-rag/v1/inputs/documents.jsonl
+    media_type: application/x-ndjson
+    sha256: 03988b4e0a95723b4fb26a3202d9438dc092ccc0fb09b8016f6c2e383d39ecdc
+    size_bytes: 4507
+  - path: studies/S003-cpu-enterprise-rag/v1/inputs/questions.jsonl
+    media_type: application/x-ndjson
+    sha256: e12e294be9ea339e53d6f4b2f0b58da699ffc5b2518c79b19c6722c99d8bb0b2
+    size_bytes: 2009
+sensitive_data:
+  contains_personal_data: false
+  contains_secrets: false
+  review_method: Manual review confirming all organizations, policies, and facts are fictional.
+limitations:
+  - The corpus is much smaller and cleaner than an enterprise knowledge base.
+  - Frozen keywords approximate answer correctness and do not cover paraphrase exhaustively.
+  - Results must not be generalized to private or multilingual corpora without replication.

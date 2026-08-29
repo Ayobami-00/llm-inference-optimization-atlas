@@ -1,0 +1,35 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/quality/quality-contract.schema.json
+schema_version: 1
+kind: QualityContract
+id: QC001
+version: 1
+slug: cpu-interactive-chat-quality
+title: Interactive chat Q1 contract
+description: Frozen deterministic checks for output validity, format, and topic relevance.
+status: active
+authors: [ { name: Ayobami-00, github: Ayobami-00, roles: [ investigator ], conflicts: [] } ]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance: { method: preregistered quality contract, source_paths: [], generated: false }
+extensions: {}
+gate: Q1
+dimensions:
+- id: valid-output
+  name: Valid non-empty response
+  evaluator: atlas://evaluator/EV001@v1
+  direction: higher_is_better
+  minimum: 1
+  allowed_regression: 0
+  weight: 0.4
+- id: topic-relevance
+  name: Frozen topic-keyword recall
+  evaluator: atlas://evaluator/EV001@v1
+  direction: higher_is_better
+  minimum: 0.75
+  allowed_regression: 0.05
+  weight: 0.6
+aggregation: all_dimensions
+missing_result: fail
+frozen_before_experiment: true

@@ -1,0 +1,14 @@
+%YAML 1.2
+---
+inputs:
+  tasks.jsonl: e1b2c3465af6dec750fd68904ed959ff30a6d424ef9cec0c2ac269795f8f41d9
+runtime_artifacts:
+  llama-cpp-source.tar.gz: 762283319feb3de30886dc850d42f0e426b06600e7f9639d34e06506597309ca
+  qwen-coder-q4-k-m.gguf: 1d9614638d18024d0fbb36575a15f1302a3adf044df10345688ec4f6e1c4ff32
+  llama-server: 4ff04e40ee43cf46ec9792bc01c471b04e53c98c2cc72dd3c378685603222d16
+generated_files:
+  - metrics/requests.parquet
+  - metrics/samples.parquet
+  - metrics/summary.json
+  - quality/results.json
+  - outputs/responses.jsonl

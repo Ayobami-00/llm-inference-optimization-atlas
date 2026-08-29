@@ -1,0 +1,79 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: OPTIMIZATIONS-O5
+version: 1
+title: "Runtime execution optimizations"
+description: "Execution graphs, allocators, streams, and overlap."
+entries:
+  - id: OPT035
+    name: "Eager execution"
+    definition: "Eager execution is a controlled intervention in the runtime execution layer."
+    status: active
+    aliases: []
+    parent: O5
+    target_bottlenecks: ["atlas://bottleneck/B021@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0066@v1"]
+  - id: OPT036
+    name: "Execution graph capture"
+    definition: "Execution graph capture is a controlled intervention in the runtime execution layer."
+    status: active
+    aliases: []
+    parent: O5
+    target_bottlenecks: ["atlas://bottleneck/B021@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0066@v1"]
+  - id: OPT037
+    name: "Graph-shape bucketing"
+    definition: "Graph-shape bucketing is a controlled intervention in the runtime execution layer."
+    status: active
+    aliases: []
+    parent: O5
+    target_bottlenecks: ["atlas://bottleneck/B021@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0066@v1"]
+  - id: OPT038
+    name: "Runtime compilation"
+    definition: "Runtime compilation is a controlled intervention in the runtime execution layer."
+    status: active
+    aliases: []
+    parent: O5
+    target_bottlenecks: ["atlas://bottleneck/B021@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0066@v1"]
+  - id: OPT039
+    name: "Asynchronous execution"
+    definition: "Asynchronous execution is a controlled intervention in the runtime execution layer."
+    status: active
+    aliases: []
+    parent: O5
+    target_bottlenecks: ["atlas://bottleneck/B021@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0066@v1"]
+  - id: OPT040
+    name: "Memory-pool tuning"
+    definition: "Memory-pool tuning is a controlled intervention in the runtime execution layer."
+    status: active
+    aliases: []
+    parent: O5
+    target_bottlenecks: ["atlas://bottleneck/B021@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0066@v1"]
+  - id: OPT041
+    name: "Compute-transfer overlap"
+    definition: "Compute-transfer overlap is a controlled intervention in the runtime execution layer."
+    status: active
+    aliases: []
+    parent: O5
+    target_bottlenecks: ["atlas://bottleneck/B021@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0066@v1"]
+

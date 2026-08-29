@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/run-record.schema.json",
+  "title": "Experiment run record",
+  "allOf": [
+    {
+      "$ref": "../common/artifact.schema.json"
+    },
+    {
+      "type": "object",
+      "required": [
+        "experiment",
+        "configuration",
+        "replicate",
+        "seed",
+        "started_at",
+        "ended_at",
+        "outcome",
+        "hardware_snapshot",
+        "runtime_snapshot",
+        "input_fingerprints",
+        "command",
+        "environment",
+        "windows",
+        "artifacts",
+        "checksums",
+        "quality",
+        "validation"
+      ],
+      "properties": {
+        "kind": {
+          "const": "RunRecord"
+        },
+        "id": {
+          "pattern": "^R[0-9]{4}$"
+        },
+        "experiment": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "configuration": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "replicate": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ended_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "outcome": {
+          "enum": [
+            "complete",
+            "failed",
+            "interrupted",
+            "invalidated"
+          ]
+        },
+        "failure_reason": {
+          "type": "string"
+        },
+        "hardware_snapshot": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "runtime_snapshot": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "input_fingerprints": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "command": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "environment": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "windows": {
+          "type": "object",
+          "required": [
+            "warmup",
+            "measurement"
+          ],
+          "properties": {
+            "warmup": {
+              "type": "object"
+            },
+            "measurement": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "checksums": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "quality": {
+          "type": "object",
+          "required": [
+            "gate",
+            "passed"
+          ],
+          "properties": {
+            "gate": {
+              "enum": [
+                "Q0",
+                "Q1",
+                "Q2"
+              ]
+            },
+            "passed": {
+              "type": "boolean"
+            },
+            "results_path": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "validation": {
+          "type": "object",
+          "required": [
+            "passed",
+            "validated_at"
+          ],
+          "properties": {
+            "passed": {
+              "type": "boolean"
+            },
+            "validated_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "errors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

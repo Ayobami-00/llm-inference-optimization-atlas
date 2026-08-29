@@ -1,0 +1,35 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0053
+version: 1
+slug: "zeroquant-efficient-and-affordable-post-training-quantization-fo"
+title: "ZeroQuant: Efficient and Affordable Post-Training Quantization for Large-Scale Transformers"
+description: "Authoritative external source for quantization, post-training."
+status: active
+authors:
+  - name: Atlas maintainers
+    roles: [curator]
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the primary or official source
+  source_paths: []
+  generated: false
+extensions: {}
+type: paper
+source_authors:
+  - "Yao et al."
+url: "https://arxiv.org/abs/2206.01861"
+identifiers:
+  arxiv: "2206.01861"
+published:
+  year: 2022
+topics:
+  - "quantization"
+  - "post-training"
+relevance: "Provides external grounding for Atlas concepts related to quantization and post-training."
+

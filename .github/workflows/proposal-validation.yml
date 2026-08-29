@@ -1,0 +1,61 @@
+name: Validate proposal issue
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  validate:
+    name: Validate schema-backed proposal
+    if: contains(join(github.event.issue.labels.*.name, ','), 'proposal:type:')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out trusted default branch
+        uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: 0.11.31
+      - name: Install validation dependencies
+        run: uv sync --frozen
+      - name: Validate proposal
+        id: validation
+        continue-on-error: true
+        run: uv run atlas --json proposal validate-issue "$GITHUB_EVENT_PATH" | tee proposal-validation.json
+      - name: Mark valid proposal
+        if: steps.validation.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+        run: gh issue edit "$ISSUE_URL" --add-label proposal:valid --remove-label proposal:needs-triage --remove-label proposal:needs-revision
+      - name: Require reapproval after semantic edits
+        if: steps.validation.outcome == 'success' && github.event.action == 'edited'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+        run: gh issue edit "$ISSUE_URL" --remove-label proposal:approved
+      - name: Request proposal revision
+        if: steps.validation.outcome != 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+        run: gh issue edit "$ISSUE_URL" --add-label proposal:needs-revision --remove-label proposal:needs-triage --remove-label proposal:valid --remove-label proposal:approved
+      - name: Explain required revisions
+        if: steps.validation.outcome != 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+        run: |
+          {
+            echo 'The proposal is structurally incomplete. Please edit the issue and address:'
+            echo
+            jq -r '.issues[] | "- **\(.location)** — \(.message)"' proposal-validation.json
+          } > proposal-feedback.md
+          gh issue comment "$ISSUE_URL" --body-file proposal-feedback.md
+      - name: Enforce validation result
+        if: steps.validation.outcome != 'success'
+        run: exit 1

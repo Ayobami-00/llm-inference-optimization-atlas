@@ -1,0 +1,23 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0105
+version: 1
+slug: pytorch-2130-release
+title: PyTorch 2.13.0 release
+description: Official release metadata for the PyTorch component of RT001.
+status: active
+authors: [{name: Atlas maintainers, roles: [curator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance: {method: curated from the official signed release, source_paths: [], generated: false}
+extensions: {}
+type: official_documentation
+source_authors: [PyTorch maintainers]
+url: https://github.com/pytorch/pytorch/releases/tag/v2.13.0
+published: {year: 2026, publisher: PyTorch Foundation}
+upstream: {product: PyTorch, version: 2.13.0, revision: cf30153c4c131c8164ee7798e5022d810682e2cb, retrieved_at: '2026-08-25'}
+topics: [runtime, pytorch, cpu]
+relevance: Pins the framework release used by native Transformers CPU studies.

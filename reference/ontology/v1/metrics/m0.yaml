@@ -1,0 +1,339 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: METRICS-M0
+version: 1
+title: "M0 metrics"
+description: "Canonical M0 metric definitions."
+entries:
+  - id: MET001
+    name: "Requests offered"
+    definition: "Requests offered measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: request
+    unit: "count"
+    direction: higher_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET002
+    name: "Requests completed"
+    definition: "Requests completed measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: request
+    unit: "count"
+    direction: higher_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET003
+    name: "Requests failed"
+    definition: "Requests failed measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: reliability
+    unit: "count"
+    direction: lower_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET004
+    name: "Requests timed out"
+    definition: "Requests timed out measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: reliability
+    unit: "count"
+    direction: lower_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET005
+    name: "Requests cancelled"
+    definition: "Requests cancelled measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: reliability
+    unit: "count"
+    direction: informational
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET006
+    name: "Requests rejected"
+    definition: "Requests rejected measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: reliability
+    unit: "count"
+    direction: lower_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET007
+    name: "Input tokens"
+    definition: "Input tokens measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: request
+    unit: "token"
+    direction: informational
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET008
+    name: "Output tokens"
+    definition: "Output tokens measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: request
+    unit: "token"
+    direction: informational
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET009
+    name: "Total tokens"
+    definition: "Total tokens measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: request
+    unit: "token"
+    direction: informational
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET010
+    name: "Client TTFT"
+    definition: "Client TTFT measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: latency
+    unit: "ms"
+    direction: lower_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET011
+    name: "Server TTFT"
+    definition: "Server TTFT measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: latency
+    unit: "ms"
+    direction: lower_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET012
+    name: "Queue delay"
+    definition: "Queue delay measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: latency
+    unit: "ms"
+    direction: lower_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET013
+    name: "Time per output token"
+    definition: "Time per output token measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: latency
+    unit: "ms/token"
+    direction: lower_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET014
+    name: "Inter-token latency"
+    definition: "Inter-token latency measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: latency
+    unit: "ms"
+    direction: lower_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET015
+    name: "End-to-end latency"
+    definition: "End-to-end latency measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: latency
+    unit: "ms"
+    direction: lower_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET016
+    name: "Offered request rate"
+    definition: "Offered request rate measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: throughput
+    unit: "request/s"
+    direction: informational
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET017
+    name: "Achieved request rate"
+    definition: "Achieved request rate measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: throughput
+    unit: "request/s"
+    direction: higher_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET018
+    name: "Input token throughput"
+    definition: "Input token throughput measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: throughput
+    unit: "token/s"
+    direction: higher_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET019
+    name: "Output token throughput"
+    definition: "Output token throughput measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: throughput
+    unit: "token/s"
+    direction: higher_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET020
+    name: "Total token throughput"
+    definition: "Total token throughput measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: throughput
+    unit: "token/s"
+    direction: higher_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET021
+    name: "SLO goodput"
+    definition: "SLO goodput measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: goodput
+    unit: "request/s"
+    direction: higher_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET022
+    name: "Useful goodput"
+    definition: "Useful goodput measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: goodput
+    unit: "task/s"
+    direction: higher_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET023
+    name: "Resident memory"
+    definition: "Resident memory measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: hardware
+    unit: "byte"
+    direction: lower_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET024
+    name: "Peak memory"
+    definition: "Peak memory measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: hardware
+    unit: "byte"
+    direction: lower_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET025
+    name: "CPU utilization"
+    definition: "CPU utilization measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: hardware
+    unit: "ratio"
+    direction: informational
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET026
+    name: "Accelerator utilization"
+    definition: "Accelerator utilization measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: hardware
+    unit: "ratio"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET027
+    name: "Average power"
+    definition: "Average power measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: hardware
+    unit: "W"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET028
+    name: "Error rate"
+    definition: "Error rate measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: reliability
+    unit: "ratio"
+    direction: lower_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET029
+    name: "Success rate"
+    definition: "Success rate measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: reliability
+    unit: "ratio"
+    direction: higher_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+  - id: MET030
+    name: "Quality pass rate"
+    definition: "Quality pass rate measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M0
+    category: quality
+    unit: "ratio"
+    direction: higher_is_better
+    mandatory: true
+    aggregation: [mean, p50, p90, p95]
+

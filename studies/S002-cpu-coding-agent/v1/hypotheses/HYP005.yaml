@@ -1,0 +1,41 @@
+%YAML 1.2
+---
+schema_version: 1
+kind: Hypothesis
+id: HYP005
+version: 1
+slug: coding-prefix-reuse
+title: Reusing the frozen coding-agent prefix lowers TTFT without changing 
+  unit-test correctness.
+description: Reusing the frozen coding-agent prefix lowers TTFT without changing
+  unit-test correctness.
+status: active
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered-configuration-matrix
+  source_paths: []
+  generated: true
+extensions: {}
+$schema: 
+  https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/optimizations/hypothesis.schema.json
+observation: What is the TTFT benefit of warm prefix reuse?
+statement: Reusing the frozen coding-agent prefix lowers TTFT without changing 
+  unit-test correctness.
+intervention: Enable prompt-cache reuse after the cold request.
+expected_mechanism: Enable prompt-cache reuse after the cold request.
+primary_metric: atlas://metric/MET010@v1
+guardrails:
+  - atlas://metric/MET091@v1
+quality_gate: Q1
+falsification_conditions:
+  - Warm-prefix TTFT is not lower than cold-prefix TTFT.
+background_sources: []

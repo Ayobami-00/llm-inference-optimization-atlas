@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/optimizations/optimization.schema.json",
+  "title": "Inference optimization",
+  "allOf": [
+    {
+      "$ref": "../common/artifact.schema.json"
+    },
+    {
+      "type": "object",
+      "required": [
+        "layer",
+        "mechanism",
+        "target_bottlenecks",
+        "expected_effects",
+        "preconditions",
+        "knobs",
+        "requirements",
+        "quality_impact_class",
+        "interactions",
+        "failure_modes"
+      ],
+      "properties": {
+        "kind": {
+          "const": "Optimization"
+        },
+        "id": {
+          "pattern": "^OPT[0-9]{3}$"
+        },
+        "layer": {
+          "pattern": "^O(?:[1-9]|1[0-6])$"
+        },
+        "mechanism": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target_bottlenecks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "../common/reference.schema.json"
+          }
+        },
+        "expected_effects": {
+          "type": "object",
+          "properties": {
+            "latency": {
+              "type": "string"
+            },
+            "throughput": {
+              "type": "string"
+            },
+            "memory": {
+              "type": "string"
+            },
+            "communication": {
+              "type": "string"
+            },
+            "cost": {
+              "type": "string"
+            },
+            "energy": {
+              "type": "string"
+            },
+            "quality": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "preconditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "knobs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "requirements": {
+          "type": "object",
+          "properties": {
+            "hardware": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "runtimes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "quality_impact_class": {
+          "enum": [
+            "exact",
+            "numerically_non_exact",
+            "lossy",
+            "model_transforming"
+          ]
+        },
+        "interactions": {
+          "type": "object",
+          "required": [
+            "synergizes_with",
+            "conflicts_with"
+          ],
+          "properties": {
+            "synergizes_with": {
+              "type": "array",
+              "items": {
+                "$ref": "../common/reference.schema.json"
+              }
+            },
+            "conflicts_with": {
+              "type": "array",
+              "items": {
+                "$ref": "../common/reference.schema.json"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "failure_modes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "../common/reference.schema.json"
+          }
+        }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

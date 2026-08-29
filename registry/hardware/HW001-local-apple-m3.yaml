@@ -1,0 +1,74 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/hardware/hardware-topology.schema.json
+schema_version: 1
+kind: HardwareTopology
+id: HW001
+version: 1
+slug: local-apple-m3-macbook-pro
+title: Local Apple M3 MacBook Pro CPU topology
+description: Privacy-safe inventory of the bootstrap machine, with CPU execution selected by studies.
+status: active
+authors: [{name: Atlas maintainers, roles: [inventory-curator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: hardware-metadata
+citations: [atlas://source/SRC0100@v1, atlas://source/SRC0104@v1]
+provenance:
+  method: filtered system_profiler, sw_vers, uname, and official product specification
+  source_paths: [local-system-inventory, https://support.apple.com/en-ca/117735]
+  generated: false
+extensions: {}
+nodes:
+  - id: node0
+    cpus:
+      - id: cpu0
+        vendor: Apple
+        model: M3
+        microarchitecture: Apple M3
+        architecture: aarch64
+        sockets: 1
+        physical_cores: 8
+        logical_threads: 8
+        core_groups:
+          - {name: performance, physical_cores: 4}
+          - {name: efficiency, physical_cores: 4}
+        isa_extensions: [AArch64, Advanced SIMD]
+        vector_width_bits: 128
+        caches: []
+        numa_nodes: 1
+        backends: [Accelerate, vecLib]
+    accelerators:
+      - id: gpu0
+        kind: integrated_gpu
+        vendor: Apple
+        model: M3 10-core GPU
+        architecture: Apple M3 GPU
+        compute_units: 10
+        memory:
+          id: mem0
+          kind: unified
+          capacity_bytes: 8589934592
+          bandwidth_bytes_per_second: 100000000000
+          shared: true
+        supported_dtypes: [float32, float16]
+        backends: [Metal]
+    memory_domains:
+      - id: mem0
+        kind: unified
+        capacity_bytes: 8589934592
+        bandwidth_bytes_per_second: 100000000000
+        shared: true
+    power: {mode: automatic, source: battery-or-external}
+    thermal: {state_at_inventory: unmeasured}
+topology_edges:
+  - {source: cpu0, target: gpu0, kind: shares_memory_with, bandwidth_bytes_per_second: 100000000000, bidirectional: true}
+software:
+  os: macOS 14.2 build 23C64
+  kernel: Darwin 23.2.0
+  architecture: arm64
+  drivers: []
+  firmware: []
+inventory:
+  method: filtered system_profiler plus official Apple specification
+  captured_at: '2026-08-25T00:00:00Z'
+  accuracy: detected
+redactions: [serial_number, uuid, mac_address, hostname, username, private_ip, cloud_account]

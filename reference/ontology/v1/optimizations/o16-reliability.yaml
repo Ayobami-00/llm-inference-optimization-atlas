@@ -1,0 +1,59 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: OPTIMIZATIONS-O16
+version: 1
+title: "Reliability optimizations"
+description: "Failure, cancellation, overload, and recovery behavior."
+entries:
+  - id: OPT108
+    name: "Cancellation propagation"
+    definition: "Cancellation propagation is a controlled intervention in the reliability layer."
+    status: active
+    aliases: []
+    parent: O16
+    target_bottlenecks: ["atlas://bottleneck/B008@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0036@v1"]
+  - id: OPT109
+    name: "Timeout enforcement"
+    definition: "Timeout enforcement is a controlled intervention in the reliability layer."
+    status: active
+    aliases: []
+    parent: O16
+    target_bottlenecks: ["atlas://bottleneck/B008@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0036@v1"]
+  - id: OPT110
+    name: "OOM recovery"
+    definition: "OOM recovery is a controlled intervention in the reliability layer."
+    status: active
+    aliases: []
+    parent: O16
+    target_bottlenecks: ["atlas://bottleneck/B008@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0036@v1"]
+  - id: OPT111
+    name: "Overload protection"
+    definition: "Overload protection is a controlled intervention in the reliability layer."
+    status: active
+    aliases: []
+    parent: O16
+    target_bottlenecks: ["atlas://bottleneck/B008@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0036@v1"]
+  - id: OPT112
+    name: "Partial-fleet failure recovery"
+    definition: "Partial-fleet failure recovery is a controlled intervention in the reliability layer."
+    status: active
+    aliases: []
+    parent: O16
+    target_bottlenecks: ["atlas://bottleneck/B008@v1"]
+    quality_impact_class: numerically_non_exact
+    default_quality_gate: Q1
+    sources: ["atlas://source/SRC0036@v1"]
+

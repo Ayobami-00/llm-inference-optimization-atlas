@@ -1,0 +1,48 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/quality/evaluator.schema.json
+schema_version: 1
+kind: Evaluator
+id: EV002
+version: 1
+slug: coding-agent-unit-tests
+title: Coding agent sandboxed unit-test evaluator
+description: Extracts Python functions and aggregates frozen unit-test results produced by a locked-down Docker sandbox.
+status: active
+authors: [{name: Atlas maintainers, roles: [evaluator-author], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: repository-authored deterministic evaluator
+  source_paths: [src/atlas/studies/evaluators.py]
+  generated: false
+extensions: {}
+evaluator_type: unit_tests
+implementation:
+  repository_path: src/atlas/studies/evaluators.py
+  entrypoint: atlas.studies.evaluators:evaluate_code_results
+  revision: v1
+  sha256: e06af008f26e29cf7d22484e0f49b145087398ef570a8bf2a277ecd6dae66d36
+datasets: [atlas://dataset/DS002@v1]
+inputs:
+  results: sandbox completion and frozen unit-test outcome per task
+outputs:
+  dimensions: sandbox_completion and unit_test_pass_rate
+  details: per-task execution results without generated executable artifacts
+metrics: [atlas://metric/MET091@v1, atlas://metric/MET096@v1]
+determinism: {level: exact, seeds: [], tolerance: 0}
+pass_criteria:
+  sandbox_completion: 1.0
+  unit_test_pass_rate_minimum: 0.3333333333333333
+sandbox:
+  executes_untrusted_code: true
+  network: disabled
+  controls:
+    - ephemeral non-root Docker container
+    - read-only root filesystem
+    - writable tmpfs only
+    - CPU, memory, PID, and wall-time limits
+    - no Linux capabilities and no-new-privileges
+limitations:
+  - The six compact tasks do not represent broad software-engineering capability.
+  - Passing frozen tests does not establish security, maintainability, or general correctness.

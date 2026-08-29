@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use the Atlas, cite the repository release and the individual study artifacts."
+title: "LLM Inference Optimization Atlas"
+type: software
+license: Apache-2.0
+repository-code: "https://github.com/Ayobami-00/llm-inference-optimization-atlas"
+version: 0.1.0
+date-released: 2026-08-25
+authors:
+  - family-names: Owumi
+    given-names: Festus Ayobami

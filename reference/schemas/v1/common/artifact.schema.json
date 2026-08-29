@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/artifact.schema.json",
+  "title": "Atlas artifact envelope",
+  "type": "object",
+  "required": [
+    "$schema",
+    "schema_version",
+    "kind",
+    "id",
+    "version",
+    "slug",
+    "title",
+    "description",
+    "status",
+    "authors",
+    "created_at",
+    "updated_at",
+    "license",
+    "citations",
+    "provenance",
+    "extensions"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "format": "uri"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "kind": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Za-z0-9]+$"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9-]{1,31}$"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 180
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "planned",
+        "proposed",
+        "pending",
+        "active",
+        "running",
+        "complete",
+        "failed",
+        "reviewed",
+        "accepted",
+        "supported",
+        "inconclusive",
+        "contradicted",
+        "generalized",
+        "deprecated",
+        "superseded",
+        "retracted",
+        "invalidated",
+        "rejected",
+        "retired"
+      ]
+    },
+    "authors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/author"
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "license": {
+      "type": "string",
+      "minLength": 1
+    },
+    "citations": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "reference.schema.json"
+      }
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)+$"
+      }
+    }
+  },
+  "$defs": {
+    "author": {
+      "type": "object",
+      "required": [
+        "name",
+        "roles",
+        "conflicts"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "orcid": {
+          "type": "string",
+          "pattern": "^https://orcid.org/[0-9X-]{19}$"
+        },
+        "github": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9-]+$"
+        },
+        "affiliation": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "method",
+        "source_paths",
+        "generated"
+      ],
+      "properties": {
+        "method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "generated": {
+          "type": "boolean"
+        },
+        "repository_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,64}$"
+        },
+        "parent_artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "reference.schema.json"
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

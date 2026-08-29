@@ -1,0 +1,109 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: OPTIMIZATIONS-O7
+version: 1
+title: "Precision and representation optimizations"
+description: "Weight, activation, and KV numeric or storage formats."
+entries:
+  - id: OPT050
+    name: "BF16 execution"
+    definition: "BF16 execution is a controlled intervention in the precision and representation layer."
+    status: active
+    aliases: []
+    parent: O7
+    target_bottlenecks: ["atlas://bottleneck/B002@v1"]
+    quality_impact_class: lossy
+    default_quality_gate: Q2
+    sources: ["atlas://source/SRC0014@v1"]
+  - id: OPT051
+    name: "FP16 execution"
+    definition: "FP16 execution is a controlled intervention in the precision and representation layer."
+    status: active
+    aliases: []
+    parent: O7
+    target_bottlenecks: ["atlas://bottleneck/B002@v1"]
+    quality_impact_class: lossy
+    default_quality_gate: Q2
+    sources: ["atlas://source/SRC0014@v1"]
+  - id: OPT052
+    name: "FP8 weight and activation"
+    definition: "FP8 weight and activation is a controlled intervention in the precision and representation layer."
+    status: active
+    aliases: []
+    parent: O7
+    target_bottlenecks: ["atlas://bottleneck/B002@v1"]
+    quality_impact_class: lossy
+    default_quality_gate: Q2
+    sources: ["atlas://source/SRC0014@v1"]
+  - id: OPT053
+    name: "INT8 weight and activation"
+    definition: "INT8 weight and activation is a controlled intervention in the precision and representation layer."
+    status: active
+    aliases: []
+    parent: O7
+    target_bottlenecks: ["atlas://bottleneck/B002@v1"]
+    quality_impact_class: lossy
+    default_quality_gate: Q2
+    sources: ["atlas://source/SRC0014@v1"]
+  - id: OPT054
+    name: "INT4 weight-only"
+    definition: "INT4 weight-only is a controlled intervention in the precision and representation layer."
+    status: active
+    aliases: []
+    parent: O7
+    target_bottlenecks: ["atlas://bottleneck/B002@v1"]
+    quality_impact_class: lossy
+    default_quality_gate: Q2
+    sources: ["atlas://source/SRC0014@v1"]
+  - id: OPT055
+    name: "AWQ"
+    definition: "AWQ is a controlled intervention in the precision and representation layer."
+    status: active
+    aliases: []
+    parent: O7
+    target_bottlenecks: ["atlas://bottleneck/B002@v1"]
+    quality_impact_class: lossy
+    default_quality_gate: Q2
+    sources: ["atlas://source/SRC0014@v1"]
+  - id: OPT056
+    name: "GPTQ"
+    definition: "GPTQ is a controlled intervention in the precision and representation layer."
+    status: active
+    aliases: []
+    parent: O7
+    target_bottlenecks: ["atlas://bottleneck/B002@v1"]
+    quality_impact_class: lossy
+    default_quality_gate: Q2
+    sources: ["atlas://source/SRC0014@v1"]
+  - id: OPT057
+    name: "SmoothQuant"
+    definition: "SmoothQuant is a controlled intervention in the precision and representation layer."
+    status: active
+    aliases: []
+    parent: O7
+    target_bottlenecks: ["atlas://bottleneck/B002@v1"]
+    quality_impact_class: lossy
+    default_quality_gate: Q2
+    sources: ["atlas://source/SRC0014@v1"]
+  - id: OPT058
+    name: "KV-cache quantization"
+    definition: "KV-cache quantization is a controlled intervention in the precision and representation layer."
+    status: active
+    aliases: []
+    parent: O7
+    target_bottlenecks: ["atlas://bottleneck/B002@v1"]
+    quality_impact_class: lossy
+    default_quality_gate: Q2
+    sources: ["atlas://source/SRC0014@v1"]
+  - id: OPT059
+    name: "Lossless weight representation"
+    definition: "Lossless weight representation is a controlled intervention in the precision and representation layer."
+    status: active
+    aliases: []
+    parent: O7
+    target_bottlenecks: ["atlas://bottleneck/B002@v1"]
+    quality_impact_class: lossy
+    default_quality_gate: Q2
+    sources: ["atlas://source/SRC0014@v1"]
+

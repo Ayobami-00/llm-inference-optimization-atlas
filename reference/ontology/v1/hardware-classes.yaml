@@ -1,0 +1,39 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: HARDWARE-CLASSES
+version: 1
+title: "Hardware classes"
+description: "Capability-oriented hardware tiers including local CPU systems."
+entries:
+  - id: H0
+    name: "Local and development compute"
+    definition: "Consumer CPU, integrated accelerator, or inexpensive local system; valid for scoped findings."
+    status: active
+    aliases: []
+  - id: H1
+    name: "Single production accelerator"
+    definition: "One datacenter accelerator used to establish a communication-free ceiling."
+    status: active
+    aliases: []
+  - id: H2
+    name: "Single high-memory accelerator"
+    definition: "One large-memory accelerator for long context or larger models."
+    status: active
+    aliases: []
+  - id: H3
+    name: "Single-node scale-up"
+    definition: "Multiple peer-connected accelerators in one host."
+    status: active
+    aliases: []
+  - id: H4
+    name: "Multi-node scale-out"
+    definition: "Multiple nodes joined by a production high-speed network."
+    status: active
+    aliases: []
+  - id: H5
+    name: "Cross-vendor transfer"
+    definition: "Controlled transfer between vendors or accelerator architectures."
+    status: active
+    aliases: []
+

@@ -1,0 +1,35 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0006
+version: 1
+slug: "llumnix-dynamic-scheduling-for-large-language-model-serving"
+title: "Llumnix: Dynamic Scheduling for Large Language Model Serving"
+description: "Authoritative external source for scheduling, migration."
+status: active
+authors:
+  - name: Atlas maintainers
+    roles: [curator]
+    conflicts: []
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the primary or official source
+  source_paths: []
+  generated: false
+extensions: {}
+type: paper
+source_authors:
+  - "Sun et al."
+url: "https://arxiv.org/abs/2406.03243"
+identifiers:
+  arxiv: "2406.03243"
+published:
+  year: 2024
+topics:
+  - "scheduling"
+  - "migration"
+relevance: "Provides external grounding for Atlas concepts related to scheduling and migration."
+

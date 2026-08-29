@@ -1,0 +1,207 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: METRICS-M1
+version: 1
+title: "M1 metrics"
+description: "Canonical M1 metric definitions."
+entries:
+  - id: MET031
+    name: "Running requests"
+    definition: "Running requests measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: scheduler
+    unit: "count"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET032
+    name: "Waiting requests"
+    definition: "Waiting requests measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: scheduler
+    unit: "count"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET033
+    name: "Batch size"
+    definition: "Batch size measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: scheduler
+    unit: "count"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET034
+    name: "Batched tokens"
+    definition: "Batched tokens measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: scheduler
+    unit: "token"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET035
+    name: "Prefill tokens per iteration"
+    definition: "Prefill tokens per iteration measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: scheduler
+    unit: "token"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET036
+    name: "Decode tokens per iteration"
+    definition: "Decode tokens per iteration measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: scheduler
+    unit: "token"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET037
+    name: "Preemptions"
+    definition: "Preemptions measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: scheduler
+    unit: "count"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET038
+    name: "Recomputations"
+    definition: "Recomputations measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: scheduler
+    unit: "count"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET039
+    name: "KV blocks used"
+    definition: "KV blocks used measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: cache
+    unit: "count"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET040
+    name: "KV bytes used"
+    definition: "KV bytes used measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: cache
+    unit: "byte"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET041
+    name: "KV utilization"
+    definition: "KV utilization measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: cache
+    unit: "ratio"
+    direction: informational
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET042
+    name: "Prefix request hit rate"
+    definition: "Prefix request hit rate measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: cache
+    unit: "ratio"
+    direction: higher_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET043
+    name: "Prefix token hit rate"
+    definition: "Prefix token hit rate measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: cache
+    unit: "ratio"
+    direction: higher_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET044
+    name: "Cache evictions"
+    definition: "Cache evictions measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: cache
+    unit: "count"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET045
+    name: "Offload bytes"
+    definition: "Offload bytes measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: cache
+    unit: "byte"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET046
+    name: "Admission wait"
+    definition: "Admission wait measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: scheduler
+    unit: "ms"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET047
+    name: "Scheduling duration"
+    definition: "Scheduling duration measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: scheduler
+    unit: "ms"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET048
+    name: "Cache lookup duration"
+    definition: "Cache lookup duration measured within the declared run boundary."
+    status: active
+    aliases: []
+    level: M1
+    category: cache
+    unit: "ms"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+

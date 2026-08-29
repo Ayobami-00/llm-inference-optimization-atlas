@@ -1,0 +1,97 @@
+name: Replication proposal
+description: Test an accepted finding across declared transfer axes.
+title: "[Replication]: "
+labels:
+  - proposal:needs-triage
+  - proposal:type:replication
+body:
+  - type: markdown
+    attributes:
+      value: |
+        <!-- atlas-proposal-form:v1:replication -->
+        Separate what remains constant from every hardware, runtime, model, or traffic change.
+  - type: input
+    id: proposal-title
+    attributes:
+      label: Proposal title
+      placeholder: Replicate F0001 on x86-64 Linux
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Name the finding, constants, transfer axes, and agreement test.
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Explain why the transfer test changes the evidence's practical value.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      render: yaml
+      placeholder: |
+        finding: atlas://finding/F0001@v1
+        held_constant:
+          - workload trace
+          - comparison estimand
+        transfer_axes:
+          - hardware
+          - operating system
+        agreement_test: Direction and confidence interval overlap
+    validations:
+      required: true
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Planned artifacts
+      render: yaml
+      placeholder: |
+        - replication
+        - experiment
+        - configurations
+        - runs
+        - comparison
+    validations:
+      required: true
+  - type: textarea
+    id: resources
+    attributes:
+      label: Resources
+      render: yaml
+      placeholder: |
+        compute: x86-64 CPU for 3 hours
+        downloads: 300 MB model
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks
+      render: yaml
+      placeholder: |
+        - Environment differences may prevent a paired comparison.
+    validations:
+      required: true
+  - type: input
+    id: conflicts
+    attributes:
+      label: Conflict disclosure
+      placeholder: None declared
+    validations:
+      required: true
+  - type: checkboxes
+    id: agreement
+    attributes:
+      label: Contributor agreement
+      options:
+        - label: I will report disagreement and new boundary conditions without suppression.
+          required: true
+        - label: I will wait for `proposal:approved` before implementation.
+          required: true

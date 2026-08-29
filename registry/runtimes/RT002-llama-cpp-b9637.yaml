@@ -1,0 +1,49 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/runtimes/runtime-build.schema.json
+schema_version: 1
+kind: RuntimeBuild
+id: RT002
+version: 1
+slug: llama-cpp-b9637-cpu-server
+title: llama.cpp b9637 CPU server
+description: Pinned OpenAI-compatible llama.cpp CPU server built locally from the exact b9637 source revision.
+status: active
+authors: [{name: Atlas maintainers, roles: [curator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: MIT
+citations: [atlas://source/SRC0064@v1, atlas://source/SRC0080@v1, atlas://source/SRC0107@v1]
+provenance:
+  method: exact source archive and reproducible local CMake build
+  source_paths:
+    - https://github.com/ggml-org/llama.cpp/archive/aedb2a5e9ca3d4064148bbb919e0ddc0c1b70ab3.tar.gz
+  generated: false
+extensions: {}
+runtime: llama.cpp
+upstream:
+  repository: https://github.com/ggml-org/llama.cpp
+  version: b9637
+  commit: aedb2a5e9ca3d4064148bbb919e0ddc0c1b70ab3
+language: {name: C++, standard: C++17}
+frameworks: []
+backends:
+  - {name: CPU, selected: true}
+  - {name: Metal, selected: false}
+collectives: []
+kernels: [{name: ggml-cpu, quantization: k-quants}]
+build:
+  compiler: AppleClang 15.0.0.15000309
+  flags:
+    - GGML_METAL=OFF
+    - GGML_ACCELERATE=ON
+    - LLAMA_CURL=OFF
+    - LLAMA_BUILD_SERVER=ON
+    - LLAMA_BUILD_TESTS=OFF
+    - LLAMA_BUILD_EXAMPLES=OFF
+    - LLAMA_BUILD_NUMBER=9637
+    - LLAMA_BUILD_COMMIT=aedb2a5e9ca3d4064148bbb919e0ddc0c1b70ab3
+  patches: []
+  artifact_sha256: 4ff04e40ee43cf46ec9792bc01c471b04e53c98c2cc72dd3c378685603222d16
+capabilities: [GGUF, OpenAI-compatible-HTTP, prefix-cache, parallel-slots, CPU-thread-control]
+limitations:
+  - The binary is platform-specific and dynamically linked to libraries produced by the same build.
+  - CPU-only execution must also be asserted through n-gpu-layers=0 and device=none.

@@ -1,0 +1,30 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/contributions/proposal.schema.json
+schema_version: 1
+kind: Proposal
+id: P0000
+version: 1
+slug: replace-with-experiment-proposal
+title: "Propose an Atlas experiment"
+description: "Proposal for one controlled experiment in an approved study."
+status: proposed
+authors: [{name: "Replace with contributor", roles: [proposer], conflicts: []}]
+created_at: '1970-01-01T00:00:00Z'
+updated_at: '1970-01-01T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance: {method: contributor-authored, source_paths: [], generated: false}
+extensions: {}
+proposal_type: experiment
+summary: "State baseline, intervention, primary metric, and expected mechanism."
+motivation: "Explain which approved study question this experiment answers."
+scope:
+  study: atlas://study/S000@v1
+  hypothesis: "Write a falsifiable hypothesis."
+  changed_factors: ["Name the intervention."]
+  frozen_factors: ["Name all controlled factors."]
+  quality_gate: Q1
+  replicates: 3
+artifacts: [hypothesis, configurations, experiment, runs, comparison, finding]
+resources: {compute: "Estimate wall time and hardware.", downloads: "List artifacts."}
+risks: ["Describe failure, quality, licensing, and safety risks."]
+approval: {state: pending}

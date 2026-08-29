@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/graph/graph-view.schema.json",
+  "title": "Evidence graph projection",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "description",
+    "node_ids",
+    "edge_ids",
+    "default_layout",
+    "filters"
+  ],
+  "properties": {
+    "id": {
+      "enum": [
+        "story",
+        "bottleneck",
+        "optimization",
+        "evidence",
+        "deployment",
+        "all"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "node_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "edge_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "default_layout": {
+      "type": "string"
+    },
+    "filters": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

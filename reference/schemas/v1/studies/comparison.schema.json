@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/comparison.schema.json",
+  "title": "Statistical comparison",
+  "allOf": [
+    {
+      "$ref": "../common/artifact.schema.json"
+    },
+    {
+      "type": "object",
+      "required": [
+        "experiment",
+        "baseline_runs",
+        "candidate_runs",
+        "changed_axes",
+        "compatibility",
+        "method",
+        "effects",
+        "quality_eligible",
+        "slo_eligible",
+        "result"
+      ],
+      "properties": {
+        "kind": {
+          "const": "Comparison"
+        },
+        "id": {
+          "pattern": "^CMP[0-9]{4}$"
+        },
+        "experiment": {
+          "$ref": "../common/reference.schema.json"
+        },
+        "baseline_runs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "../common/reference.schema.json"
+          }
+        },
+        "candidate_runs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "../common/reference.schema.json"
+          }
+        },
+        "changed_axes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "compatibility": {
+          "type": "object",
+          "required": [
+            "passed",
+            "checks"
+          ],
+          "properties": {
+            "passed": {
+              "type": "boolean"
+            },
+            "checks": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "method": {
+          "type": "object",
+          "required": [
+            "paired",
+            "confidence_level",
+            "bootstrap_resamples"
+          ],
+          "properties": {
+            "paired": {
+              "type": "boolean"
+            },
+            "confidence_level": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "exclusiveMaximum": 1
+            },
+            "bootstrap_resamples": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "effects": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "metric",
+              "baseline",
+              "candidate",
+              "absolute",
+              "relative",
+              "confidence_interval",
+              "unit"
+            ],
+            "properties": {
+              "metric": {
+                "$ref": "../common/reference.schema.json"
+              },
+              "baseline": {
+                "type": "number"
+              },
+              "candidate": {
+                "type": "number"
+              },
+              "absolute": {
+                "type": "number"
+              },
+              "relative": {
+                "type": "number"
+              },
+              "confidence_interval": {
+                "type": "object"
+              },
+              "unit": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "quality_eligible": {
+          "type": "boolean"
+        },
+        "slo_eligible": {
+          "type": "boolean"
+        },
+        "result": {
+          "enum": [
+            "improvement",
+            "degradation",
+            "no_significant_effect",
+            "mixed",
+            "invalid"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "compatibility"
+        ],
+        "properties": {
+          "compatibility": {
+            "required": [
+              "passed"
+            ],
+            "properties": {
+              "passed": {
+                "const": false
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "result": {
+            "const": "invalid"
+          },
+          "quality_eligible": {
+            "const": false
+          },
+          "slo_eligible": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "not": {
+              "const": "invalid"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "compatibility": {
+            "properties": {
+              "passed": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

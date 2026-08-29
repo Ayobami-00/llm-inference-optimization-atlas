@@ -1,0 +1,23 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0103
+version: 1
+slug: all-minilm-l6-v2-model-card
+title: all-MiniLM-L6-v2 model card and files
+description: Official immutable model and export metadata for Atlas retrieval embeddings.
+status: active
+authors: [{name: Atlas maintainers, roles: [curator], conflicts: []}]
+created_at: '2026-08-25T00:00:00Z'
+updated_at: '2026-08-25T00:00:00Z'
+license: metadata-only
+citations: []
+provenance: {method: curated from the official model repository, source_paths: [], generated: false}
+extensions: {}
+type: official_documentation
+source_authors: [Sentence Transformers maintainers]
+url: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/tree/1110a243fdf4706b3f48f1d95db1a4f5529b4d41
+published: {year: 2021, publisher: Hugging Face}
+upstream: {product: all-MiniLM-L6-v2, revision: 1110a243fdf4706b3f48f1d95db1a4f5529b4d41, retrieved_at: '2026-08-25'}
+topics: [model, sentence-embeddings, ONNX, quantization]
+relevance: Defines the immutable model and FP32/INT8 representations M003 through M005.

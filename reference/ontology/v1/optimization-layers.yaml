@@ -1,0 +1,89 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/ontology-catalog.schema.json
+schema_version: 1
+kind: OntologyCatalog
+id: OPTIMIZATION-LAYERS
+version: 1
+title: "Optimization layers"
+description: "The sixteen orthogonal layers used to organize inference interventions."
+entries:
+  - id: O1
+    name: "Client and request path"
+    definition: "Work before or around model execution."
+    status: active
+    aliases: []
+  - id: O2
+    name: "Admission, scheduling, and batching"
+    definition: "Queueing, admission, and batch formation."
+    status: active
+    aliases: []
+  - id: O3
+    name: "Workload-aware batching"
+    definition: "Batch formation using workload semantics or shape."
+    status: active
+    aliases: []
+  - id: O4
+    name: "KV-cache and state management"
+    definition: "Allocation, reuse, movement, compression, and eviction of state."
+    status: active
+    aliases: []
+  - id: O5
+    name: "Runtime execution"
+    definition: "Execution graphs, allocators, streams, and overlap."
+    status: active
+    aliases: []
+  - id: O6
+    name: "Kernel optimization"
+    definition: "Attention, matrix, normalization, sampling, and fused kernels."
+    status: active
+    aliases: []
+  - id: O7
+    name: "Precision and representation"
+    definition: "Weight, activation, and KV numeric or storage formats."
+    status: active
+    aliases: []
+  - id: O8
+    name: "Decoding algorithms"
+    definition: "Algorithms that reduce or restructure sequential decoding."
+    status: active
+    aliases: []
+  - id: O9
+    name: "Parallelism"
+    definition: "Data, tensor, pipeline, expert, context, and composed parallelism."
+    status: active
+    aliases: []
+  - id: O10
+    name: "Communication and topology"
+    definition: "Collectives, placement, affinity, and overlap."
+    status: active
+    aliases: []
+  - id: O11
+    name: "Disaggregated inference"
+    definition: "Independent placement and scaling of inference stages."
+    status: active
+    aliases: []
+  - id: O12
+    name: "Model transformations"
+    definition: "Changes that produce a new model revision."
+    status: active
+    aliases: []
+  - id: O13
+    name: "Routing and composition"
+    definition: "Request-dependent model, configuration, cache, or hardware selection."
+    status: active
+    aliases: []
+  - id: O14
+    name: "Cluster and resource management"
+    definition: "Replica lifecycle, placement, scaling, and fleet scheduling."
+    status: active
+    aliases: []
+  - id: O15
+    name: "Multi-tenancy and LoRA"
+    definition: "Adapter and tenant-aware memory, batching, and isolation."
+    status: active
+    aliases: []
+  - id: O16
+    name: "Reliability"
+    definition: "Failure, cancellation, overload, and recovery behavior."
+    status: active
+    aliases: []
+
