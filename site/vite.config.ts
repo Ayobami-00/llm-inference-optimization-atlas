@@ -66,11 +66,13 @@ export default defineConfig({
     outDir: outputRoot,
     emptyOutDir: true,
     sourcemap: true,
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        manualChunks: {
-          react: ["react", "react-dom"],
-          cytoscape: ["cytoscape"],
+        codeSplitting: {
+          groups: [
+            { name: "react", test: /node_modules\/(?:react|react-dom)\// },
+            { name: "cytoscape", test: /node_modules\/cytoscape\// },
+          ],
         },
       },
     },

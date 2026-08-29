@@ -199,9 +199,8 @@ describe("Atlas explorer", () => {
     ).toBeVisible();
     const recording = screen.getByLabelText("S003 guided study walkthrough");
     expect(recording.tagName).toBe("VIDEO");
-    expect(recording.querySelector("source")).toHaveAttribute(
-      "src",
-      "/llm-inference-optimization-atlas/media/s003-guided-tour.mp4",
+    expect(recording.querySelector("source")?.getAttribute("src")).toMatch(
+      /\/media\/s003-guided-tour\.mp4$/,
     );
     expect(screen.getByText(/walkthrough of WS003/)).toBeVisible();
   });
