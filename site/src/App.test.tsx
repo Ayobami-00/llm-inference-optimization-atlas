@@ -188,4 +188,21 @@ describe("Atlas explorer", () => {
     });
     expect(screen.getByRole("button", { name: /Paged KV cache/ })).toBeInTheDocument();
   });
+
+  it("offers the silent study walkthrough from the global homepage", async () => {
+    render(<App />);
+    await screen.findByRole("heading", { name: "Story" });
+
+    fireEvent.click(screen.getByRole("button", { name: /Watch walkthrough/ }));
+    expect(
+      screen.getByRole("dialog", { name: "Read one complete evidence story with us." }),
+    ).toBeVisible();
+    const recording = screen.getByLabelText("S003 guided study walkthrough");
+    expect(recording.tagName).toBe("VIDEO");
+    expect(recording.querySelector("source")).toHaveAttribute(
+      "src",
+      "/llm-inference-optimization-atlas/media/s003-guided-tour.mp4",
+    );
+    expect(screen.getByText(/silent walkthrough of WS003/)).toBeVisible();
+  });
 });

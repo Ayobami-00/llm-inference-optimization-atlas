@@ -49,10 +49,6 @@ universal optimization claims.
 - `docs/`: architecture, concepts, reproduction, and contribution guides.
 - `build/`: ignored generated graph, source catalog, bibliography, and site output.
 
-There is no `reference/examples/`. Reusable empty structure belongs in
-`reference/templates/v1`; realistic examples are first-class studies and follow
-the same proposal and evidence-review process as every future contribution.
-
 ## Quick start
 
 Requirements: Python 3.12, [uv](https://docs.astral.sh/uv/), Node.js 24, npm,

@@ -143,9 +143,7 @@ def compile_views(
             selected_types = GLOBAL_STORY_TYPES
             presentation = GLOBAL_STORY_PRESENTATION
         node_ids = {
-            node["id"]
-            for node in nodes
-            if not selected_types or node["type"] in selected_types
+            node["id"] for node in nodes if not selected_types or node["type"] in selected_types
         }
         node_types = {node["id"]: node["type"] for node in nodes}
         selected_edges = [

@@ -53,10 +53,7 @@ def test_study_story_has_an_explicit_evidence_chain() -> None:
     output = GraphCompiler(ROOT).build("S003-cpu-enterprise-rag").root
     projection = output / "studies" / "S003-cpu-enterprise-rag" / "v1"
     graph = _load(projection / "graph.json")
-    edges = {
-        (edge["source"], edge["relation"], edge["target"])
-        for edge in graph["edges"]
-    }
+    edges = {(edge["source"], edge["relation"], edge["target"]) for edge in graph["edges"]}
 
     assert (
         "atlas://study/S003@v1",
@@ -80,9 +77,7 @@ def test_study_story_has_an_explicit_evidence_chain() -> None:
     ) in edges
 
     story = _load(projection / "views" / "story.json")
-    story_types = {
-        node["type"] for node in graph["nodes"] if node["id"] in story["node_ids"]
-    }
+    story_types = {node["type"] for node in graph["nodes"] if node["id"] in story["node_ids"]}
     assert story_types == {
         "workload",
         "study",

@@ -72,6 +72,8 @@ function artifactCode(reference: string): string {
 const repositoryUrl = "https://github.com/Ayobami-00/llm-inference-optimization-atlas";
 const tourStorageKey = "atlas:s003-tour:v1";
 const tourStudyPath = "studies/S003-cpu-enterprise-rag/v1/";
+const tourRecordingUrl = `${import.meta.env.BASE_URL}media/s003-guided-tour.mp4`;
+const tourRecordingPosterUrl = `${import.meta.env.BASE_URL}media/s003-guided-tour-poster.jpg`;
 
 interface TourStep {
   code: string;
@@ -672,41 +674,63 @@ function WelcomeTour({ onStart, onDismiss }: { onStart: () => void; onDismiss: (
         <button className="welcome-close" onClick={onDismiss} aria-label="Dismiss guided tour">
           Close ×
         </button>
-        <p className="eyebrow">First time in the Atlas?</p>
-        <h2 id="welcome-tour-title">Read one complete evidence story with us.</h2>
-        <p className="welcome-lead">
-          Take a two-minute tour through the real S003 enterprise RAG study. You will see how a
-          workload becomes an experiment, a finding, and finally a defensible deployment decision.
-        </p>
-        <ol className="welcome-route" aria-label="Guided tour route">
-          <li>
-            <code>WS003</code>
-            <span>Workload</span>
-          </li>
-          <li>
-            <code>E0009</code>
-            <span>Experiment</span>
-          </li>
-          <li>
-            <code>CMP0013</code>
-            <span>Comparison</span>
-          </li>
-          <li>
-            <code>F0013</code>
-            <span>Finding</span>
-          </li>
-          <li>
-            <code>DEC0003</code>
-            <span>Decision</span>
-          </li>
-        </ol>
-        <div className="welcome-actions">
-          <button className="primary-action" onClick={onStart} autoFocus>
-            Start the S003 tour
-          </button>
-          <button className="secondary-action" onClick={onDismiss}>
-            Explore on my own
-          </button>
+        <div className="welcome-layout">
+          <div className="welcome-copy">
+            <p className="eyebrow">First time in the Atlas?</p>
+            <h2 id="welcome-tour-title">Read one complete evidence story with us.</h2>
+            <p className="welcome-lead">
+              Watch the silent 33-second walkthrough, or take the live tour through the real S003
+              enterprise RAG study. See how a workload becomes an experiment, a finding, and a
+              defensible deployment decision.
+            </p>
+            <ol className="welcome-route" aria-label="Guided tour route">
+              <li>
+                <code>WS003</code>
+                <span>Workload</span>
+              </li>
+              <li>
+                <code>E0009</code>
+                <span>Experiment</span>
+              </li>
+              <li>
+                <code>CMP0013</code>
+                <span>Comparison</span>
+              </li>
+              <li>
+                <code>F0013</code>
+                <span>Finding</span>
+              </li>
+              <li>
+                <code>DEC0003</code>
+                <span>Decision</span>
+              </li>
+            </ol>
+            <div className="welcome-actions">
+              <button className="primary-action" onClick={onStart} autoFocus>
+                Start the S003 tour
+              </button>
+              <button className="secondary-action" onClick={onDismiss}>
+                Explore on my own
+              </button>
+            </div>
+          </div>
+          <figure className="welcome-recording">
+            <video
+              controls
+              playsInline
+              preload="metadata"
+              poster={tourRecordingPosterUrl}
+              aria-label="S003 guided study walkthrough"
+              aria-describedby="tour-recording-caption"
+            >
+              <source src={tourRecordingUrl} type="video/mp4" />
+              Your browser does not support the Atlas study walkthrough video.
+            </video>
+            <figcaption id="tour-recording-caption">
+              A silent walkthrough of WS003 → E0009 → CMP0013 → F0013 → DEC0003. Use the live tour
+              to inspect each record.
+            </figcaption>
+          </figure>
         </div>
       </section>
     </div>
@@ -1106,6 +1130,12 @@ export function App() {
             <span>Guided tour</span>
             <small>Follow one real S003 evidence story</small>
           </button>
+          {atlas.manifest.scope.type === "global" && (
+            <button className="tour-recording-launch" onClick={() => setWelcomeOpen(true)}>
+              <span>Watch walkthrough</span>
+              <small>33-second silent study overview</small>
+            </button>
+          )}
         </div>
         <nav className="view-nav" aria-label="Graph views">
           {viewOrder.map((id, index) => (

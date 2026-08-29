@@ -303,6 +303,47 @@ input:focus-visible {
   line-height: 1.4;
 }
 
+.tour-recording-launch {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 9px 11px;
+  margin-top: 7px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: #536159;
+  text-align: left;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tour-recording-launch:hover {
+  border-color: #c6d2ca;
+  color: var(--ink);
+  background: #ffffff;
+}
+
+.tour-recording-launch span {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.tour-recording-launch span::before {
+  margin-right: 7px;
+  color: #9e6818;
+  content: "▶";
+  font-size: 8px;
+}
+
+.tour-recording-launch small {
+  padding-left: 15px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
 .view-nav {
   display: grid;
   gap: 3px;
@@ -1198,14 +1239,27 @@ input:focus-visible {
 
 .welcome-tour {
   position: relative;
-  width: min(720px, 100%);
-  padding: clamp(28px, 5vw, 52px);
+  width: min(1160px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: clamp(28px, 4vw, 48px);
   border: 1px solid #d4ddd6;
   border-radius: 12px;
   background:
     radial-gradient(circle at 92% 12%, rgba(232, 179, 90, 0.18), transparent 28%),
     #ffffff;
   box-shadow: 0 28px 80px rgba(6, 13, 11, 0.34);
+}
+
+.welcome-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.88fr) minmax(430px, 1.12fr);
+  gap: clamp(28px, 4vw, 54px);
+  align-items: center;
+}
+
+.welcome-copy {
+  min-width: 0;
 }
 
 .welcome-close {
@@ -1223,7 +1277,7 @@ input:focus-visible {
 }
 
 .welcome-tour h2 {
-  max-width: 600px;
+  max-width: 560px;
   margin: 0;
   color: var(--ink);
   font-family: var(--font-display);
@@ -1287,6 +1341,33 @@ input:focus-visible {
 
 .welcome-actions .primary-action {
   width: auto;
+}
+
+.welcome-recording {
+  min-width: 0;
+  padding: 10px;
+  margin: 0;
+  border: 1px solid #cfd9d2;
+  border-radius: 11px;
+  background: #f3f6f2;
+  box-shadow: 0 18px 44px rgba(31, 48, 41, 0.13);
+}
+
+.welcome-recording video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border: 1px solid #c5d0c9;
+  border-radius: 7px;
+  object-fit: cover;
+  background: #ffffff;
+}
+
+.welcome-recording figcaption {
+  padding: 10px 5px 2px;
+  color: #596860;
+  font-size: 10px;
+  line-height: 1.5;
 }
 
 .study-tour {
@@ -2102,6 +2183,10 @@ input:focus-visible {
     bottom: 18px;
     left: 18px;
     width: auto;
+  }
+
+  .welcome-layout {
+    grid-template-columns: 1fr;
   }
 }
 

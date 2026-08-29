@@ -9,6 +9,7 @@ test("navigates views, searches, and resolves source details", async ({ page }) 
   await page.goto("./");
   await expect(page.getByRole("link", { name: "Atlas home" })).toBeVisible();
   await expect(page.getByText("LLM Inference Optimization Atlas")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Watch walkthrough/ })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Story" })).toBeVisible();
   await expect(page.getByRole("navigation", { name: "Graph views" }).getByRole("button")).toHaveCount(5);
   await page.getByRole("searchbox", { name: "Search evidence" }).focus();
@@ -41,6 +42,12 @@ test("offers a first-visit tour through a real study", async ({ page }) => {
     "WS003WorkloadE0009ExperimentCMP0013ComparisonF0013FindingDEC0003Decision",
   );
   await expect(welcome.getByRole("button", { name: "Start the S003 tour" })).toBeVisible();
+  const recording = welcome.getByLabel("S003 guided study walkthrough");
+  await expect(recording).toBeVisible();
+  await expect(recording.locator("source")).toHaveAttribute(
+    "src",
+    "/llm-inference-optimization-atlas/media/s003-guided-tour.mp4",
+  );
   const results = await new AxeBuilder({ page }).include(".welcome-tour").analyze();
   expect(
     results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact ?? "")),
