@@ -82,6 +82,9 @@ def test_approval_gate_never_checks_out_or_executes_pull_request_code() -> None:
     workflow = _yaml(path)
     assert isinstance(workflow, dict)
     assert "pull_request_target" in workflow["on"]
+    condition = workflow["jobs"]["approval"]["if"]
+    assert "github.event.pull_request.draft == false" in condition
+    assert "github.event.pull_request.user.login != 'dependabot[bot]'" in condition
     text = path.read_text()
     assert "github.event.repository.default_branch" in text
     assert "github.event.pull_request.head.sha" not in text
