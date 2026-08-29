@@ -1,0 +1,51 @@
+%YAML 1.2
+---
+$schema: https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/contributions/proposal.schema.json
+schema_version: 1
+kind: Proposal
+id: P0022
+version: 1
+slug: register-the-dependency-maintenance-label
+title: Register the dependency maintenance label
+description: Add the `dependencies` label requested by `dependabot.yml` to the checked-in label catalog and ensure the live repository label uses the same name, color, and description.
+status: proposed
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - proposer
+    conflicts: []
+created_at: '2026-08-29T22:08:10Z'
+updated_at: '2026-08-29T22:08:45Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: github-issue-form
+  source_paths:
+    - https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/22
+  generated: true
+extensions:
+  github.issue-url: https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/22
+proposal_type: methodology
+summary: Add the `dependencies` label requested by `dependabot.yml` to the checked-in label catalog and ensure the live repository label uses the same name, color, and description.
+motivation: Dependabot reported on every initial update that it could not apply the configured `dependencies` label because the label did not exist. The live label has now been created to stop new warnings; the repository catalog must record that configuration so automation and documented state remain aligned.
+scope:
+  subsystem: repository_automation
+  breaking_change: false
+  migration: Existing issues and pull requests are unchanged. Future Dependabot pull requests receive the configured dependencies label.
+  acceptance_tests:
+    - The live repository contains a dependencies label.
+    - .github/labels.yml declares the same label metadata.
+    - GitHub configuration tests and strict artifact validation pass.
+artifacts:
+  - methodology_change
+  - tests
+  - documentation
+resources:
+  implementation: GitHub label API and existing repository checks
+  compute: Existing CI fixtures only
+risks:
+  - Live and checked-in label metadata could diverge; verify both after publication.
+approval:
+  state: approved
+  issue_url: https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/22
