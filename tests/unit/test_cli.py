@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from rich.text import Text
 from typer.testing import CliRunner
 
 import atlas.cli as cli
@@ -101,7 +102,7 @@ def test_proposal_help_exposes_guided_authoring() -> None:
     result = runner.invoke(app, ["proposal", "new", "--help"])
 
     assert result.exit_code == 0, result.output
-    assert "--guided" in result.output
+    assert "--guided" in Text.from_ansi(result.output).plain
 
 
 def test_guided_study_proposal_requires_no_yaml_authoring(
