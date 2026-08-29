@@ -1,0 +1,53 @@
+%YAML 1.2
+---
+$schema: https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/contributions/proposal.schema.json
+schema_version: 1
+kind: Proposal
+id: P0017
+version: 1
+slug: make-dependency-maintenance-pass-the-correct-governance-checks
+title: Make dependency maintenance pass the correct governance checks
+description: Link the live GitHub Pages Atlas prominently from the repository README and exempt trusted Dependabot pull requests from the study-proposal approval checker. Keep all ordinary human contribution pull requests subject to the existing approval workflow.
+status: proposed
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - proposer
+    conflicts: []
+created_at: '2026-08-29T21:44:19Z'
+updated_at: '2026-08-29T21:44:45Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: github-issue-form
+  source_paths:
+    - https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/17
+  generated: true
+extensions:
+  github.issue-url: https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/17
+proposal_type: methodology
+summary: Link the live GitHub Pages Atlas prominently from the repository README and exempt trusted Dependabot pull requests from the study-proposal approval checker. Keep all ordinary human contribution pull requests subject to the existing approval workflow.
+motivation: The first Dependabot run opened eleven updates, and every one received a failing proposal-gate check even when its dependency, lock, frontend, and Python checks passed. Automated dependency maintenance cannot carry a study contribution manifest, so this produces misleading failures and prevents maintainers from evaluating updates by their relevant checks.
+scope:
+  subsystem: repository_automation
+  breaking_change: false
+  migration: Existing study, experiment, replication, challenge, methodology, and tooling contributions from humans remain governed by the approval checker. Only pull requests authored by dependabot[bot] skip that job.
+  acceptance_tests:
+    - The live Atlas URL is prominent and clickable in README.md.
+    - Dependabot-authored pull requests skip the proposal approval job.
+    - Non-draft human pull requests continue to execute the proposal approval checker.
+    - Workflow security tests continue to require checkout of the trusted default branch.
+artifacts:
+  - methodology_change
+  - tests
+  - documentation
+resources:
+  implementation: Existing repository tooling and GitHub Actions only
+  compute: Existing CI fixtures; no model downloads
+risks:
+  - An overly broad bot exemption could bypass governance; match only the exact dependabot[bot] actor.
+  - A stale Pages URL could misdirect readers; verify the published endpoint before linking it.
+approval:
+  state: approved
+  issue_url: https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/17
