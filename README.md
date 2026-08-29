@@ -1,6 +1,8 @@
 # LLM Inference Optimization Atlas
 
-![LLM Inference Optimization Atlas — Evidence before intuition](site/public/og.png)
+[![LLM Inference Optimization Atlas — Evidence before intuition](site/public/og.png)](https://ayobami-00.github.io/llm-inference-optimization-atlas/)
+
+**[Explore the live interactive Atlas →](https://ayobami-00.github.io/llm-inference-optimization-atlas/)**
 
 A schema-first, Git-native evidence base for deciding how to run LLM inference.
 
