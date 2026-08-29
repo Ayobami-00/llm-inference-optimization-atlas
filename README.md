@@ -15,6 +15,14 @@ Workload -> Hypothesis -> Experiment -> Run -> Comparison
          -> Finding -> Decision -> Evidence Graph
 ```
 
+## Walkthrough
+
+[![S003 study walkthrough from workload to deployment decision](site/public/media/s003-guided-tour-preview.gif)](site/public/media/s003-guided-tour.mp4)
+
+Follow the real S003 enterprise RAG evidence chain from `WS003` through its
+experiment, comparison, finding, and deployment decision. Select the walkthrough
+to open the full recording, or [inspect the study records](studies/S003-cpu-enterprise-rag/v1/).
+
 The repository is the database. Canonical JSON Schemas freeze the contracts,
 YAML records preserve human reviewability, accepted evidence remains in Git, and
 a deterministic compiler materializes global and per-study interactive graphs.
