@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "cytoscape": "3.33.1",
-    "react": "19.1.1",
+    "react": "19.2.8",
     "react-dom": "19.1.1"
   },
   "devDependencies": {
@@ -22,7 +22,7 @@
     "@testing-library/react": "16.3.0",
     "@types/cytoscape": "3.21.9",
     "@types/node": "24.3.0",
-    "@types/react": "19.1.10",
+    "@types/react": "19.2.18",
     "@types/react-dom": "19.1.7",
     "@vitejs/plugin-react": "6.1.1",
     "jsdom": "26.1.0",
