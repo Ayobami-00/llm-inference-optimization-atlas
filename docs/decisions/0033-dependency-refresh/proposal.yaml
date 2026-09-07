@@ -1,0 +1,58 @@
+%YAML 1.2
+---
+$schema: https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/contributions/proposal.schema.json
+schema_version: 1
+kind: Proposal
+id: P0033
+version: 1
+slug: refresh-the-september-maintenance-dependencies-as-one-verified-set
+title: Refresh the September maintenance dependencies as one verified set
+description: Combine the nine open Dependabot updates into one coherent Python and frontend maintenance change. Upgrade React and ReactDOM atomically with their type packages, refresh the remaining compatible development and runtime dependencies, and validate the resolved dependency graph before merging.
+status: proposed
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - proposer
+    conflicts: []
+created_at: '2026-09-07T12:39:52Z'
+updated_at: '2026-09-07T12:43:38Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: github-issue-form
+  source_paths:
+    - https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/33
+  generated: true
+extensions:
+  github.issue-url: https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/33
+proposal_type: methodology
+summary: Combine the nine open Dependabot updates into one coherent Python and frontend maintenance change. Upgrade React and ReactDOM atomically with their type packages, refresh the remaining compatible development and runtime dependencies, and validate the resolved dependency graph before merging.
+motivation: The current Dependabot queue contains overlapping Python and npm lockfile updates. React and ReactDOM were proposed separately and each isolated branch fails frontend validation because it creates a mixed 19.1/19.2 runtime pair; one coordinated change can test the actual final dependency graph and avoid merge-conflict churn.
+scope:
+  subsystem: dependency_toolchain
+  breaking_change: false
+  migration: No canonical schemas, accepted evidence, model runtimes, or public Atlas interfaces change. React and ReactDOM move together to 19.2.8; supporting type, test, graph, CLI, lint, and property-test packages move to the versions already proposed by Dependabot. The deprecated @types/cytoscape stub is removed because Cytoscape 3.34 supplies its own declarations.
+  acceptance_tests:
+    - Python formatting, linting, static typing, tests, strict artifact validation, and deterministic graph compilation pass.
+    - Frontend type checking, component tests, production build, Playwright flows, and accessibility checks pass.
+    - React, ReactDOM, and their type packages resolve as a compatible set.
+    - Cytoscape type checking uses the declarations bundled with Cytoscape rather than the deprecated stub package.
+    - Lock and production dependency audits pass.
+    - Accepted study evidence and pinned model/runtime records remain unchanged.
+artifacts:
+  - methodology_change
+  - dependency_locks
+  - tests
+  - documentation
+resources:
+  implementation: Existing repository tooling, package registries, Dependabot branches, and CI
+  compute: Existing validation and browser fixtures; no model downloads or study reruns
+risks:
+  - A coordinated React runtime update may expose rendering or interaction regressions; require component and browser coverage.
+  - Cytoscape's bundled types may expose API assumptions formerly hidden by DefinitelyTyped; require TypeScript and graph interaction checks.
+  - A newer Node type surface may conflict with the configured browser toolchain; retain it only if the complete frontend checks pass.
+  - Shared lockfile regeneration may introduce unrelated transitive drift; inspect the final diff and audit result.
+approval:
+  state: approved
+  issue_url: https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/33
