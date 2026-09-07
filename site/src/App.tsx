@@ -268,7 +268,11 @@ function EffectList({ detail }: { detail: EntityDetail }) {
             <article className="effect" key={`${String(record.metric)}-${index}`}>
               <div>
                 <strong>{String(record.metric ?? "Metric")}</strong>
-                <span>{relative === null ? "Effect recorded" : `${relative.toFixed(1)}% relative`}</span>
+                <span>
+                  {relative === null
+                    ? "Relative effect unavailable"
+                    : `${relative.toFixed(1)}% relative`}
+                </span>
               </div>
               {relative !== null && (
                 <div className="effect-track" aria-label={`${relative.toFixed(1)} percent relative`}>

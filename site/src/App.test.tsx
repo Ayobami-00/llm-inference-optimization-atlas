@@ -80,6 +80,14 @@ const detail: EntityDetail = {
   artifact: {
     mechanism: "Paged allocation avoids contiguous reservation.",
     candidate_optimizations: [referencedNode.artifact_ref, "atlas://optimization/OPT999@v1"],
+    effects: [
+      {
+        metric: "atlas://metric/MET012@v1",
+        absolute: 5144.17,
+        relative: null,
+        unit: "ms",
+      },
+    ],
   },
   incoming: [],
   outgoing: [],
@@ -162,6 +170,7 @@ describe("Atlas explorer", () => {
     await waitFor(() => expect(screen.getByRole("heading", { name: "Paged KV cache" })).toBeVisible());
     expect(screen.getByRole("heading", { name: "Optimization record" })).toBeVisible();
     expect(screen.getByText("Paged allocation avoids contiguous reservation.")).toBeVisible();
+    expect(screen.getByText("Relative effect unavailable")).toBeVisible();
     const recordLink = screen.getByRole("link", {
       name: "Open Continuous batching in the repository",
     });
@@ -171,7 +180,9 @@ describe("Atlas explorer", () => {
       "https://github.com/Ayobami-00/llm-inference-optimization-atlas/blob/0123456789abcdef/reference/ontology/v1/optimizations/scheduling.yaml",
     );
     expect(screen.queryByText(referencedNode.artifact_ref)).not.toBeInTheDocument();
-    expect(screen.getByTitle(/Unresolved Atlas reference/)).toHaveTextContent("OPT999");
+    expect(
+      screen.getByTitle("Unresolved Atlas reference: atlas://optimization/OPT999@v1"),
+    ).toHaveTextContent("OPT999");
     expect(centerGraph).not.toHaveBeenCalled();
     expect(window.location.search).toContain("node=atlas%3A%2F%2Foptimization%2FOPT023%40v1");
   });

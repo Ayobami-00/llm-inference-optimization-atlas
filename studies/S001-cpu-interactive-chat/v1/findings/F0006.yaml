@@ -31,7 +31,7 @@ intervention: atlas://configuration/CFG007@v1
 effects:
   - metric: atlas://metric/MET012@v1
     absolute: 5144.1680523004225
-    relative: 0.0
+    relative: null
     confidence_interval: {lower: 4720.34302791338, upper: 5670.17558690665, level: 0.95}
     unit: ms
 works_when: [Burst groups and service times match the measured trace and no admission or parallel-serving layer is added.]

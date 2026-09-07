@@ -12,6 +12,15 @@ def _experiment(root: Path, study: str, experiment: str) -> Path:
     return path
 
 
+def test_relative_effect_is_unavailable_for_a_zero_baseline() -> None:
+    assert service._relative_effect(absolute=5.0, baseline=0.0) is None
+    assert service._relative_effect(absolute=5.0, baseline=-0.0) is None
+
+
+def test_relative_effect_uses_the_baseline_as_denominator() -> None:
+    assert service._relative_effect(absolute=5.0, baseline=20.0) == 0.25
+
+
 def test_compare_all_skips_experiments_without_accepted_runs(tmp_path: Path, monkeypatch) -> None:
     _experiment(tmp_path, "S001-test", "E0001")
     called = []

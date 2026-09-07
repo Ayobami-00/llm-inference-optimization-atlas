@@ -28,8 +28,9 @@ rates. Plot or tabulate replicate-level results so drift and heterogeneity remai
 ## Effects
 
 For each primary metric report baseline, candidate, absolute effect, relative effect, direction, and
-confidence interval. Relative effects with a zero or unstable denominator are invalid; use absolute
-effects. Keep latency reduction signs unambiguous by naming the estimand.
+confidence interval. Relative effects with a zero or unstable denominator are invalid; record the
+relative effect as `null` and use the absolute effect. Keep latency reduction signs unambiguous by
+naming the estimand.
 
 ## Confidence intervals
 

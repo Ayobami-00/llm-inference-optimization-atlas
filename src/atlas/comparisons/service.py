@@ -129,6 +129,12 @@ def _comparison_result(direction: str, lower: float, upper: float) -> str:
     return "no_significant_effect"
 
 
+def _relative_effect(*, absolute: float, baseline: float) -> float | None:
+    if baseline == 0.0:
+        return None
+    return absolute / baseline
+
+
 def _compatibility(
     baseline: dict[str, Any], candidate: dict[str, Any], changed_factors: list[str]
 ) -> list[str]:
@@ -238,7 +244,7 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
             baseline_mean = float(np.mean(baseline_values))
             candidate_mean = float(np.mean(candidate_values))
             absolute = candidate_mean - baseline_mean
-            relative = absolute / baseline_mean if baseline_mean else 0.0
+            relative = _relative_effect(absolute=absolute, baseline=baseline_mean)
             lower, upper = _bootstrap_interval(
                 baseline_values,
                 candidate_values,

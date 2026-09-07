@@ -122,7 +122,11 @@
                 "type": "number"
               },
               "relative": {
-                "type": "number"
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Relative effect, or null when the baseline denominator is zero or otherwise unsuitable for a relative effect."
               },
               "confidence_interval": {
                 "type": "object"

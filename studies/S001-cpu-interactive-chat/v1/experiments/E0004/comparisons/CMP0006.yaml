@@ -61,7 +61,7 @@ effects:
     baseline: 0.0
     candidate: 5144.1680523004225
     absolute: 5144.1680523004225
-    relative: 0.0
+    relative: null
     confidence_interval:
       lower: 4720.34302791338
       upper: 5670.17558690665
