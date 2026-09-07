@@ -10,5 +10,4 @@ artifacts:
   - README.md
   - site/package.json
   - site/package-lock.json
-  - uv.lock
 closes_issue: true
