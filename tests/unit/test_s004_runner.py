@@ -217,15 +217,16 @@ def test_request_accounting_rejects_missing_duplicate_and_unexpected_rows() -> N
     ("configuration", "log_text", "valid"),
     [
         ("CFG021", "ordinary startup", True),
-        ("CFG022", "Engram host table ready layout=shared", True),
+        ("CFG022", "Engram host table ready layout=shared, pinned", True),
         (
             "CFG023",
-            "Engram host table ready layout=shared\n"
+            "Engram host table ready layout=shared, pinned\n"
             "Engram layer 14 KV prefetch enabled for BS=1 decode",
             True,
         ),
-        ("CFG023", "Engram host table ready layout=shared", False),
-        ("CFG021", "Engram host table ready layout=shared", False),
+        ("CFG022", "Engram host table ready layout=shared, unpinned (ATS)", False),
+        ("CFG023", "Engram host table ready layout=shared, pinned", False),
+        ("CFG021", "Engram host table ready layout=shared, pinned", False),
     ],
 )
 def test_treatment_resolution_is_machine_checked(

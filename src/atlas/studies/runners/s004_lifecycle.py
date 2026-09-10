@@ -444,19 +444,21 @@ def resolve_treatment(configuration: str, log_text: str) -> dict[str, Any]:
     host_shared = (
         "engram host table" in log_text.casefold() and "layout=shared" in log_text.casefold()
     )
+    host_pinned = host_shared and ", pinned" in log_text.casefold()
     prefetch = "Engram layer 14 KV prefetch enabled for BS=1 decode" in log_text
     expected = {
-        "CFG021": (False, False, "device"),
-        "CFG022": (True, False, "host-sync"),
-        "CFG023": (True, True, "host-prefetch"),
+        "CFG021": (False, False, False, "device"),
+        "CFG022": (True, True, False, "host-sync"),
+        "CFG023": (True, True, True, "host-prefetch"),
     }[configuration]
-    valid = (host_shared, prefetch) == expected[:2]
+    valid = (host_shared, host_pinned, prefetch) == expected[:3]
     return {
         "configuration": configuration,
         "host_shared_resolved": host_shared,
+        "host_pinned_resolved": host_pinned,
         "prefetch_stream_resolved": prefetch,
-        "requested_mode": expected[2],
-        "resolved_mode": expected[2] if valid else "unexpected-fallback-or-unsupported",
+        "requested_mode": expected[3],
+        "resolved_mode": expected[3] if valid else "unexpected-fallback-or-unsupported",
         "valid": valid,
     }
 

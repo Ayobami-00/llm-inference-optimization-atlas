@@ -47,6 +47,8 @@ Before the collector pilot or any confirmatory request, the full runner starts
 and stops each of CFG021, CFG022, and CFG023 once. All three requested Engram
 modes must resolve from the pinned runtime logs. Any fallback or unsupported
 mode is retained under `.atlas/work` and stops execution before measurement.
+For CFG022 and CFG023, `layout=shared, pinned` is required; SGLang's unpinned
+ATS fallback is not accepted as the preregistered treatment.
 
 Every condition starts in a new SGLang process. Logs, invalid attempts, failure
 state, treatment resolution, capacity points, and full telemetry stay ignored
