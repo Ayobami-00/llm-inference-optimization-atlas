@@ -39,6 +39,13 @@ vary one dominant shape axis, such as input length, output length, or concurrent
 outside measured points is a model, not a finding, and includes model form, fit diagnostics, uncertainty,
 and validation points.
 
+Label every search boundary as resolved, right-censored, left-censored, or unresolved. Keep the two
+questions separate: `slo_passed` means at least one tested offered load met the complete contract;
+`slo_eligible` means the retained search supports a reportable resolved or censored capacity result. A
+left-censored search can therefore be eligible evidence without passing the SLO. If its capacity value
+is encoded as zero, state that zero means no qualifying load in the declared tested domain and is not
+an estimate of zero physical serving capacity. Unresolved searches are not comparison-eligible.
+
 ## Resource and cost normalization
 
 Record physical/logical cores, accelerator count, memory, power policy, runtime workers, and replicas.

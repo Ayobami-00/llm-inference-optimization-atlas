@@ -170,11 +170,14 @@ def test_nested_identity_namespace_exhaustion_is_rejected(tmp_path: Path) -> Non
         next_identifiers(tmp_path, "metric")
 
 
-def test_expected_comparisons_count_registered_contrasts() -> None:
+def test_expected_comparisons_count_contrasts_not_effect_metrics() -> None:
     experiments = [
         {
             "candidates": ["candidate-a", "candidate-b"],
-            "analysis": {"contrasts": [{"id": "a"}, {"id": "b"}, {"id": "c"}]},
+            "analysis": {
+                "contrasts": [{"id": "a"}, {"id": "b"}, {"id": "c"}],
+                "effect_metrics": ["primary", "secondary", "guardrail"],
+            },
         },
         {"candidates": ["candidate-c"], "analysis": {}},
     ]

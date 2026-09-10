@@ -107,6 +107,26 @@ const detail: EntityDetail = {
       },
       {
         metric: "atlas://metric/MET019@v1",
+        baseline: 120,
+        candidate: 126,
+        absolute: 6,
+        relative: 0.05,
+        confidence_interval: { lower: 1, upper: 11, level: 0.95 },
+        unit: "token/s",
+        scope: { content_family: "code", context_tokens: 8192, concurrency: 8 },
+      },
+      {
+        metric: "atlas://metric/MET019@v1",
+        baseline: 150,
+        candidate: 147,
+        absolute: -3,
+        relative: -0.02,
+        confidence_interval: { lower: -8, upper: 2, level: 0.95 },
+        unit: "token/s",
+        scope: { content_family: "code", context_tokens: 8192, concurrency: 16 },
+      },
+      {
+        metric: "atlas://metric/MET019@v1",
         baseline: 80,
         candidate: 96,
         absolute: 16,
@@ -114,6 +134,16 @@ const detail: EntityDetail = {
         confidence_interval: { lower: 8, upper: 24, level: 0.95 },
         unit: "token/s",
         scope: { content_family: "natural", context_tokens: 32768, concurrency: 16 },
+      },
+      {
+        metric: "atlas://metric/MET013@v1",
+        baseline: 100,
+        candidate: 80,
+        absolute: -20,
+        relative: -0.2,
+        confidence_interval: { lower: -25, upper: -15, level: 0.95 },
+        unit: "ms/token",
+        scope: { content_family: "code", context_tokens: 32768, concurrency: 8 },
       },
     ],
   },
@@ -206,9 +236,30 @@ describe("Atlas explorer", () => {
       target: { value: "atlas://metric/MET019@v1" },
     });
     expect(screen.getByRole("table", { name: "Scoped measured effects" })).toBeVisible();
-    expect(screen.getByText("MET019 effects by exact workload scope")).toBeVisible();
+    expect(
+      screen.getByText("Output token throughput (MET019) effects by exact workload scope"),
+    ).toBeVisible();
     expect(screen.getByLabelText("Content Family")).toBeVisible();
-    expect(screen.getByText("11.1%")).toBeVisible();
+    expect(screen.getByLabelText("Signed-change color key")).toHaveTextContent(
+      "does not by itself mean improvement or regression",
+    );
+    expect(
+      screen.getByRole("table", {
+        name: "Output token throughput (MET019) context by concurrency heatmap, Content Family: Code",
+      }),
+    ).toBeVisible();
+    expect(screen.getAllByText("+11.1%").length).toBeGreaterThan(0);
+
+    fireEvent.change(screen.getByLabelText("Metric"), {
+      target: { value: "atlas://metric/MET013@v1" },
+    });
+    expect(screen.getByText("Time per output token (MET013) effects by exact workload scope")).toBeVisible();
+    const lowerCells = screen.getAllByText("-20.0%");
+    expect(lowerCells.length).toBeGreaterThan(0);
+    lowerCells.forEach((cell) => {
+      expect(cell).toHaveAttribute("title", expect.stringContaining("Candidate 20.0% lower"));
+      expect(cell).toHaveStyle({ backgroundColor: "rgba(50, 126, 160, 0.52)" });
+    });
     const recordLink = screen.getByRole("link", {
       name: "Open Continuous batching in the repository",
     });

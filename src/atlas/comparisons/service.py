@@ -9,6 +9,7 @@ from typing import Any, TypeGuard
 
 import numpy as np
 
+from atlas.experiment_analysis import ExperimentAnalysisError, planned_effect_metrics
 from atlas.identities import next_identifier
 from atlas.utilities.serialization import load_data, yaml_writer
 
@@ -115,6 +116,21 @@ def _metric_observations(
             raise ComparisonError(f"Summary {run_root} has duplicate {metric} scope {key}")
         scoped[key] = (scope, float(scoped_value))
     return float(value["value"]), str(value.get("unit", "1")), scoped
+
+
+def _summary_slo_eligible(run_root: Path) -> bool:
+    summary = load_data(run_root / "metrics" / "summary.json")
+    if not isinstance(summary, dict):
+        raise ComparisonError(f"Summary must be an object: {run_root}")
+    if "slo_eligible" in summary:
+        eligible = summary["slo_eligible"]
+        if not isinstance(eligible, bool):
+            raise ComparisonError(f"Summary {run_root} has non-boolean slo_eligible")
+        return eligible
+    passed = summary.get("slo_passed", False)
+    if not isinstance(passed, bool):
+        raise ComparisonError(f"Summary {run_root} has non-boolean slo_passed")
+    return passed
 
 
 def _bootstrap_interval(
@@ -248,6 +264,13 @@ def _analysis_settings(experiment: dict[str, Any]) -> tuple[int, float, int]:
     return resamples, float(confidence), seed
 
 
+def _planned_effect_metrics(experiment: dict[str, Any]) -> list[str]:
+    try:
+        return planned_effect_metrics(experiment)
+    except ExperimentAnalysisError as error:
+        raise ComparisonError(str(error)) from error
+
+
 def _pairing_key(run: dict[str, Any]) -> tuple[int, int]:
     return int(run["replicate"]), int(run["seed"])
 
@@ -366,6 +389,45 @@ def _existing_comparison(
     return None
 
 
+def _validate_existing_effect_plan(
+    path: Path,
+    planned_metrics: list[str],
+    *,
+    require_frozen_plan: bool,
+) -> None:
+    comparison = load_data(path)
+    if not isinstance(comparison, dict):
+        raise ComparisonError(f"Existing comparison is not an object: {path}")
+
+    method = comparison.get("method")
+    frozen_metrics = method.get("effect_metrics") if isinstance(method, dict) else None
+    if frozen_metrics is not None and frozen_metrics != planned_metrics:
+        raise ComparisonError(
+            f"Existing comparison {path} has stale frozen effect metrics: "
+            f"expected {planned_metrics}, found {frozen_metrics}"
+        )
+    if require_frozen_plan and frozen_metrics is None:
+        raise ComparisonError(
+            f"Existing comparison {path} lacks the frozen preregistered effect metrics"
+        )
+
+    effects = comparison.get("effects")
+    if not isinstance(effects, list):
+        raise ComparisonError(f"Existing comparison {path} has invalid effects")
+    observed_metrics: list[str] = []
+    for effect in effects:
+        metric = effect.get("metric") if isinstance(effect, dict) else None
+        if not isinstance(metric, str):
+            raise ComparisonError(f"Existing comparison {path} has an effect without a metric")
+        if metric not in observed_metrics:
+            observed_metrics.append(metric)
+    if observed_metrics != planned_metrics:
+        raise ComparisonError(
+            f"Existing comparison {path} has stale generated effects: "
+            f"expected metric order {planned_metrics}, found {observed_metrics}"
+        )
+
+
 def _comparison_output_path(experiment_root: Path, comparison_id: str) -> Path:
     output = experiment_root / "comparisons" / f"{comparison_id}.yaml"
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -379,6 +441,10 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
         raise ComparisonError(f"Invalid experiment: {experiment_root}")
     runs = _accepted_runs(experiment_root)
     resamples, confidence, analysis_seed = _analysis_settings(experiment)
+    effect_metrics = _planned_effect_metrics(experiment)
+    primary_metrics = set(experiment["metrics"]["primary"])
+    analysis = experiment.get("analysis", {})
+    requires_frozen_effect_plan = isinstance(analysis, dict) and "effect_metrics" in analysis
 
     outputs = []
     for contrast in _planned_contrasts(experiment):
@@ -413,12 +479,17 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
             candidate_references,
         )
         if existing is not None:
+            _validate_existing_effect_plan(
+                existing,
+                effect_metrics,
+                require_frozen_plan=requires_frozen_effect_plan,
+            )
             outputs.append(existing)
             continue
 
         effects = []
         overall_results = []
-        for metric_reference in experiment["metrics"]["primary"]:
+        for metric_reference in effect_metrics:
             metric_id = metric_reference.rsplit("/", 1)[-1].split("@", 1)[0]
             baseline_observations = [
                 _metric_observations(path, metric_id) for _, path in selected_baseline
@@ -439,7 +510,8 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
                 seed=analysis_seed,
             )
             effects.append(overall_effect)
-            overall_results.append(overall_result)
+            if metric_reference in primary_metrics:
+                overall_results.append(overall_result)
 
             expected_scopes = _matching_scope_keys(
                 [scoped for _, _, scoped in baseline_observations],
@@ -507,12 +579,12 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
                 "bootstrap_resamples": resamples,
                 "bootstrap_seed": analysis_seed,
                 "pairing_keys": ["replicate", "seed"],
+                "effect_metrics": effect_metrics,
             },
             "effects": effects,
             "quality_eligible": True,
             "slo_eligible": all(
-                bool(load_data(path / "metrics" / "summary.json").get("slo_passed", False))
-                for _, path in selected_baseline + selected_candidate
+                _summary_slo_eligible(path) for _, path in selected_baseline + selected_candidate
             ),
             "result": overall,
         }

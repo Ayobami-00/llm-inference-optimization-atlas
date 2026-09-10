@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 from collections import Counter
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -161,3 +162,21 @@ def test_artifact_templates_match_their_declared_schema(
         ).iter_errors(template)
     )
     assert errors == [], f"{path}: {errors}"
+
+
+def test_experiment_effect_metrics_schema_requires_a_unique_nonempty_plan() -> None:
+    experiment = load_yaml(TEMPLATE_ROOT / "experiment" / "experiment.yaml")
+    schema = schema_registry().contents(experiment["$schema"])
+    validator = Draft202012Validator(schema, registry=schema_registry())
+
+    valid = deepcopy(experiment)
+    valid["analysis"]["effect_metrics"] = [
+        valid["metrics"]["primary"][0],
+        valid["metrics"]["secondary"][0],
+    ]
+    assert list(validator.iter_errors(valid)) == []
+
+    for invalid_plan in ([], [valid["metrics"]["primary"][0]] * 2):
+        invalid = deepcopy(experiment)
+        invalid["analysis"]["effect_metrics"] = invalid_plan
+        assert list(validator.iter_errors(invalid))

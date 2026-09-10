@@ -32,6 +32,12 @@ confidence interval. Relative effects with a zero or unstable denominator are in
 relative effect as `null` and use the absolute effect. Keep latency reduction signs unambiguous by
 naming the estimand.
 
+Comparisons generate effects for primary metrics by default. An experiment may preregister an ordered
+`analysis.effect_metrics` list when secondary or guardrail effects are also needed. The list must be a
+non-empty, duplicate-free subset of the experiment's declared metrics and include every primary metric.
+The comparison freezes that ordered plan in `method.effect_metrics`; scoped effects do not create extra
+comparisons, and only primary-metric effects determine the comparison's overall `result`.
+
 ## Confidence intervals
 
 Use paired bootstrap intervals with 10,000 resamples when requests are paired and the estimand supports

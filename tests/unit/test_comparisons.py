@@ -204,6 +204,171 @@ def test_analysis_settings_are_read_from_the_experiment() -> None:
     ) == (1234, 0.9, 17)
 
 
+def test_explicit_slo_eligibility_supports_a_left_censored_capacity_run(
+    tmp_path: Path,
+) -> None:
+    metrics = tmp_path / "metrics"
+    metrics.mkdir()
+    (metrics / "summary.json").write_text(json.dumps({"slo_passed": False, "slo_eligible": True}))
+
+    assert service._summary_slo_eligible(tmp_path) is True
+
+
+def test_explicit_slo_ineligibility_overrides_legacy_pass(tmp_path: Path) -> None:
+    metrics = tmp_path / "metrics"
+    metrics.mkdir()
+    (metrics / "summary.json").write_text(json.dumps({"slo_passed": True, "slo_eligible": False}))
+
+    assert service._summary_slo_eligible(tmp_path) is False
+
+
+def test_slo_eligibility_falls_back_to_legacy_slo_passed(tmp_path: Path) -> None:
+    metrics = tmp_path / "metrics"
+    metrics.mkdir()
+    (metrics / "summary.json").write_text(json.dumps({"slo_passed": True}))
+
+    assert service._summary_slo_eligible(tmp_path) is True
+
+
+def test_non_boolean_explicit_slo_eligibility_is_rejected(tmp_path: Path) -> None:
+    metrics = tmp_path / "metrics"
+    metrics.mkdir()
+    (metrics / "summary.json").write_text(json.dumps({"slo_eligible": 1}))
+
+    with pytest.raises(service.ComparisonError, match="non-boolean slo_eligible"):
+        service._summary_slo_eligible(tmp_path)
+
+
+def test_effect_metrics_default_to_primary_metrics_in_primary_order() -> None:
+    experiment = {
+        "metrics": {
+            "primary": [
+                "atlas://metric/MET019@v1",
+                "atlas://metric/MET010@v1",
+            ],
+            "secondary": ["atlas://metric/MET013@v1"],
+            "guardrails": ["atlas://metric/MET028@v1"],
+        },
+        "analysis": {},
+    }
+
+    assert service._planned_effect_metrics(experiment) == experiment["metrics"]["primary"]
+
+
+def test_preregistered_effect_metrics_preserve_declared_order() -> None:
+    effect_metrics = [
+        "atlas://metric/MET013@v1",
+        "atlas://metric/MET019@v1",
+        "atlas://metric/MET028@v1",
+    ]
+    experiment = {
+        "metrics": {
+            "primary": ["atlas://metric/MET019@v1"],
+            "secondary": ["atlas://metric/MET013@v1"],
+            "guardrails": ["atlas://metric/MET028@v1"],
+        },
+        "analysis": {"effect_metrics": effect_metrics},
+    }
+
+    assert service._planned_effect_metrics(experiment) == effect_metrics
+
+
+@pytest.mark.parametrize(
+    ("effect_metrics", "message"),
+    [
+        ([], "non-empty"),
+        (
+            ["atlas://metric/MET019@v1", "atlas://metric/MET019@v1"],
+            "duplicates",
+        ),
+        (["atlas://metric/MET999@v1", "atlas://metric/MET019@v1"], "undeclared"),
+        (["atlas://metric/MET013@v1"], "include every primary"),
+    ],
+)
+def test_invalid_preregistered_effect_metrics_are_rejected(
+    effect_metrics: list[str], message: str
+) -> None:
+    experiment = {
+        "metrics": {
+            "primary": ["atlas://metric/MET019@v1"],
+            "secondary": ["atlas://metric/MET013@v1"],
+            "guardrails": [],
+        },
+        "analysis": {"effect_metrics": effect_metrics},
+    }
+
+    with pytest.raises(service.ComparisonError, match=message):
+        service._planned_effect_metrics(experiment)
+
+
+def test_existing_comparison_accepts_scoped_duplicates_in_frozen_metric_order(
+    tmp_path: Path,
+) -> None:
+    planned = ["atlas://metric/MET019@v1", "atlas://metric/MET010@v1"]
+    path = tmp_path / "CMP0001.yaml"
+    _write_yaml(
+        path,
+        {
+            "method": {"effect_metrics": planned},
+            "effects": [
+                {"metric": planned[0]},
+                {"metric": planned[0], "scope": {"concurrency": 8}},
+                {"metric": planned[1]},
+                {"metric": planned[1], "scope": {"concurrency": 8}},
+            ],
+        },
+    )
+
+    service._validate_existing_effect_plan(path, planned, require_frozen_plan=True)
+
+
+def test_existing_comparison_must_freeze_an_explicit_effect_plan(tmp_path: Path) -> None:
+    planned = ["atlas://metric/MET019@v1", "atlas://metric/MET010@v1"]
+    path = tmp_path / "CMP0001.yaml"
+    _write_yaml(
+        path,
+        {
+            "method": {"paired": True},
+            "effects": [{"metric": reference} for reference in planned],
+        },
+    )
+
+    with pytest.raises(service.ComparisonError, match="lacks the frozen preregistered"):
+        service._validate_existing_effect_plan(path, planned, require_frozen_plan=True)
+
+
+def test_existing_legacy_comparison_can_omit_an_implicit_effect_plan(tmp_path: Path) -> None:
+    planned = ["atlas://metric/MET019@v1"]
+    path = tmp_path / "CMP0001.yaml"
+    _write_yaml(
+        path,
+        {
+            "method": {"paired": True},
+            "effects": [
+                {"metric": planned[0]},
+                {"metric": planned[0], "scope": {"concurrency": 8}},
+            ],
+        },
+    )
+
+    service._validate_existing_effect_plan(path, planned, require_frozen_plan=False)
+
+
+def test_existing_comparison_rejects_stale_generated_effect_metrics(tmp_path: Path) -> None:
+    planned = ["atlas://metric/MET019@v1", "atlas://metric/MET010@v1"]
+    path = tmp_path / "CMP0001.yaml"
+    _write_yaml(
+        path,
+        {
+            "method": {"effect_metrics": planned},
+            "effects": [{"metric": planned[0]}],
+        },
+    )
+
+    with pytest.raises(service.ComparisonError, match="stale generated effects"):
+        service._validate_existing_effect_plan(path, planned, require_frozen_plan=True)
+
+
 def test_metric_breakdowns_require_unique_canonical_scopes(tmp_path: Path) -> None:
     metrics = tmp_path / "metrics"
     metrics.mkdir()
@@ -321,7 +486,12 @@ def test_compare_experiment_generates_paired_scoped_contrast(tmp_path: Path) -> 
 
     _write_yaml(
         tmp_path / "reference" / "ontology" / "v1" / "metrics" / "throughput.yaml",
-        {"entries": [{"id": "MET019", "direction": "higher_is_better"}]},
+        {
+            "entries": [
+                {"id": "MET019", "direction": "higher_is_better"},
+                {"id": "MET010", "direction": "lower_is_better"},
+            ]
+        },
     )
     _write_yaml(
         experiment_root / "experiment.yaml",
@@ -335,11 +505,19 @@ def test_compare_experiment_generates_paired_scoped_contrast(tmp_path: Path) -> 
             "baseline": configuration_references[0],
             "candidates": configuration_references[1:],
             "changed_factors": ["engram placement"],
-            "metrics": {"primary": ["atlas://metric/MET019@v1"]},
+            "metrics": {
+                "primary": ["atlas://metric/MET019@v1"],
+                "secondary": ["atlas://metric/MET010@v1"],
+                "guardrails": [],
+            },
             "analysis": {
                 "resamples": 100,
                 "confidence_level": 0.9,
                 "seed": 17,
+                "effect_metrics": [
+                    "atlas://metric/MET019@v1",
+                    "atlas://metric/MET010@v1",
+                ],
                 "contrasts": [
                     {
                         "id": "host-sync-vs-host-prefetch",
@@ -397,7 +575,8 @@ def test_compare_experiment_generates_paired_scoped_contrast(tmp_path: Path) -> 
                                 "value": value + 5,
                             },
                         ],
-                    }
+                    },
+                    "MET010": {"value": value, "unit": "ms"},
                 },
             }
             metrics = run_root / "metrics"
@@ -430,9 +609,18 @@ def test_compare_experiment_generates_paired_scoped_contrast(tmp_path: Path) -> 
         "bootstrap_resamples": 100,
         "bootstrap_seed": 17,
         "pairing_keys": ["replicate", "seed"],
+        "effect_metrics": [
+            "atlas://metric/MET019@v1",
+            "atlas://metric/MET010@v1",
+        ],
     }
-    assert len(comparison["effects"]) == 3
+    assert len(comparison["effects"]) == 4
     assert comparison["effects"][0]["absolute"] == 21.0
+    assert [effect["metric"] for effect in comparison["effects"] if "scope" not in effect] == [
+        "atlas://metric/MET019@v1",
+        "atlas://metric/MET010@v1",
+    ]
+    assert comparison["result"] == "improvement"
     scoped_effects = {
         effect["scope"]["content_family"]: effect
         for effect in comparison["effects"]
