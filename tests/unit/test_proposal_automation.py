@@ -62,6 +62,12 @@ downloads: 300 MB
 ### Conflict disclosure
 
 None declared
+
+<!-- atlas-proposal
+id: P0000
+version: 1
+type: {proposal_type}
+-->
 """
 
 
@@ -89,6 +95,7 @@ def test_issue_form_is_materialized_and_schema_validated(tmp_path: Path) -> None
     assert result.proposal is not None
     assert result.proposal["id"] == "P0017"
     assert result.proposal["scope"]["archetype"] == "atlas://workload/W001@v1"
+    assert result.proposal["authors"][0]["conflicts"] == []
 
 
 def test_issue_form_rejects_missing_machine_marker(tmp_path: Path) -> None:

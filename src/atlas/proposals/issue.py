@@ -19,6 +19,9 @@ PROPOSAL_SCHEMA = (
     "schemas/v1/contributions/proposal.schema.json"
 )
 FORM_MARKER = re.compile(r"<!--\s*atlas-proposal-form:v1:(?P<type>[a-z-]+)\s*-->", re.IGNORECASE)
+MACHINE_MARKER = re.compile(
+    r"\n*<!--\s*atlas-proposal(?!-form)\b.*?-->\s*$", re.IGNORECASE | re.DOTALL
+)
 SECTION = re.compile(
     r"^### (?P<title>[^\n]+)\n+(?P<body>.*?)(?=^### |\Z)", re.MULTILINE | re.DOTALL
 )
@@ -66,6 +69,7 @@ def _problem(location: str, message: str, code: str = "proposal-issue") -> dict[
 
 
 def _sections(body: str) -> dict[str, str]:
+    body = MACHINE_MARKER.sub("", body)
     return {
         match.group("title").strip().lower(): match.group("body").strip()
         for match in SECTION.finditer(body)
