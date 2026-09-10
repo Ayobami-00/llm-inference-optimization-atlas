@@ -311,7 +311,7 @@ def test_server_command_freezes_the_confirmatory_shape() -> None:
     assert command[command.index("--cuda-graph-max-bs-decode") + 1] == "64"
     assert command[command.index("--random-seed") + 1] == "20260910"
     assert command[command.index("--fp8-gemm-backend") + 1] == "flashinfer_cutedsl"
-    assert command[command.index("--json-model-override-args") + 1] == '{"vision_config": null}'
+    assert command[command.index("--json-model-override-args") + 1] == '{"vision_n_layers": 0}'
     assert "--enable-metrics" in command
 
 
@@ -328,7 +328,7 @@ def test_resolved_server_configuration_is_machine_checked() -> None:
         "context_length": 262400,
         "random_seed": 20260910,
         "fp8_gemm_runner_backend": "flashinfer_cutedsl",
-        "json_model_override_args": '{"vision_config": null}',
+        "json_model_override_args": '{"vision_n_layers": 0}',
         "enable_dp_attention": False,
         "speculative_algorithm": None,
         "enable_hierarchical_cache": False,

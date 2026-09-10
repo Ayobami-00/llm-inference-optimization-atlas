@@ -50,6 +50,13 @@ mode is retained under `.atlas/work` and stops execution before measurement.
 For CFG022 and CFG023, `layout=shared, pinned` is required; SGLang's unpinned
 ATS fallback is not accepted as the preregistered treatment.
 
+All three conditions explicitly set the runtime's normalized flat
+`vision_n_layers` field to zero. Setting only `vision_config` to null is not a
+text-only override in the pinned SGLang parser: it normalizes away without
+changing the model's 32 flattened vision layers, which also makes Engram KV
+prefetch ineligible. The resolved raw override is machine-checked through
+`/server_info` before a pilot may pass.
+
 Those pilots also populate the pinned SGLang and FlashInfer compiled-kernel and
 autotune caches for every treatment. The cache is then retained unchanged, so
 `MET098` represents a warm-compilation-cache production restart. Per-request

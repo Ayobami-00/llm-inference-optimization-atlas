@@ -37,7 +37,7 @@ extensions:
     cuda_graph_max_bs_decode: 64
     random_seed: 20260910
     fp8_gemm_backend: flashinfer_cutedsl
-    json_model_override_args: '{"vision_config": null}'
+    json_model_override_args: '{"vision_n_layers": 0}'
     reasoning_parser: deepseek-v41
     tool_call_parser: deepseekv41
   atlas.support-boundary:
