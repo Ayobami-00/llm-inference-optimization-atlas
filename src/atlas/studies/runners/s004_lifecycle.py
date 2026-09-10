@@ -420,6 +420,8 @@ def server_command(*, model_path: Path = MODEL_PATH, telemetry: bool = False) ->
         "262400",
         "--cuda-graph-max-bs-decode",
         "64",
+        "--random-seed",
+        "20260910",
         "--fp8-gemm-backend",
         "flashinfer_cutedsl",
         "--json-model-override-args",

@@ -242,6 +242,7 @@ def test_server_command_freezes_the_confirmatory_shape() -> None:
     assert command[command.index("--mem-fraction-static") + 1] == "0.80"
     assert command[command.index("--context-length") + 1] == "262400"
     assert command[command.index("--cuda-graph-max-bs-decode") + 1] == "64"
+    assert command[command.index("--random-seed") + 1] == "20260910"
     assert command[command.index("--fp8-gemm-backend") + 1] == "flashinfer_cutedsl"
     assert command[command.index("--json-model-override-args") + 1] == '{"vision_config": null}'
     assert "--enable-metrics" in command

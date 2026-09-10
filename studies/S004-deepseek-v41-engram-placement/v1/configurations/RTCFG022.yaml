@@ -35,6 +35,7 @@ extensions:
     trust_remote_code: true
     mem_fraction_static: 0.80
     cuda_graph_max_bs_decode: 64
+    random_seed: 20260910
     fp8_gemm_backend: flashinfer_cutedsl
     json_model_override_args: '{"vision_config": null}'
     reasoning_parser: deepseek-v41
