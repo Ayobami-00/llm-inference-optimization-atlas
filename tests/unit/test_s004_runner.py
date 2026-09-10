@@ -13,6 +13,7 @@ from atlas.studies.runners.s004 import (
     _capacity_bisection_rate,
     _completed_attempt,
     _new_attempt_directory,
+    _run_treatment_resolution_pilots,
     _scoped_breakdown,
     _slo_result,
 )
@@ -295,6 +296,46 @@ def test_geometric_capacity_bisection_resolves_a_factor_two_bracket_in_three_ste
         high = _capacity_bisection_rate(low, high)
 
     assert (high - low) / low < 0.10
+
+
+def test_treatment_resolution_pilots_cover_all_modes_and_resume(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    launched: list[str] = []
+    stopped: list[str] = []
+
+    class FakeServer:
+        def __init__(self, configuration: str) -> None:
+            self.configuration = configuration
+
+        def stop(self) -> None:
+            stopped.append(self.configuration)
+
+    def fake_preflight(*_args: object, **_kwargs: object) -> dict[str, object]:
+        return {"valid": True}
+
+    def fake_launch_server(
+        *, configuration: str, work_dir: Path, telemetry: bool
+    ) -> tuple[FakeServer, dict[str, object], dict[str, object], float]:
+        del work_dir, telemetry
+        launched.append(configuration)
+        return (
+            FakeServer(configuration),
+            {"max_total_num_tokens": 1234, "internal_states": []},
+            {"configuration": configuration, "valid": True},
+            10.0,
+        )
+
+    monkeypatch.setattr("atlas.studies.runners.s004.preflight", fake_preflight)
+    monkeypatch.setattr("atlas.studies.runners.s004.launch_server", fake_launch_server)
+
+    first = _run_treatment_resolution_pilots(tmp_path, tmp_path / "work")
+    second = _run_treatment_resolution_pilots(tmp_path, tmp_path / "work")
+
+    assert first == second
+    assert first["status"] == "pass"
+    assert launched == ["CFG021", "CFG022", "CFG023"]
+    assert stopped == launched
 
 
 def test_slo_gate_reports_and_enforces_timeout_rate() -> None:

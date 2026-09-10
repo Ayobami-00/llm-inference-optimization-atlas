@@ -43,6 +43,11 @@ agreement result. AIPerf disagreement invalidates the attempt and prevents
 headline publication until investigated, but its observations are not pooled
 with the confirmatory Atlas measurements.
 
+Before the collector pilot or any confirmatory request, the full runner starts
+and stops each of CFG021, CFG022, and CFG023 once. All three requested Engram
+modes must resolve from the pinned runtime logs. Any fallback or unsupported
+mode is retained under `.atlas/work` and stops execution before measurement.
+
 Every condition starts in a new SGLang process. Logs, invalid attempts, failure
 state, treatment resolution, capacity points, and full telemetry stay ignored
 under `.atlas/work`. Only successfully validated candidates are promoted, at

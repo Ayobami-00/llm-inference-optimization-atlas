@@ -1083,6 +1083,68 @@ def _run_optional_probe(
             server.stop()
 
 
+def _run_treatment_resolution_pilots(root: Path, work_dir: Path) -> dict[str, Any]:
+    pilot_root = work_dir / "treatment-resolution-pilots"
+    summary_path = pilot_root / "summary.json"
+    if summary_path.is_file():
+        retained = load_data(summary_path)
+        if isinstance(retained, dict) and retained.get("status") == "pass":
+            return retained
+
+    results: list[dict[str, Any]] = []
+    for configuration in ("CFG021", "CFG022", "CFG023"):
+        configuration_root = pilot_root / configuration
+        result_path = configuration_root / "result.json"
+        if result_path.is_file():
+            retained = load_data(result_path)
+            if isinstance(retained, dict) and retained.get("status") == "pass":
+                results.append(retained)
+                continue
+
+        preflight(
+            root,
+            configuration_root / "preflight.json",
+            verify_weights=False,
+        )
+        server = None
+        try:
+            server, info, treatment, readiness_ms = launch_server(
+                configuration=configuration,
+                work_dir=configuration_root / "server",
+                telemetry=False,
+            )
+            result = {
+                "status": "pass",
+                "configuration": configuration,
+                "readiness_ms": readiness_ms,
+                "available_kv_cache_tokens": _server_kv_capacity(info),
+                "treatment_resolution": treatment,
+            }
+            _write_json(result_path, result)
+            results.append(result)
+        except BaseException as error:
+            _write_json(
+                result_path,
+                {
+                    "status": "fail",
+                    "configuration": configuration,
+                    "error": f"{type(error).__name__}: {error}",
+                },
+            )
+            raise
+        finally:
+            if server:
+                server.stop()
+
+    summary = {
+        "status": "pass",
+        "policy": "all requested treatments must resolve before any measurement",
+        "results": results,
+    }
+    _write_json(summary_path, summary)
+    return summary
+
+
 def _run_quick(work_dir: Path) -> Path:
     encode = _fake_encoder
     results, warmups, matrix_seconds = _run_matrix(
@@ -1155,6 +1217,7 @@ def _run_full(work_dir: Path) -> None:
     encode, vocab_size, special_ids = _load_tokenizer()
     study_root = root / "studies/S004-deepseek-v41-engram-placement/v1"
     fixed_correctness = correctness_specs(study_root, seed=20260910, encode=encode)
+    _run_treatment_resolution_pilots(root, work_dir)
 
     pilot_root = work_dir / "collector-pilot"
     reference_path = pilot_root / "device-correctness-reference.json"

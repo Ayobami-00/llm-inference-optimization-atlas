@@ -27,6 +27,9 @@ extensions:
     method: resumable Hugging Face snapshot restricted to the frozen manifest
     repository: deepseek-ai/DeepSeek-V4.1-Flash
     revision: dba1be0a40aa45a94ad051997016db3960a90277
+  atlas.preexecution-pilots:
+    treatment_resolution: all three requested modes must resolve before any measurement
+    failure_policy: preserve the failed pilot and stop before the collector pilot or confirmatory matrix
 platforms:
   - {os: linux, architecture: x86_64}
   - {os: macos, architecture: aarch64}
