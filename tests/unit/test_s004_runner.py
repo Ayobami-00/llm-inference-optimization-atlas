@@ -49,6 +49,17 @@ from atlas.studies.runners.s004_trace import (
 )
 from atlas.utilities.serialization import yaml_writer
 
+_PINNED_HOST_LOG = "\n".join(
+    f"[test TP{rank} EP{rank}] engram host table layer {layer}: "
+    "layout=shared, 1 MiB resident, pinned"
+    for rank in range(4)
+    for layer in (1, 14)
+)
+_PREFETCH_LOG = "\n".join(
+    f"[test TP{rank} EP{rank}] Engram layer 14 KV prefetch enabled for BS=1 decode"
+    for rank in range(4)
+)
+
 
 def _encode(text: str) -> list[int]:
     return [128 + (value % 97) for value in text.encode()]
@@ -272,22 +283,26 @@ def test_healthcheck_accepts_sglang_empty_health_body(
     ("configuration", "log_text", "valid"),
     [
         ("CFG021", "ordinary startup", True),
-        ("CFG022", "Engram host table ready layout=shared, pinned", True),
+        ("CFG022", _PINNED_HOST_LOG, True),
         (
             "CFG023",
-            "Engram host table ready layout=shared, pinned\n"
-            "Engram layer 14 KV prefetch enabled for BS=1 decode",
+            _PINNED_HOST_LOG + "\n" + _PREFETCH_LOG,
             True,
         ),
         ("CFG022", "Engram host table ready layout=shared, unpinned (ATS)", False),
         (
             "CFG022",
-            "Engram host table owner layout=shared, pinned\n"
-            "Engram host table peer layout=shared, unpinned (ATS)",
+            _PINNED_HOST_LOG.replace(
+                "[test TP3 EP3] engram host table layer 14: layout=shared, 1 MiB resident, pinned",
+                "[test TP3 EP3] engram host table layer 14: "
+                "layout=shared, 1 MiB resident, unpinned (ATS)",
+            ),
             False,
         ),
-        ("CFG023", "Engram host table ready layout=shared, pinned", False),
-        ("CFG021", "Engram host table ready layout=shared, pinned", False),
+        ("CFG022", "\n".join(_PINNED_HOST_LOG.splitlines()[:-1]), False),
+        ("CFG023", _PINNED_HOST_LOG + "\n" + "\n".join(_PREFETCH_LOG.splitlines()[:-1]), False),
+        ("CFG023", _PINNED_HOST_LOG, False),
+        ("CFG021", _PINNED_HOST_LOG, False),
     ],
 )
 def test_treatment_resolution_is_machine_checked(
@@ -323,6 +338,7 @@ def test_resolved_server_configuration_is_machine_checked() -> None:
         "dp_size": 1,
         "mem_fraction_static": 0.8,
         "max_running_requests": 64,
+        "cuda_graph_max_bs_decode": 64,
         "schedule_policy": "fcfs",
         "num_continuous_decode_steps": 1,
         "context_length": 262400,

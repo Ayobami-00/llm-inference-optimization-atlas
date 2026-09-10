@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import platform
+import re
 import resource
 import signal
 import subprocess
@@ -71,6 +72,7 @@ EXPECTED_SERVER_CONFIGURATION: dict[str, Any] = {
     "dp_size": 1,
     "mem_fraction_static": 0.8,
     "max_running_requests": 64,
+    "cuda_graph_max_bs_decode": 64,
     "schedule_policy": "fcfs",
     "num_continuous_decode_steps": 1,
     "context_length": 262400,
@@ -468,16 +470,27 @@ def server_command(*, model_path: Path = MODEL_PATH, telemetry: bool = False) ->
 
 
 def resolve_treatment(configuration: str, log_text: str) -> dict[str, Any]:
-    host_status_lines = [
-        line.casefold()
-        for line in log_text.splitlines()
-        if "engram host table" in line.casefold() and "layout=" in line.casefold()
-    ]
-    host_shared = bool(host_status_lines) and all(
-        "layout=shared" in line for line in host_status_lines
-    )
+    host_status_lines = []
+    host_scopes: set[tuple[int, int]] = set()
+    prefetch_ranks: set[int] = set()
+    for original_line in log_text.splitlines():
+        line = original_line.casefold()
+        if "engram host table" in line and "layout=" in line:
+            host_status_lines.append(line)
+            scope = re.search(r"\btp(\d+)\s+ep\d+\].*engram host table layer\s+(\d+):", line)
+            if scope:
+                host_scopes.add((int(scope.group(1)), int(scope.group(2))))
+        if "engram layer 14 kv prefetch enabled for bs=1 decode" in line:
+            rank = re.search(r"\btp(\d+)\s+ep\d+\]", line)
+            if rank:
+                prefetch_ranks.add(int(rank.group(1)))
+
+    expected_ranks = set(range(int(EXPECTED_SERVER_CONFIGURATION["tp_size"])))
+    expected_host_scopes = {(rank, layer) for rank in expected_ranks for layer in (1, 14)}
+    host_scope_complete = expected_host_scopes.issubset(host_scopes)
+    host_shared = host_scope_complete and all("layout=shared" in line for line in host_status_lines)
     host_pinned = host_shared and all(", pinned" in line for line in host_status_lines)
-    prefetch = "Engram layer 14 KV prefetch enabled for BS=1 decode" in log_text
+    prefetch = prefetch_ranks == expected_ranks
     expected = {
         "CFG021": (False, False, False, "device"),
         "CFG022": (True, True, False, "host-sync"),
@@ -487,8 +500,16 @@ def resolve_treatment(configuration: str, log_text: str) -> dict[str, Any]:
     return {
         "configuration": configuration,
         "host_table_status_line_count": len(host_status_lines),
+        "host_table_status_scopes": [
+            {"tp_rank": rank, "layer": layer} for rank, layer in sorted(host_scopes)
+        ],
         "host_shared_resolved": host_shared,
         "host_pinned_resolved": host_pinned,
+        "prefetch_status_line_count": sum(
+            "engram layer 14 kv prefetch enabled for bs=1 decode" in line.casefold()
+            for line in log_text.splitlines()
+        ),
+        "prefetch_tp_ranks": sorted(prefetch_ranks),
         "prefetch_stream_resolved": prefetch,
         "requested_mode": expected[3],
         "resolved_mode": expected[3] if valid else "unexpected-fallback-or-unsupported",

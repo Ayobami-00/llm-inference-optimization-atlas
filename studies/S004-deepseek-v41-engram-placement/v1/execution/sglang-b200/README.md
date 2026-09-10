@@ -47,8 +47,10 @@ Before the collector pilot or any confirmatory request, the full runner starts
 and stops each of CFG021, CFG022, and CFG023 once. All three requested Engram
 modes must resolve from the pinned runtime logs. Any fallback or unsupported
 mode is retained under `.atlas/work` and stops execution before measurement.
-For CFG022 and CFG023, `layout=shared, pinned` is required; SGLang's unpinned
-ATS fallback is not accepted as the preregistered treatment.
+For CFG022 and CFG023, both Engram layers must report `layout=shared, pinned`
+on every tensor-parallel rank; SGLang's unpinned ATS fallback is not accepted
+as the preregistered treatment. CFG023 must also report its prefetch stream on
+every tensor-parallel rank.
 
 All three conditions explicitly set the runtime's normalized flat
 `vision_n_layers` field to zero. Setting only `vision_config` to null is not a
