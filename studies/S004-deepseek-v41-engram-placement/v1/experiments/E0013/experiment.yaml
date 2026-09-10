@@ -49,10 +49,11 @@ extensions:
     scope: block 1 for CFG021, CFG022, and CFG023 at 32768 tokens and concurrency 8
     requests: 96
     endpoint: OpenAI-compatible /v1/completions with exact integer token-ID prompts
-    cache_policy: flush before and after the AIPerf request set
+    comparison_design: the Atlas controller and AIPerf each execute the same 96-request trace once
+    cache_policy: flush before each driver and after the AIPerf request set
     comparison_metrics: [mean TTFT, mean ITL, output token throughput]
     agreement_rule: symmetric relative difference at most 10 percent, or an absolute difference at most 10 ms TTFT, 1 ms ITL, or 1 token/s throughput
-    failure_policy: disagreement blocks headline use until investigated but never enters the confirmatory estimate
+    failure_policy: disagreement invalidates the attempt and blocks headline use until investigated but never enters the confirmatory estimate
 $schema: https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/experiment.schema.json
 study: atlas://study/S004@v1
 question: When should DeepSeek-V4.1 Flash keep Engram on the accelerator, use

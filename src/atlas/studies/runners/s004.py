@@ -21,6 +21,7 @@ from atlas.studies.evidence_writer import RunDraft, sha256_file, utc_now, write_
 from atlas.studies.runners.common import distribution, process_sample, repository_root
 from atlas.studies.runners.s004_aiperf import (
     AIPERF_DEFAULT_BINARY,
+    CROSSCHECK_CONCURRENCY,
     CROSSCHECK_REQUESTS,
     compare_aiperf_summary,
     run_aiperf,
@@ -1229,7 +1230,7 @@ def _run_full(work_dir: Path) -> None:
                         "Q0 exact-output equivalence failed before performance measurement"
                     )
 
-                aiperf_result: dict[str, Any] | None = None
+                aiperf_validation: dict[str, Any] | None = None
                 if block == 1:
                     crosscheck_specs = [
                         matrix_request(
@@ -1245,6 +1246,17 @@ def _run_full(work_dir: Path) -> None:
                         for ordinal in range(CROSSCHECK_REQUESTS)
                     ]
                     flush_cache(BASE_URL)
+                    atlas_crosscheck = run_count(
+                        BASE_URL,
+                        crosscheck_specs,
+                        concurrency=CROSSCHECK_CONCURRENCY,
+                    )
+                    reconcile_request_ids(crosscheck_specs, _rows(atlas_crosscheck))
+                    if any(result.row["outcome"] != "complete" for result in atlas_crosscheck):
+                        raise RuntimeError(
+                            "Atlas client failed the independent-driver cross-check trace"
+                        )
+                    flush_cache(BASE_URL)
                     try:
                         aiperf_result = run_aiperf(
                             binary=aiperf_binary,
@@ -1256,6 +1268,23 @@ def _run_full(work_dir: Path) -> None:
                         )
                     finally:
                         flush_cache(BASE_URL)
+                    _write_json(
+                        attempt / "aiperf-crosscheck" / "atlas-client-rows.json",
+                        _rows(atlas_crosscheck),
+                    )
+                    aiperf_validation = compare_aiperf_summary(
+                        _rows(atlas_crosscheck),
+                        aiperf_result["summary"],
+                    )
+                    _write_json(
+                        attempt / "aiperf-crosscheck" / "agreement.json",
+                        aiperf_validation,
+                    )
+                    if not aiperf_validation["headline_eligible"]:
+                        raise RuntimeError(
+                            "Independent AIPerf validation disagreed with the Atlas client; "
+                            "headline execution is blocked pending investigation"
+                        )
 
                 collector = TelemetryCollector(
                     attempt / "telemetry.json",
@@ -1355,12 +1384,9 @@ def _run_full(work_dir: Path) -> None:
                         ],
                     }
                 )
-                if aiperf_result is not None:
+                if aiperf_validation is not None:
                     summary["independent_load_generator_validation"] = {
-                        **compare_aiperf_summary(
-                            _rows(matrix),
-                            aiperf_result["summary"],
-                        ),
+                        **aiperf_validation,
                         "payload_sha256": aiperf_result["payload_sha256"],
                         "aiperf_version_verified": aiperf_version,
                     }

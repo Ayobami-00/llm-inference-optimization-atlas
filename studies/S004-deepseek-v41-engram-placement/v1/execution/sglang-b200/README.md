@@ -35,9 +35,11 @@ uv pip install --python /workspace/aiperf-venv/bin/python 'aiperf==0.12.0'
 ```
 
 During block 1, each configuration receives one non-confirmatory AIPerf audit
-of 96 exact-token 32K requests at concurrency 8. Payloads and all AIPerf exports
-remain under `.atlas/work`; the run summary retains only the version, payload
-fingerprint, shape checks, and agreement result. AIPerf disagreement prevents
+of 96 exact-token 32K requests at concurrency 8. The Atlas controller and
+AIPerf each execute the identical trace after separate cache flushes. Payloads,
+driver-level rows, and all AIPerf exports remain under `.atlas/work`; the run
+summary retains only the version, payload fingerprint, shape checks, and
+agreement result. AIPerf disagreement invalidates the attempt and prevents
 headline publication until investigated, but its observations are not pooled
 with the confirmatory Atlas measurements.
 
