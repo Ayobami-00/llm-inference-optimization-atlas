@@ -69,6 +69,7 @@ frozen_factors:
   - TP=4, EP=4, PP=1, DP=1 with DP attention disabled.
   - Scheduler, dynamic batch ceiling, static memory fraction, and decode graph ceiling.
   - SGLang server initialization seed 20260910.
+  - Compiled-kernel and autotune caches populated by all-treatment pilots and retained unchanged during measurement.
   - MXFP8 backend, greedy decoding, text-only model override, and one-token decode steps.
   - Trace generator, per-rate trace, seed, connection reuse, timeouts, and server/cache initialization policy within each paired block.
   - Shared pinned host-table layout between host-sync and host-prefetch.

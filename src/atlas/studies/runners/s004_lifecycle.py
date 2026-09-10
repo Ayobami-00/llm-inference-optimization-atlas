@@ -64,6 +64,23 @@ COMMON_ENVIRONMENT = {
     "SGLANG_DSV41_ENGRAM_HOST_TABLE_LAYOUT": "shared",
     "SGLANG_ENABLE_DSV41_ENGRAM_DROP_PAGE_CACHE": "0",
 }
+EXPECTED_SERVER_CONFIGURATION: dict[str, Any] = {
+    "tp_size": 4,
+    "ep_size": 4,
+    "pp_size": 1,
+    "dp_size": 1,
+    "mem_fraction_static": 0.8,
+    "max_running_requests": 64,
+    "schedule_policy": "fcfs",
+    "num_continuous_decode_steps": 1,
+    "context_length": 262400,
+    "random_seed": 20260910,
+    "fp8_gemm_runner_backend": "flashinfer_cutedsl",
+    "json_model_override_args": '{"vision_config": null}',
+    "enable_dp_attention": False,
+    "speculative_algorithm": None,
+    "enable_hierarchical_cache": False,
+}
 
 
 def sha256_file(path: Path) -> str:
@@ -414,8 +431,18 @@ def server_command(*, model_path: Path = MODEL_PATH, telemetry: bool = False) ->
         "4",
         "--ep-size",
         "4",
+        "--pp-size",
+        "1",
+        "--dp-size",
+        "1",
         "--mem-fraction-static",
         "0.80",
+        "--max-running-requests",
+        "64",
+        "--schedule-policy",
+        "fcfs",
+        "--num-continuous-decode-steps",
+        "1",
         "--context-length",
         "262400",
         "--cuda-graph-max-bs-decode",
@@ -441,10 +468,15 @@ def server_command(*, model_path: Path = MODEL_PATH, telemetry: bool = False) ->
 
 
 def resolve_treatment(configuration: str, log_text: str) -> dict[str, Any]:
-    host_shared = (
-        "engram host table" in log_text.casefold() and "layout=shared" in log_text.casefold()
+    host_status_lines = [
+        line.casefold()
+        for line in log_text.splitlines()
+        if "engram host table" in line.casefold() and "layout=" in line.casefold()
+    ]
+    host_shared = bool(host_status_lines) and all(
+        "layout=shared" in line for line in host_status_lines
     )
-    host_pinned = host_shared and ", pinned" in log_text.casefold()
+    host_pinned = host_shared and all(", pinned" in line for line in host_status_lines)
     prefetch = "Engram layer 14 KV prefetch enabled for BS=1 decode" in log_text
     expected = {
         "CFG021": (False, False, False, "device"),
@@ -454,12 +486,28 @@ def resolve_treatment(configuration: str, log_text: str) -> dict[str, Any]:
     valid = (host_shared, host_pinned, prefetch) == expected[:3]
     return {
         "configuration": configuration,
+        "host_table_status_line_count": len(host_status_lines),
         "host_shared_resolved": host_shared,
         "host_pinned_resolved": host_pinned,
         "prefetch_stream_resolved": prefetch,
         "requested_mode": expected[3],
         "resolved_mode": expected[3] if valid else "unexpected-fallback-or-unsupported",
         "valid": valid,
+    }
+
+
+def resolved_server_configuration(info: dict[str, Any]) -> dict[str, Any]:
+    actual = {name: info.get(name) for name in EXPECTED_SERVER_CONFIGURATION}
+    mismatches = {
+        name: {"expected": expected, "actual": actual[name]}
+        for name, expected in EXPECTED_SERVER_CONFIGURATION.items()
+        if actual[name] != expected
+    }
+    return {
+        "valid": not mismatches,
+        "expected": EXPECTED_SERVER_CONFIGURATION,
+        "actual": actual,
+        "mismatches": mismatches,
     }
 
 
@@ -482,6 +530,36 @@ class ServerProcess:
             except ProcessLookupError:
                 pass
         self.pid_path.unlink(missing_ok=True)
+        wait_for_gpu_release()
+
+
+def wait_for_gpu_release(timeout: float = 120) -> None:
+    deadline = time.monotonic() + timeout
+    last_processes: list[str] = []
+    last_error = ""
+    while time.monotonic() < deadline:
+        result = subprocess.run(
+            [
+                "nvidia-smi",
+                "--query-compute-apps=pid,process_name,used_memory",
+                "--format=csv,noheader,nounits",
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            last_error = result.stderr.strip() or f"nvidia-smi exited {result.returncode}"
+            time.sleep(1)
+            continue
+        last_processes = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+        if not last_processes:
+            return
+        time.sleep(1)
+    raise RuntimeError(
+        "GPU release could not be verified after server stop: "
+        f"processes={last_processes} error={last_error or None}"
+    )
 
 
 def launch_server(
@@ -519,6 +597,7 @@ def launch_server(
     last_error = "server has not answered"
     while time.monotonic() < deadline:
         if process.poll() is not None:
+            server.stop()
             raise RuntimeError(f"SGLang exited with {process.returncode}; inspect {log_path}")
         try:
             info = healthcheck(BASE_URL, timeout=10)
@@ -531,9 +610,17 @@ def launch_server(
         raise RuntimeError(f"SGLang readiness timed out: {last_error}")
     readiness_ms = (time.monotonic_ns() - started_ns) / 1e6
     log_text = log_path.read_text(errors="replace")
+    resolved_configuration = resolved_server_configuration(info)
     treatment = resolve_treatment(configuration, log_text)
+    _write_json(work_dir / "resolved-server-configuration.json", resolved_configuration)
     _write_json(work_dir / "treatment-resolution.json", treatment)
     _write_json(work_dir / "server-info.json", info)
+    if not resolved_configuration["valid"]:
+        server.stop()
+        raise RuntimeError(
+            f"Resolved SGLang configuration does not match the frozen contract for "
+            f"{configuration}; retained at {work_dir}"
+        )
     if not treatment["valid"]:
         server.stop()
         raise RuntimeError(

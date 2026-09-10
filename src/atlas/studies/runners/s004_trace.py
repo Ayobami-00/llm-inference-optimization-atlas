@@ -68,8 +68,12 @@ def _repeat_to_length(values: Sequence[int], length: int) -> list[int]:
     return list(values) * quotient + list(values[:remainder])
 
 
-def _unique_prefix(encode: Callable[[str], list[int]], seed: int, ordinal: int) -> list[int]:
-    prefix = encode(f" {seed:08d}-{ordinal:08d} atlas unique request evidence boundary ")
+def _unique_prefix(
+    encode: Callable[[str], list[int]], seed: int, ordinal: int, namespace: str
+) -> list[int]:
+    prefix = encode(
+        f" {seed:08d}-{ordinal:08d} {namespace} atlas unique request evidence boundary "
+    )
     return _repeat_to_length(prefix, 32)
 
 
@@ -89,6 +93,7 @@ def exact_content_tokens(
     vocab_size: int,
     special_token_ids: Iterable[int],
     shared_prefix: Sequence[int] | None = None,
+    prefix_namespace: str = "generated",
 ) -> tuple[int, ...]:
     """Create an exact-length token sequence without relying on post-hoc estimates."""
 
@@ -97,7 +102,9 @@ def exact_content_tokens(
     if target_tokens < 33:
         raise ValueError("S004 inputs reserve 32 tokens for a prefix")
     prefix = (
-        list(shared_prefix) if shared_prefix is not None else _unique_prefix(encode, seed, ordinal)
+        list(shared_prefix)
+        if shared_prefix is not None
+        else _unique_prefix(encode, seed, ordinal, prefix_namespace)
     )
     prefix = _repeat_to_length(prefix, 32)
     payload_length = target_tokens - len(prefix)
@@ -169,6 +176,7 @@ def matrix_request(
             encode=encode,
             vocab_size=vocab_size,
             special_token_ids=special_token_ids,
+            prefix_namespace=f"matrix-{context_tokens}-{concurrency}-{family}",
         )
         cell = f"context-{context_tokens}-concurrency-{concurrency}"
     return RequestSpec(

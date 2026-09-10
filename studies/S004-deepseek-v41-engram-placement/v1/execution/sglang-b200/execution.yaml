@@ -30,6 +30,10 @@ extensions:
   atlas.preexecution-pilots:
     treatment_resolution: all three requested modes must resolve before any measurement
     failure_policy: preserve the failed pilot and stop before the collector pilot or confirmatory matrix
+  atlas.compilation-cache:
+    initialization: the all-treatment pilots materialize SGLang and FlashInfer compiled-kernel and autotune caches
+    measurement_state: the populated cache is retained unchanged for every confirmatory server process
+    readiness_scope: MET098 measures a warm-compilation-cache production restart
 platforms:
   - {os: linux, architecture: x86_64}
   - {os: macos, architecture: aarch64}
@@ -78,4 +82,4 @@ limitations:
   - The quick profile is portable and synthetic; only the full Linux x86_64 CUDA profile can produce accepted evidence.
   - The provider image exposes no immutable OCI digest, so RT004 pins the exact installed SGLang source files and complete package manifest instead.
   - Engram prefetch in the measured implementation is eligible only for single-row decode steps.
-  - Transparent huge pages remain at the provider default; no host or kernel tuning is performed.
+  - Shared-memory transparent huge pages remain disabled at the provider default; no host or kernel tuning is performed.

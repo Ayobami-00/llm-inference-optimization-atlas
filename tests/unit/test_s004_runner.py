@@ -4,10 +4,12 @@ import hashlib
 import json
 from collections import Counter, defaultdict
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 import atlas.studies.runners.s004_client as s004_client
+import atlas.studies.runners.s004_lifecycle as s004_lifecycle
 from atlas.studies.runners.s004 import (
     MINIMUM_SLO_CLASS_OBSERVATIONS,
     THERMAL_OR_POWER_THROTTLE_MASK,
@@ -31,9 +33,11 @@ from atlas.studies.runners.s004_lifecycle import (
     EXPECTED_TREATMENT_SOURCE_FINGERPRINT,
     host_memory_snapshot,
     resolve_treatment,
+    resolved_server_configuration,
     server_command,
     treatment_source_fingerprint,
     verify_model_manifest,
+    wait_for_gpu_release,
 )
 from atlas.studies.runners.s004_trace import (
     capacity_trace,
@@ -123,6 +127,31 @@ def test_unique_and_repeated_prefix_contracts() -> None:
     assert unique_a.request_id != repeated_a.request_id
     assert repeated_a.input_ids[:16384] == repeated_b.input_ids[:16384]
     assert repeated_a.input_ids[16384:] != repeated_b.input_ids[16384:]
+
+
+def test_primary_prefixes_are_unique_across_matrix_cells() -> None:
+    short = matrix_request(
+        context_tokens=1024,
+        concurrency=1,
+        family="natural_language",
+        seed=41001,
+        ordinal=1,
+        encode=_encode,
+        vocab_size=1024,
+        special_token_ids=set(),
+    )
+    long = matrix_request(
+        context_tokens=8192,
+        concurrency=8,
+        family="natural_language",
+        seed=41001,
+        ordinal=1,
+        encode=_encode,
+        vocab_size=1024,
+        special_token_ids=set(),
+    )
+
+    assert short.input_ids[:32] != long.input_ids[:32]
 
 
 def test_poisson_and_capacity_traces_are_reproducible() -> None:
@@ -251,6 +280,12 @@ def test_healthcheck_accepts_sglang_empty_health_body(
             True,
         ),
         ("CFG022", "Engram host table ready layout=shared, unpinned (ATS)", False),
+        (
+            "CFG022",
+            "Engram host table owner layout=shared, pinned\n"
+            "Engram host table peer layout=shared, unpinned (ATS)",
+            False,
+        ),
         ("CFG023", "Engram host table ready layout=shared, pinned", False),
         ("CFG021", "Engram host table ready layout=shared, pinned", False),
     ],
@@ -266,13 +301,62 @@ def test_server_command_freezes_the_confirmatory_shape() -> None:
 
     assert command[command.index("--tp-size") + 1] == "4"
     assert command[command.index("--ep-size") + 1] == "4"
+    assert command[command.index("--pp-size") + 1] == "1"
+    assert command[command.index("--dp-size") + 1] == "1"
     assert command[command.index("--mem-fraction-static") + 1] == "0.80"
+    assert command[command.index("--max-running-requests") + 1] == "64"
+    assert command[command.index("--schedule-policy") + 1] == "fcfs"
+    assert command[command.index("--num-continuous-decode-steps") + 1] == "1"
     assert command[command.index("--context-length") + 1] == "262400"
     assert command[command.index("--cuda-graph-max-bs-decode") + 1] == "64"
     assert command[command.index("--random-seed") + 1] == "20260910"
     assert command[command.index("--fp8-gemm-backend") + 1] == "flashinfer_cutedsl"
     assert command[command.index("--json-model-override-args") + 1] == '{"vision_config": null}'
     assert "--enable-metrics" in command
+
+
+def test_resolved_server_configuration_is_machine_checked() -> None:
+    expected = {
+        "tp_size": 4,
+        "ep_size": 4,
+        "pp_size": 1,
+        "dp_size": 1,
+        "mem_fraction_static": 0.8,
+        "max_running_requests": 64,
+        "schedule_policy": "fcfs",
+        "num_continuous_decode_steps": 1,
+        "context_length": 262400,
+        "random_seed": 20260910,
+        "fp8_gemm_runner_backend": "flashinfer_cutedsl",
+        "json_model_override_args": '{"vision_config": null}',
+        "enable_dp_attention": False,
+        "speculative_algorithm": None,
+        "enable_hierarchical_cache": False,
+    }
+
+    assert resolved_server_configuration(expected)["valid"] is True
+    expected["max_running_requests"] = 256
+    mismatch = resolved_server_configuration(expected)
+    assert mismatch["valid"] is False
+    assert mismatch["mismatches"]["max_running_requests"] == {
+        "expected": 64,
+        "actual": 256,
+    }
+
+
+def test_gpu_release_waits_until_all_child_processes_exit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    responses = iter(
+        (
+            SimpleNamespace(stdout="1234, scheduler, 100\n", stderr="", returncode=0),
+            SimpleNamespace(stdout="", stderr="", returncode=0),
+        )
+    )
+    monkeypatch.setattr(s004_lifecycle.subprocess, "run", lambda *_args, **_kwargs: next(responses))
+    monkeypatch.setattr(s004_lifecycle.time, "sleep", lambda _seconds: None)
+
+    wait_for_gpu_release(timeout=1)
 
 
 def test_treatment_source_aggregate_is_canonical_and_frozen() -> None:
@@ -364,6 +448,52 @@ def test_treatment_resolution_pilots_cover_all_modes_and_resume(
     assert first["status"] == "pass"
     assert launched == ["CFG021", "CFG022", "CFG023"]
     assert stopped == launched
+
+
+def test_treatment_pilot_retry_preserves_failed_attempt(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    calls = 0
+
+    class FakeServer:
+        def stop(self) -> None:
+            return None
+
+    def fake_preflight(*_args: object, **_kwargs: object) -> dict[str, object]:
+        return {"valid": True}
+
+    def fake_launch_server(
+        *, configuration: str, work_dir: Path, telemetry: bool
+    ) -> tuple[FakeServer, dict[str, object], dict[str, object], float]:
+        nonlocal calls
+        del work_dir, telemetry
+        calls += 1
+        if calls == 1:
+            raise RuntimeError("synthetic startup failure")
+        return (
+            FakeServer(),
+            {"max_total_num_tokens": 1234, "internal_states": []},
+            {"configuration": configuration, "valid": True},
+            10.0,
+        )
+
+    monkeypatch.setattr("atlas.studies.runners.s004.preflight", fake_preflight)
+    monkeypatch.setattr("atlas.studies.runners.s004.launch_server", fake_launch_server)
+    work = tmp_path / "work"
+
+    with pytest.raises(RuntimeError, match="synthetic startup failure"):
+        _run_treatment_resolution_pilots(tmp_path, work)
+    result = _run_treatment_resolution_pilots(tmp_path, work)
+
+    first = json.loads(
+        (work / "treatment-resolution-pilots/CFG021/attempt-1/result.json").read_text()
+    )
+    second = json.loads(
+        (work / "treatment-resolution-pilots/CFG021/attempt-2/result.json").read_text()
+    )
+    assert first["status"] == "fail"
+    assert second["status"] == "pass"
+    assert result["status"] == "pass"
 
 
 def test_slo_gate_reports_and_enforces_timeout_rate() -> None:

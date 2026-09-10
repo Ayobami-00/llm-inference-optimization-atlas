@@ -1094,23 +1094,31 @@ def _run_treatment_resolution_pilots(root: Path, work_dir: Path) -> dict[str, An
     results: list[dict[str, Any]] = []
     for configuration in ("CFG021", "CFG022", "CFG023"):
         configuration_root = pilot_root / configuration
-        result_path = configuration_root / "result.json"
-        if result_path.is_file():
-            retained = load_data(result_path)
+        retained_result = None
+        for prior_result_path in sorted(configuration_root.glob("attempt-*/result.json")):
+            retained = load_data(prior_result_path)
             if isinstance(retained, dict) and retained.get("status") == "pass":
-                results.append(retained)
-                continue
+                retained_result = retained
+                break
+        if retained_result is not None:
+            results.append(retained_result)
+            continue
 
-        preflight(
-            root,
-            configuration_root / "preflight.json",
-            verify_weights=False,
-        )
+        attempt_number = 1
+        while (attempt_root := configuration_root / f"attempt-{attempt_number}").exists():
+            attempt_number += 1
+        result_path = attempt_root / "result.json"
+
         server = None
         try:
+            preflight(
+                root,
+                attempt_root / "preflight.json",
+                verify_weights=False,
+            )
             server, info, treatment, readiness_ms = launch_server(
                 configuration=configuration,
-                work_dir=configuration_root / "server",
+                work_dir=attempt_root / "server",
                 telemetry=False,
             )
             result = {
@@ -1212,7 +1220,8 @@ def _run_full(work_dir: Path) -> None:
     aiperf_binary = Path(os.environ.get("ATLAS_S004_AIPERF_BIN", str(AIPERF_DEFAULT_BINARY)))
     aiperf_version = verify_aiperf(aiperf_binary)
     root = repository_root()
-    _write_json(work_dir / "preregistration-gate.json", verify_preregistration_pushed(root))
+    preregistration = verify_preregistration_pushed(root)
+    _write_json(work_dir / "preregistration-gate.json", preregistration)
     preflight_data = preflight(root, work_dir / "full-preflight.json", verify_weights=True)
     encode, vocab_size, special_ids = _load_tokenizer()
     study_root = root / "studies/S004-deepseek-v41-engram-placement/v1"
@@ -1379,6 +1388,7 @@ def _run_full(work_dir: Path) -> None:
                         repeated_prefix=True,
                     )
 
+                flush_cache(BASE_URL)
                 _warmup(base_url=BASE_URL, factory=prefix_factory, concurrency=8, count=32)
                 prefix = run_fixed_concurrency(
                     BASE_URL,
@@ -1483,6 +1493,9 @@ def _run_full(work_dir: Path) -> None:
                     },
                     artifact_checksums={
                         "model-manifest": str(preflight_data["model"]["aggregate_sha256"]),
+                        "trace-generator": lifecycle_sha256_file(
+                            Path(__file__).with_name("s004_trace.py")
+                        ),
                         "sglang-treatment-source-files": str(
                             preflight_data["runtime"]["treatment_source_fingerprint"]
                         ),
@@ -1504,6 +1517,7 @@ def _run_full(work_dir: Path) -> None:
                         for name, value in {
                             **CONDITION_ENVIRONMENT[configuration],
                             "configuration": configuration,
+                            "atlas_git_head": str(preregistration["head"]),
                         }.items()
                     ],
                 )

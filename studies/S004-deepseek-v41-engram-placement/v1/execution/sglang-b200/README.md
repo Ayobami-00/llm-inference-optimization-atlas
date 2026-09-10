@@ -50,6 +50,11 @@ mode is retained under `.atlas/work` and stops execution before measurement.
 For CFG022 and CFG023, `layout=shared, pinned` is required; SGLang's unpinned
 ATS fallback is not accepted as the preregistered treatment.
 
+Those pilots also populate the pinned SGLang and FlashInfer compiled-kernel and
+autotune caches for every treatment. The cache is then retained unchanged, so
+`MET098` represents a warm-compilation-cache production restart. Per-request
+prefix/KV state is still cleared according to the workload protocol.
+
 Every condition starts in a new SGLang process. Logs, invalid attempts, failure
 state, treatment resolution, capacity points, and full telemetry stay ignored
 under `.atlas/work`. Only successfully validated candidates are promoted, at
