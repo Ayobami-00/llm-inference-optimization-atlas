@@ -110,7 +110,9 @@ Before promotion, finalize each mutable `R0000` candidate and then run the
 ordinary evidence validator:
 
 ```bash
-python -m atlas.studies.runners.s004_finalize .atlas/work/.../candidates/runs/block-1-CFG021
+python -m atlas.studies.runners.s004_finalize \
+  .atlas/work/.../candidates/runs/block-1-CFG021 \
+  --server-log .atlas/work/.../attempts/block-1-CFG021-retry-2/server/server.log
 atlas evidence validate .atlas/work/.../candidates/runs/block-1-CFG021
 atlas evidence promote .atlas/work/.../candidates/runs/block-1-CFG021
 ```
@@ -125,3 +127,15 @@ declared tested domain, not a claim of zero physical service capacity. The
 finalizer records its policy and implementation fingerprints and reseals the
 draft checksum manifest. It refuses an allocated run, so accepted evidence is
 never mutated.
+
+The finalizer also converts the retained server log into privacy-safe diagnostic
+counts and a source-log fingerprint. PyTorch 2.13 reports a warning at
+`CUDACachingAllocator.cpp:3933` for an initial failed `cudaMalloc`, including
+cases where the caching allocator releases cached blocks, retries, and the
+request completes. This behavior is documented in PyTorch's
+[allocator issue 193195](https://github.com/pytorch/pytorch/issues/193195) and
+[v2.13.0 retry path](https://github.com/pytorch/pytorch/blob/v2.13.0/c10/cuda/CUDACachingAllocator.cpp#L1770-L1792).
+The study reports these as allocator memory-pressure retry warnings, separately
+from a raised `torch.OutOfMemoryError`, request failure, or server failure. A
+real OOM failure remains invalid under the frozen failure policy; a recovered
+allocator retry is not relabeled as a failed request.

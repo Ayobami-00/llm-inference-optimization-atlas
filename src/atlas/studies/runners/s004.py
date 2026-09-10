@@ -36,6 +36,7 @@ from atlas.studies.runners.s004_client import (
     run_fixed_concurrency,
     run_open_loop,
 )
+from atlas.studies.runners.s004_diagnostics import server_log_diagnostics
 from atlas.studies.runners.s004_finalize import apply_slo_status
 from atlas.studies.runners.s004_lifecycle import (
     BASE_URL,
@@ -738,20 +739,6 @@ def _measurement_health(
             "incomplete_gpu_health_cycle_count": incomplete_gpu_health_cycles,
             "by_gpu": power_limit_by_gpu,
         },
-    }
-
-
-def _server_log_diagnostics(server_log: Path) -> dict[str, Any]:
-    text = server_log.read_text(errors="replace")
-    batch_sizes = [
-        int(match.group(1))
-        for match in re.finditer(r"#running-req:\s*([0-9]+)", text, re.IGNORECASE)
-    ]
-    return {
-        "maximum_reported_running_batch": max(batch_sizes, default=0),
-        "reported_running_batch_observations": len(batch_sizes),
-        "preemption_log_mentions": len(re.findall(r"\bpreempt(?:ion|ed|ing)?\b", text, re.I)),
-        "fallback_log_mentions": len(re.findall(r"\bfallback\b", text, re.I)),
     }
 
 
@@ -1740,7 +1727,7 @@ def _run_full(work_dir: Path) -> None:
                         "treatment_resolution": treatment,
                         "measurement_health": health,
                         "instrumentation": _instrumentation_summary(telemetry_events),
-                        "server_log_diagnostics": _server_log_diagnostics(server.log_path),
+                        "server_log_diagnostics": server_log_diagnostics(server.log_path),
                         "runtime_package_manifest_sha256": preflight_data["runtime"][
                             "package_manifest_sha256"
                         ],

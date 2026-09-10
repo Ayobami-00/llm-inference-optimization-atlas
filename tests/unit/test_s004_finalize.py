@@ -180,6 +180,71 @@ def test_finalize_s004_draft_is_idempotent_and_reseals_checksums(tmp_path: Path)
     assert f"{expected_digest}  metrics/summary.json" in manifest
 
 
+def test_finalize_s004_draft_attaches_matching_server_log_diagnostics(tmp_path: Path) -> None:
+    draft = tmp_path / "draft"
+    summary_path = draft / "metrics" / "summary.json"
+    summary_path.parent.mkdir(parents=True)
+    summary = _summary(
+        [(0.2, "pass"), (0.4, "pass")],
+        boundary_status="right-censored",
+        upper=None,
+        width=None,
+        resolved=False,
+    )
+    summary["server_log_diagnostics"] = {
+        "maximum_reported_running_batch": 8,
+        "reported_running_batch_observations": 1,
+        "preemption_log_mentions": 0,
+        "fallback_log_mentions": 0,
+    }
+    summary_path.write_text(json.dumps(summary))
+    (draft / "run.yaml").write_text(
+        json.dumps({"id": "R0000", "experiment": "atlas://experiment/E0013@v1"})
+    )
+    _seal(draft)
+    server_log = tmp_path / "server.log"
+    server_log.write_text(
+        "Decode batch, #running-req: 8\n"
+        "[rank0]:[W910 CUDACachingAllocator.cpp:3933] memory allocation failed with OOM "
+        "on device 0 while trying to allocate 7516192768 bytes "
+        "(free: 1547173888, total: 191495471104).\n"
+    )
+
+    first = finalize_s004_draft(draft, server_log=server_log)
+    second = finalize_s004_draft(draft, server_log=server_log)
+
+    assert first == second
+    assert first["server_log_diagnostics_attached"] is True
+    finalized = json.loads(summary_path.read_text())
+    pressure = finalized["server_log_diagnostics"]["allocator_memory_pressure"]
+    assert pressure["retry_warning_count"] == 1
+    assert pressure["fatal_oom_exception_mentions"] == 0
+
+
+def test_finalize_s004_draft_rejects_mismatched_server_log(tmp_path: Path) -> None:
+    draft = tmp_path / "draft"
+    summary_path = draft / "metrics" / "summary.json"
+    summary_path.parent.mkdir(parents=True)
+    summary = _summary(
+        [(0.2, "fail")],
+        boundary_status="left-censored",
+        upper=0.2,
+        width=None,
+        resolved=False,
+    )
+    summary["server_log_diagnostics"] = {"maximum_reported_running_batch": 8}
+    summary_path.write_text(json.dumps(summary))
+    (draft / "run.yaml").write_text(
+        json.dumps({"id": "R0000", "experiment": "atlas://experiment/E0013@v1"})
+    )
+    _seal(draft)
+    server_log = tmp_path / "server.log"
+    server_log.write_text("Decode batch, #running-req: 4\n")
+
+    with pytest.raises(ValueError, match="maximum_reported_running_batch"):
+        finalize_s004_draft(draft, server_log=server_log)
+
+
 def test_finalize_s004_draft_refuses_allocated_evidence(tmp_path: Path) -> None:
     draft = tmp_path / "draft"
     (draft / "metrics").mkdir(parents=True)

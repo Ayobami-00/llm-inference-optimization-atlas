@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from atlas.studies.evidence_writer import sha256_file
+from atlas.studies.runners.s004_diagnostics import server_log_diagnostics
 from atlas.utilities.serialization import load_data
 
 SLO_DERIVATION_POLICY_VERSION = "E0013-SLO-DERIVATION-001"
@@ -249,7 +250,24 @@ def _verify_existing_manifest(draft: Path) -> None:
         )
 
 
-def finalize_s004_draft(draft: Path) -> dict[str, Any]:
+def _attach_server_log_diagnostics(summary: dict[str, Any], server_log: Path) -> None:
+    diagnostics = server_log_diagnostics(server_log)
+    existing = summary.get("server_log_diagnostics")
+    if existing is not None:
+        if not isinstance(existing, dict):
+            raise ValueError("Existing server_log_diagnostics must be an object")
+        for key in (
+            "maximum_reported_running_batch",
+            "reported_running_batch_observations",
+            "preemption_log_mentions",
+            "fallback_log_mentions",
+        ):
+            if key in existing and existing[key] != diagnostics[key]:
+                raise ValueError(f"Server log does not match existing server_log_diagnostics.{key}")
+    summary["server_log_diagnostics"] = diagnostics
+
+
+def finalize_s004_draft(draft: Path, *, server_log: Path | None = None) -> dict[str, Any]:
     """Finalize mutable S004 draft metadata and reseal its checksum manifest."""
 
     if draft.is_symlink():
@@ -268,6 +286,8 @@ def finalize_s004_draft(draft: Path) -> dict[str, Any]:
     summary = load_data(summary_path)
     if not isinstance(summary, dict):
         raise ValueError("Draft has no valid metrics/summary.json")
+    if server_log is not None:
+        _attach_server_log_diagnostics(summary, server_log)
     apply_slo_status(summary)
     summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
     _reseal_draft(draft)
@@ -277,6 +297,7 @@ def finalize_s004_draft(draft: Path) -> dict[str, Any]:
         "slo_passed": summary["slo_passed"],
         "slo_eligible": summary["slo_eligible"],
         "slo_boundary_status": summary["slo_boundary_status"],
+        "server_log_diagnostics_attached": server_log is not None,
         "summary_sha256": sha256_file(summary_path),
         "checksums_sha256": sha256_file(draft / "checksums.sha256"),
     }
@@ -287,8 +308,19 @@ def main() -> None:
         description="Derive S004 SLO publication metadata and reseal a mutable run draft."
     )
     parser.add_argument("draft", type=Path)
+    parser.add_argument(
+        "--server-log",
+        type=Path,
+        help="Retained attempt server log used to attach privacy-safe memory-pressure counts.",
+    )
     args = parser.parse_args()
-    print(json.dumps(finalize_s004_draft(args.draft), indent=2, sort_keys=True))
+    print(
+        json.dumps(
+            finalize_s004_draft(args.draft, server_log=args.server_log),
+            indent=2,
+            sort_keys=True,
+        )
+    )
 
 
 if __name__ == "__main__":
