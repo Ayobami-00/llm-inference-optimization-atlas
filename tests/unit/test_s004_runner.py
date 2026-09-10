@@ -8,7 +8,9 @@ from pathlib import Path
 import pytest
 
 from atlas.studies.runners.s004 import (
+    MINIMUM_SLO_CLASS_OBSERVATIONS,
     THERMAL_OR_POWER_THROTTLE_MASK,
+    _capacity_bisection_rate,
     _completed_attempt,
     _new_attempt_directory,
     _scoped_breakdown,
@@ -275,11 +277,24 @@ def _result(
 
 
 def test_slo_gate_requires_every_context_class_and_load_generator_health() -> None:
-    passing = [_result(name) for name in ("context-8k", "context-32k", "context-128k")]
+    passing = [
+        _result(name)
+        for name in ("context-8k", "context-32k", "context-128k")
+        for _ in range(MINIMUM_SLO_CLASS_OBSERVATIONS)
+    ]
     assert _slo_result(passing)["status"] == "pass"
-    assert _slo_result(passing[:2])["status"] == "insufficient"
+    assert _slo_result(passing[:-1])["status"] == "insufficient"
     lagged = [*passing, _result("context-8k", lag=0.02)]
     assert _slo_result(lagged)["status"] == "fail"
+
+
+def test_geometric_capacity_bisection_resolves_a_factor_two_bracket_in_three_steps() -> None:
+    low = 1.0
+    high = 2.0
+    for _ in range(3):
+        high = _capacity_bisection_rate(low, high)
+
+    assert (high - low) / low < 0.10
 
 
 def test_slo_gate_reports_and_enforces_timeout_rate() -> None:
@@ -299,7 +314,9 @@ def test_slo_gate_reports_and_enforces_timeout_rate() -> None:
 
 def test_slo_failure_without_completions_serializes_without_nan() -> None:
     failed = [
-        _result(name, outcome="timeout") for name in ("context-8k", "context-32k", "context-128k")
+        _result(name, outcome="timeout")
+        for name in ("context-8k", "context-32k", "context-128k")
+        for _ in range(MINIMUM_SLO_CLASS_OBSERVATIONS)
     ]
 
     result = _slo_result(failed)

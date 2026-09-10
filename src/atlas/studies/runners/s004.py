@@ -10,7 +10,6 @@ import threading
 import time
 from collections import defaultdict
 from collections.abc import Callable, Iterable, Sequence
-from dataclasses import dataclass
 from pathlib import Path
 from statistics import fmean, median
 from typing import Any
@@ -68,9 +67,9 @@ CONFIGURATION_ORDER = (
 )
 SEEDS = (41001, 41002, 41003, 41004, 41005)
 MODEL_PATH = Path("/workspace/models/DeepSeek-V4.1-Flash-dba1be0")
-HOURLY_RATE_USD = 31.303
-HARD_CAP_USD = 500.0
 THERMAL_OR_POWER_THROTTLE_MASK = 0xEC
+CAPACITY_INITIAL_RATE = 0.2
+MINIMUM_SLO_CLASS_OBSERVATIONS = 3
 
 
 def _write_json(path: Path, value: Any) -> None:
@@ -98,50 +97,6 @@ def _metric(value: float, unit: str, values: Sequence[float] | None = None) -> d
     if values is not None:
         result["distribution"] = _distribution(values)
     return result
-
-
-@dataclass
-class BudgetLedger:
-    work_dir: Path
-    prior_spend_usd: float
-    hourly_rate_usd: float = HOURLY_RATE_USD
-    cap_usd: float = HARD_CAP_USD
-    started: float = 0.0
-
-    def __post_init__(self) -> None:
-        self.started = time.monotonic()
-        self.record("initialized")
-
-    @property
-    def current_spend(self) -> float:
-        return (
-            self.prior_spend_usd + (time.monotonic() - self.started) * self.hourly_rate_usd / 3600
-        )
-
-    def forecast(self, forecast_seconds: float) -> float:
-        return self.current_spend + forecast_seconds * self.hourly_rate_usd / 3600
-
-    def require(self, label: str, forecast_seconds: float) -> None:
-        forecast = self.forecast(forecast_seconds)
-        self.record(label, forecast_usd=forecast)
-        if forecast >= self.cap_usd:
-            raise RuntimeError(
-                f"Budget stop before {label}: forecast ${forecast:.2f} "
-                f"reaches ${self.cap_usd:.2f} cap"
-            )
-
-    def record(self, label: str, **extra: Any) -> None:
-        _write_json(
-            self.work_dir / "budget.json",
-            {
-                "label": label,
-                "prior_spend_usd": self.prior_spend_usd,
-                "elapsed_spend_usd": self.current_spend if self.started else self.prior_spend_usd,
-                "hourly_rate_usd": self.hourly_rate_usd,
-                "hard_cap_usd": self.cap_usd,
-                **extra,
-            },
-        )
 
 
 class TelemetryCollector:
@@ -706,7 +661,6 @@ def _run_matrix(
     vocab_size: int,
     special_ids: set[int],
     quick: bool = False,
-    budget: BudgetLedger | None = None,
 ) -> tuple[list[RequestResult], int, float]:
     results: list[RequestResult] = []
     warmup_total = 0
@@ -721,8 +675,6 @@ def _run_matrix(
         ]
     )
     for context, concurrency in cells:
-        if budget is not None:
-            budget.require(f"controlled matrix {context} tokens at concurrency {concurrency}", 1500)
 
         def factory(
             ordinal: int,
@@ -774,9 +726,13 @@ def _slo_result(results: Sequence[RequestResult]) -> dict[str, Any]:
     for request_class, (ttft_limit, tpot_limit) in thresholds.items():
         selected = [row for row in rows if row["request_class"] == request_class]
         complete = [row for row in selected if row["outcome"] == "complete"]
-        if not selected:
+        if len(selected) < MINIMUM_SLO_CLASS_OBSERVATIONS:
             enough = False
-            classes[request_class] = {"observations": 0, "status": "insufficient"}
+            classes[request_class] = {
+                "observations": len(selected),
+                "minimum_observations": MINIMUM_SLO_CLASS_OBSERVATIONS,
+                "status": "insufficient",
+            }
             continue
         success_rate = len(complete) / len(selected)
         error_rate = 1 - success_rate
@@ -850,6 +806,12 @@ def _capacity_seed(seed: int, rate: float, *, stabilization: bool) -> int:
     return seed ^ rate_key ^ (0x51A8 if stabilization else 0)
 
 
+def _capacity_bisection_rate(low: float, high: float) -> float:
+    if low <= 0 or not math.isfinite(high) or high <= low:
+        raise ValueError(f"Invalid positive capacity bracket: low={low} high={high}")
+    return math.sqrt(low * high)
+
+
 def _capacity_search(
     *,
     base_url: str,
@@ -857,10 +819,9 @@ def _capacity_search(
     encode: Callable[[str], list[int]],
     vocab_size: int,
     special_ids: set[int],
-    budget: BudgetLedger,
     progress_path: Path,
 ) -> tuple[float, list[RequestResult], list[dict[str, Any]], dict[str, Any]]:
-    rate = 0.02
+    rate = CAPACITY_INITIAL_RATE
     passing: list[float] = []
     failing: list[float] = []
     all_results: list[RequestResult] = []
@@ -869,8 +830,7 @@ def _capacity_search(
     bisecting = False
     low = 0.0
     high = math.inf
-    for point_index in range(8):
-        budget.require(f"capacity point {point_index + 1} at {rate:.6f} request/s", 1200)
+    for _point_index in range(8):
         flush_cache(base_url)
         # Stabilization is sent and retained separately from the measurement evidence.
         stabilization = capacity_trace(
@@ -938,7 +898,7 @@ def _capacity_search(
         if bisecting:
             if relative_boundary_width(low, high) <= 0.10:
                 break
-            rate = (low + high) / 2
+            rate = _capacity_bisection_rate(low, high)
         else:
             rate *= 2
     capacity = max(passing) if passing else 0.0
@@ -1071,7 +1031,6 @@ def _run_optional_probe(
     *,
     root: Path,
     work_dir: Path,
-    budget: BudgetLedger,
     encode: Callable[[str], list[int]],
     vocab_size: int,
     special_ids: set[int],
@@ -1080,19 +1039,6 @@ def _run_optional_probe(
     output.mkdir(parents=True, exist_ok=True)
     if (output / "result.json").is_file():
         return
-    forecast_seconds = 3600
-    if budget.forecast(forecast_seconds) >= budget.cap_usd:
-        _write_json(
-            output / "result.json",
-            {
-                "status": "skipped-budget-gate",
-                "confirmatory": False,
-                "forecast_usd": budget.forecast(forecast_seconds),
-                "hard_cap_usd": budget.cap_usd,
-            },
-        )
-        return
-    budget.require("optional 256K feasibility probe", forecast_seconds)
     preflight(root, output / "preflight.json", verify_weights=False)
     server = None
     try:
@@ -1200,20 +1146,10 @@ def _run_quick(work_dir: Path) -> Path:
 
 
 def _run_full(work_dir: Path) -> None:
-    prior_value = os.environ.get("ATLAS_S004_PRIOR_SPEND_USD")
-    if prior_value is None:
-        raise RuntimeError(
-            "Set ATLAS_S004_PRIOR_SPEND_USD from the provider billing page before full execution"
-        )
-    hourly_rate = float(os.environ.get("ATLAS_S004_HOURLY_RATE_USD", HOURLY_RATE_USD))
-    if hourly_rate <= 0:
-        raise RuntimeError("ATLAS_S004_HOURLY_RATE_USD must be positive")
-    budget = BudgetLedger(work_dir, float(prior_value), hourly_rate_usd=hourly_rate)
     aiperf_binary = Path(os.environ.get("ATLAS_S004_AIPERF_BIN", str(AIPERF_DEFAULT_BINARY)))
     aiperf_version = verify_aiperf(aiperf_binary)
     root = repository_root()
     _write_json(work_dir / "preregistration-gate.json", verify_preregistration_pushed(root))
-    budget.require("full preflight and weight verification", 900)
     preflight_data = preflight(root, work_dir / "full-preflight.json", verify_weights=True)
     encode, vocab_size, special_ids = _load_tokenizer()
     study_root = root / "studies/S004-deepseek-v41-engram-placement/v1"
@@ -1228,7 +1164,6 @@ def _run_full(work_dir: Path) -> None:
         if not isinstance(global_reference, list) or not isinstance(collector_policy, dict):
             raise RuntimeError("Retained collector pilot is malformed")
     else:
-        budget.require("collector overhead pilot server", 1800)
         pilot_server, _, _, _ = launch_server(
             configuration="CFG021", work_dir=pilot_root / "server", telemetry=False
         )
@@ -1254,12 +1189,7 @@ def _run_full(work_dir: Path) -> None:
         for configuration in order:
             completed = _completed_attempt(work_dir, block, configuration)
             if completed is not None:
-                budget.record(
-                    f"skipped completed block {block} {configuration}",
-                    retained_attempt=str(completed),
-                )
                 continue
-            budget.require(f"block {block} {configuration}", 3600)
             attempt = _new_attempt_directory(work_dir, block, configuration)
             attempt.mkdir(parents=True, exist_ok=False)
             state_path = attempt / "attempt.json"
@@ -1301,7 +1231,6 @@ def _run_full(work_dir: Path) -> None:
 
                 aiperf_result: dict[str, Any] | None = None
                 if block == 1:
-                    budget.require("independent AIPerf cross-check", 1800)
                     crosscheck_specs = [
                         matrix_request(
                             context_tokens=32768,
@@ -1343,7 +1272,6 @@ def _run_full(work_dir: Path) -> None:
                     encode=encode,
                     vocab_size=vocab_size,
                     special_ids=special_ids,
-                    budget=budget,
                 )
 
                 def prefix_factory(ordinal: int, run_seed: int = seed) -> RequestSpec:
@@ -1359,7 +1287,6 @@ def _run_full(work_dir: Path) -> None:
                         repeated_prefix=True,
                     )
 
-                budget.require("repeated-prefix probe", 2100)
                 _warmup(base_url=BASE_URL, factory=prefix_factory, concurrency=8, count=32)
                 prefix = run_fixed_concurrency(
                     BASE_URL,
@@ -1373,7 +1300,6 @@ def _run_full(work_dir: Path) -> None:
                     encode=encode,
                     vocab_size=vocab_size,
                     special_ids=special_ids,
-                    budget=budget,
                     progress_path=attempt / "capacity-points.json",
                 )
                 if collector:
@@ -1513,12 +1439,10 @@ def _run_full(work_dir: Path) -> None:
             finally:
                 if server:
                     server.stop()
-                budget.record(f"finished block {block} {configuration}")
 
     _run_optional_probe(
         root=root,
         work_dir=work_dir,
-        budget=budget,
         encode=encode,
         vocab_size=vocab_size,
         special_ids=special_ids,

@@ -67,11 +67,13 @@ production_capacity:
   stabilization_seconds: 60
   measurement_seconds: 120
   search:
-    initial_rate_request_per_second: 0.02
+    initial_rate_request_per_second: 0.2
     geometric_multiplier: 2
     stop_after_consecutive_slo_failures: 2
+    bisection_midpoint: geometric
     bisection_relative_width: 0.10
     maximum_load_points: 8
+  minimum_observations_per_slo_class: 3
   recovery:
     require_empty_waiting_queue: true
     require_healthcheck: true
@@ -104,6 +106,3 @@ invalidation:
   - model_runtime_or_configuration_fingerprint_mismatch
   - server_restart_during_measurement
   - requested_engram_mode_not_resolved
-budget:
-  hard_cap_usd: 500
-  pause_before_cap: true

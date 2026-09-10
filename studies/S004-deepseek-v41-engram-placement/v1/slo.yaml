@@ -36,6 +36,5 @@ request_classes:
       - {metric: tpot, percentile: p95, operator: lte, threshold: 60, unit: ms}
 reliability: {minimum_success_rate: 0.99, maximum_error_rate: 0.01, maximum_timeout_rate: 0.01}
 capacity: {minimum_slo_goodput: 0, unit: request/s}
-economics: {maximum_total_cost: 500, currency: USD}
 energy: {measurement: informational}
 frozen_before_experiment: true

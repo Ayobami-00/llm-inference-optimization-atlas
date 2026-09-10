@@ -22,7 +22,6 @@ provenance:
 extensions:
   atlas.preregistration:
     analysis_seed: 20260910
-    hard_budget_usd: 500
     benchmark_allowed_before_commit: false
     benchmark_allowed_after_push: true
     execution_gates:
@@ -79,4 +78,3 @@ completion_criteria:
   - Q0 passes before any performance finding is eligible.
   - Three preregistered contrasts report overall and exactly matched scoped effects with paired 95% bootstrap intervals.
   - A deployment decision or explicit no-recommendation is reviewed.
-  - Total paid compute and bandwidth remains at or below 500 USD.

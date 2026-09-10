@@ -43,12 +43,12 @@ transformations:
   - {name: unique-prefix-injection, tokens: 32, exception: repeated-prefix-probe}
 fingerprint:
   algorithm: sha256
-  value: 5691aa440528d18fd8f5492baeecba36766439686dc4702cb71c4be41fd4ccc6
+  value: 122b39d27397fc21a2aa6c28e2cebe9db68aaf4908be59eb79ce09b4ad8ac01a
 files:
   - path: studies/S004-deepseek-v41-engram-placement/v1/inputs/trace-spec.yaml
     media_type: application/yaml
-    sha256: 67cc739727223b55329c09a39667c13ffe5d75e726afc72ced3d5158a1401ef0
-    size_bytes: 4169
+    sha256: fbb0b229e2ab24b561de78041af7cf8cf4e4d8fe3f0cfb40bad252ee914ec9c3
+    size_bytes: 4189
   - path: studies/S004-deepseek-v41-engram-placement/v1/inputs/correctness-cases.jsonl
     media_type: application/x-ndjson
     sha256: 5af922f2659d39ff375440181ac6b88c5248bdbe6d0292b825c5a9c6b8cc18c1

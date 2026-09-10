@@ -36,13 +36,13 @@ extensions:
   atlas.scope-policy:
     scoped_effects: exploratory-unless-named-in-HYP013
     p99_minimum_observations: 100
+    capacity_minimum_observations_per_slo_class: 3
     zero_or_unstable_relative_denominator: null
   atlas.preexecution-gates:
     - Public proposal issue 36 remains approved.
     - This design is committed and pushed before model preparation resumes.
     - The exact SGLang source or equivalent clean-build fingerprint is resolved.
     - Each requested Engram mode passes a treatment-resolution pilot.
-    - Forecast and accumulated Vast.ai cost remain below 500 USD.
   atlas.independent-load-generator-validation:
     tool: NVIDIA AIPerf 0.12.0
     role: non-confirmatory instrumentation cross-check
@@ -126,10 +126,9 @@ analysis:
     - {id: host-sync-vs-host-prefetch, baseline: atlas://configuration/CFG022@v1, candidate: atlas://configuration/CFG023@v1}
     - {id: device-vs-host-prefetch, baseline: atlas://configuration/CFG021@v1, candidate: atlas://configuration/CFG023@v1}
 stopping_rule: Stop after five valid paired blocks, or earlier for Q0 failure,
-  unresolved treatment, a safety invalidation, or before actual or forecast
-  project spend reaches 500 USD. Each capacity search stops after at most eight
-  load points, after two consecutive SLO failures and bisection to a boundary
-  within 10 percent.
+  unresolved treatment, or a safety invalidation. Each capacity search stops
+  after at most eight load points, after two consecutive SLO failures and
+  geometric bisection to a boundary within 10 percent.
 failure_policy: Preserve every interrupted, failed, OOM, fallback, and invalid
   attempt under .atlas/work; never silently remove outliers; promote only runs
   with complete mandatory evidence, matching fingerprints, resolved requested

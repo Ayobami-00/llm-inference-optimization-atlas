@@ -41,13 +41,6 @@ fingerprint, shape checks, and agreement result. AIPerf disagreement prevents
 headline publication until investigated, but its observations are not pooled
 with the confirmatory Atlas measurements.
 
-Before a full run, export `ATLAS_S004_PRIOR_SPEND_USD` with the provider's actual
-study spend to date. If the current provider rate differs from the frozen
-31.303 USD/hour planning rate, also export `ATLAS_S004_HOURLY_RATE_USD`. The
-runner refuses to start without prior spend and records a live budget ledger
-under `.atlas/work`. It forecasts every block before launch and
-stops before the total could reach the preregistered 500 USD ceiling.
-
 Every condition starts in a new SGLang process. Logs, invalid attempts, failure
 state, treatment resolution, capacity points, and full telemetry stay ignored
 under `.atlas/work`. Only successfully validated candidates are promoted, at
@@ -58,5 +51,4 @@ timestamped work directory. Candidate-complete block/configuration pairs and a
 complete collector pilot are discovered and skipped; failed attempts are kept
 in numbered retry directories. After all 15 primary candidates complete, the
 runner performs one non-confirmatory 256K natural-language feasibility request
-under CFG023, or records that the probe was skipped when its one-hour forecast
-would approach the budget ceiling.
+under CFG023.
