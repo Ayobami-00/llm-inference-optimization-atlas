@@ -22,18 +22,10 @@ def test_strict_validation_rejects_effect_plan_missing_a_primary_metric(
     tmp_path: Path,
 ) -> None:
     root = Path(__file__).resolve().parents[2]
-    source = (
-        root
-        / "studies"
-        / "S004-deepseek-v41-engram-placement"
-        / "v1"
-        / "experiments"
-        / "E0013"
-        / "experiment.yaml"
-    )
+    source = root / "reference" / "templates" / "v1" / "experiment" / "experiment.yaml"
     experiment = load_data(source)
     assert isinstance(experiment, dict)
-    experiment["analysis"]["effect_metrics"] = ["atlas://metric/MET010@v1"]
+    experiment["analysis"]["effect_metrics"] = [experiment["metrics"]["secondary"][0]]
     target = tmp_path / "experiment.yaml"
     with target.open("w") as stream:
         yaml_writer().dump(experiment, stream)
