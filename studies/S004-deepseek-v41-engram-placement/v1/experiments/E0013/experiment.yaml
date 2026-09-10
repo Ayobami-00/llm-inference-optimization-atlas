@@ -11,9 +11,9 @@ description: Paired five-block ablation of three DeepSeek-V4.1 Engram modes on
 status: planned
 authors: [{name: Ayobami-00, github: Ayobami-00, roles: [investigator], conflicts: []}]
 created_at: '2026-09-10T16:11:26Z'
-updated_at: '2026-09-10T17:00:00Z'
+updated_at: '2026-09-10T22:35:09Z'
 license: Apache-2.0
-citations: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1, atlas://source/SRC0111@v1, atlas://source/SRC0112@v1]
+citations: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1, atlas://source/SRC0111@v1, atlas://source/SRC0112@v1, atlas://source/SRC0113@v1]
 provenance:
   method: preregistered-paired-ablation
   source_paths:
@@ -22,6 +22,15 @@ provenance:
   generated: false
   parent_artifacts: [atlas://proposal/P0036@v1]
 extensions:
+  atlas.preregistration-amendments:
+    - id: E0013-AMENDMENT-001
+      approved_at: '2026-09-10T22:35:09Z'
+      prospective: true
+      title: NVIDIA software power capping under an unchanged configured limit
+      record: AMENDMENT-001-software-power-capping.md
+      trigger: Sparse 0x4 SW_POWER_CAP observations in two invalid CFG021 attempts.
+      prior_attempts: retained-invalid-and-ineligible-for-promotion
+      effect: Treat 0x4 as reportable and non-invalidating only while every configured power limit remains frozen; continue invalidating genuine thermal or hardware slowdown, hardware power brake, power-limit drift, Xid, and new ECC events.
   atlas.randomized-order:
     block-1: [CFG021, CFG022, CFG023]
     block-2: [CFG021, CFG022, CFG023]
@@ -73,6 +82,7 @@ frozen_factors:
   - MXFP8 backend, greedy decoding, text-only model override, and one-token decode steps.
   - Trace generator, per-rate trace, seed, connection reuse, timeouts, and server/cache initialization policy within each paired block.
   - Shared pinned host-table layout between host-sync and host-prefetch.
+  - Per-GPU configured power limit expected at 1000 W and required to be readable and unchanged in every mandatory telemetry sample.
 protocol:
   warmup:
     requests: max(32, 2 * target_concurrency)
@@ -135,5 +145,10 @@ stopping_rule: Stop after five valid paired blocks, or earlier for Q0 failure,
 failure_policy: Preserve every interrupted, failed, OOM, fallback, and invalid
   attempt under .atlas/work; never silently remove outliers; promote only runs
   with complete mandatory evidence, matching fingerprints, resolved requested
-  treatment, and no machine-checkable invalidation event.
-background_sources: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1, atlas://source/SRC0111@v1, atlas://source/SRC0112@v1]
+  treatment, and no machine-checkable invalidation event. Under prospective
+  amendment E0013-AMENDMENT-001, NVIDIA 0x4 SW_POWER_CAP observations are
+  retained and reported but do not alone invalidate a new attempt when the
+  configured power limit is unchanged; thermal or hardware slowdown, hardware
+  power brake, configured power-limit drift, Xid, and new ECC events remain
+  invalidating.
+background_sources: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1, atlas://source/SRC0111@v1, atlas://source/SRC0112@v1, atlas://source/SRC0113@v1]

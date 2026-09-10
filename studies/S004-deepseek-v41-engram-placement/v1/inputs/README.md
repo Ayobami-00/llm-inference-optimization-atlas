@@ -19,3 +19,9 @@ or aggregated into the corresponding primary 32K-by-8 cell.
 `model-manifest.yaml` freezes 57 files totaling 510,310,624,019 bytes. Its
 canonical aggregate SHA-256 is
 `c5a37ff491e09e9abd947d0823e428679e4e3bd94944adfe7ab16f7b91691eeb`.
+
+Hardware-health interpretation is part of the frozen experiment rather than the
+request generator. Prospective amendment E0013-AMENDMENT-001 splits report-only
+NVIDIA `0x4` `SW_POWER_CAP` observations from the invalidating `0xE8` clock-event
+mask and requires a readable 1000 W configured limit for every GPU in every
+mandatory collector sample.

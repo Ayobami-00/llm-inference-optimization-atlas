@@ -1,0 +1,29 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0113
+version: 1
+slug: nvidia-nvml-api-reference-guide
+title: NVIDIA Management Library API Reference Guide
+description: Official NVIDIA reference for GPU clock-event reasons, power-management limits, temperatures, and ECC telemetry.
+status: active
+authors: [{name: Atlas maintainers, roles: [curator], conflicts: []}]
+created_at: '2026-09-10T00:00:00Z'
+updated_at: '2026-09-10T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from official NVIDIA documentation
+  source_paths: [https://docs.nvidia.com/deploy/pdf/NVML_API_Reference_Guide.pdf]
+  generated: false
+extensions: {}
+type: official_documentation
+source_authors: [NVIDIA Corporation]
+url: https://docs.nvidia.com/deploy/pdf/NVML_API_Reference_Guide.pdf
+published: {year: 2026, publisher: NVIDIA Corporation}
+upstream:
+  product: NVIDIA Management Library
+  version: Release 615
+  retrieved_at: '2026-09-10'
+topics: [gpu-telemetry, power-management, clock-events, thermal-health, ecc]
+relevance: Defines the NVIDIA clock-event, power-limit, thermal, and ECC semantics used by E0013-AMENDMENT-001 to separate report-only software power capping from hardware-health invalidations.

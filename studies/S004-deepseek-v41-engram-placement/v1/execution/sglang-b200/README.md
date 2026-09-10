@@ -69,6 +69,27 @@ state, treatment resolution, capacity points, and full telemetry stay ignored
 under `.atlas/work`. Only successfully validated candidates are promoted, at
 which time Atlas allocates their permanent run IDs.
 
+Hardware-health evaluation follows prospective amendment
+E0013-AMENDMENT-001. Preflight verifies the preregistered 1000 W configured
+power limit, and the collector records a readable limit for every GPU alongside
+every mandatory clock-event sample. A `0x4` `SW_POWER_CAP` sample is retained
+and reported but is not sufficient to reject a new attempt while that limit is
+unchanged. A missing or changed configured limit, `0x8` hardware slowdown,
+`0x20` software thermal slowdown, `0x40` hardware thermal slowdown, `0x80`
+hardware power brake, Xid, or a new ECC error rejects the attempt. The two
+attempts completed before the amendment stay invalid and the runner must not
+resume either as an accepted candidate.
+
+The amended telemetry path has its own collector-on/off overhead pilot under
+`collector-pilot-amendment-001`. The earlier pilot remains preserved, but it
+cannot authorize the additional `power.limit` query used by new confirmatory
+runs. The amended pilot records and checks the health-policy version, exact GPU
+query fields, and runner fingerprint before it can be reused.
+
+Collector shutdown allows the full bounded GPU-health, PCIe, and scheduler
+sampling cycle to finish. If the collector is still active after that bound, it
+records a terminal collector error and the attempt cannot become evidence.
+
 The open-loop client prestarts its bounded worker pool before starting each
 Poisson clock. Dispatch lag is measured at worker entry, independently of HTTP
 payload construction. Each capacity point writes its excluded stabilization
@@ -77,7 +98,8 @@ SLO gates, so an invalid point remains auditable under `.atlas/work`.
 
 If a full invocation is interrupted, rerun the S004 runner against the same
 timestamped work directory. Candidate-complete block/configuration pairs and a
-complete collector pilot are discovered and skipped. A retained treatment
+complete, fingerprint-matched amended collector pilot are discovered and
+skipped. A retained treatment
 pilot is reused only after the current runner recomputes its treatment state
 from the raw server log and verifies its retained preflight and `/server_info`;
 failed attempts are kept in numbered retry directories. After all 15 primary

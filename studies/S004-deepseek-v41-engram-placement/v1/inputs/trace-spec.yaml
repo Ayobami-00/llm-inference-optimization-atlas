@@ -99,10 +99,29 @@ optional_probe:
   confirmatory: false
 invalidation:
   - gpu_xid_or_new_ecc_error
-  - thermal_or_power_throttling_during_measurement
+  - missing_or_unreadable_configured_gpu_power_limit_sample
+  - configured_gpu_power_limit_changed_during_measurement
+  - telemetry_collector_did_not_finish_bounded_sampling_cycle
+  - nvidia_hardware_slowdown_0x8
+  - nvidia_software_thermal_slowdown_0x20
+  - nvidia_hardware_thermal_slowdown_0x40
+  - nvidia_hardware_power_brake_0x80
   - competing_gpu_process
   - fraction_of_requests_dispatched_more_than_10ms_late_above_0.01
   - missing_mandatory_request_evidence
   - model_runtime_or_configuration_fingerprint_mismatch
   - server_restart_during_measurement
   - requested_engram_mode_not_resolved
+hardware_health_reporting:
+  amendment: E0013-AMENDMENT-001
+  configured_power_limit:
+    expected_from: atlas://hardware/HW002@v1
+    expected_w_per_gpu: 1000.0
+    display_tolerance_w: 0.1
+    verify_at: [preflight, every_mandatory_collector_sample]
+    require_unchanged: true
+  nvidia_software_power_cap_0x4:
+    invalidating: false
+    retain_all_observations: true
+    report: [per_gpu_count, per_gpu_observations, per_gpu_incidence, aggregate_count, aggregate_observations, aggregate_incidence]
+  invalidating_clock_event_mask: '0xE8'

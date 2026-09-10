@@ -70,7 +70,27 @@ CONFIGURATION_ORDER = (
 )
 SEEDS = (41001, 41002, 41003, 41004, 41005)
 MODEL_PATH = Path("/workspace/models/DeepSeek-V4.1-Flash-dba1be0")
-THERMAL_OR_POWER_THROTTLE_MASK = 0xEC
+EXPECTED_GPU_POWER_LIMIT_W = 1_000.0
+POWER_LIMIT_TOLERANCE_W = 0.1
+SOFTWARE_POWER_CAP_THROTTLE_MASK = 0x4
+INVALIDATING_GPU_CLOCK_EVENT_MASK = 0xE8
+HARDWARE_HEALTH_POLICY_VERSION = "E0013-AMENDMENT-001"
+COLLECTOR_SHUTDOWN_TIMEOUT_SECONDS = 20.0
+GPU_TELEMETRY_QUERY_FIELDS = (
+    "index",
+    "utilization.gpu",
+    "memory.used",
+    "power.draw",
+    "power.limit",
+    "temperature.gpu",
+    "clocks.current.sm",
+    "clocks_throttle_reasons.active",
+    "ecc.errors.uncorrected.volatile.total",
+)
+# Retain the older public name for callers that imported it before the
+# preregistration amendment. Software power capping (0x4) is intentionally no
+# longer part of this invalidating mask.
+THERMAL_OR_POWER_THROTTLE_MASK = INVALIDATING_GPU_CLOCK_EVENT_MASK
 CAPACITY_INITIAL_RATE = 0.2
 MINIMUM_SLO_CLASS_OBSERVATIONS = 3
 
@@ -121,6 +141,7 @@ class TelemetryCollector:
         self._thread: threading.Thread | None = None
         self._peak_rss_bytes = 0
         self._pcie_unavailable_reported = False
+        self._shutdown_failure: str | None = None
 
     def start(self) -> None:
         self._thread = threading.Thread(target=self._loop, daemon=True)
@@ -128,8 +149,28 @@ class TelemetryCollector:
 
     def stop(self) -> None:
         self._stop.set()
+        if self._shutdown_failure is not None:
+            _write_json(self.output, {"samples": self.samples, "events": self.events})
+            return
         if self._thread is not None:
-            self._thread.join(timeout=self.interval_seconds * 3)
+            self._thread.join(timeout=COLLECTOR_SHUTDOWN_TIMEOUT_SECONDS)
+            if self._thread.is_alive():
+                self._shutdown_failure = (
+                    "Telemetry collector did not finish its mandatory sampling cycle within "
+                    f"{COLLECTOR_SHUTDOWN_TIMEOUT_SECONDS:.0f} seconds"
+                )
+                self.events.append(
+                    {
+                        "timestamp_ns": time.time_ns(),
+                        "event_type": "collector-error",
+                        "details_json": json.dumps(
+                            {"error": self._shutdown_failure, "terminal": True}, sort_keys=True
+                        ),
+                    }
+                )
+                _write_json(self.output, {"samples": self.samples, "events": self.events})
+                raise RuntimeError(self._shutdown_failure)
+            self._thread = None
         _write_json(self.output, {"samples": self.samples, "events": self.events})
 
     def _sample(
@@ -199,7 +240,7 @@ class TelemetryCollector:
         result = subprocess.run(
             [
                 "nvidia-smi",
-                "--query-gpu=index,utilization.gpu,memory.used,power.draw,temperature.gpu,clocks.current.sm,clocks_throttle_reasons.active,ecc.errors.uncorrected.volatile.total",
+                f"--query-gpu={','.join(GPU_TELEMETRY_QUERY_FIELDS)}",
                 "--format=csv,noheader,nounits",
             ],
             capture_output=True,
@@ -207,18 +248,36 @@ class TelemetryCollector:
             timeout=5,
             check=True,
         )
-        for line in result.stdout.splitlines():
-            fields = [field.strip() for field in line.split(",")]
-            if len(fields) != 8:
-                raise RuntimeError(f"Unexpected nvidia-smi telemetry row: {line}")
+        rows = [[field.strip() for field in line.split(",")] for line in result.stdout.splitlines()]
+        if len(rows) != 4 or any(len(fields) != 9 for fields in rows):
+            raise RuntimeError(f"Expected four complete nvidia-smi telemetry rows, received {rows}")
+        if {fields[0] for fields in rows} != {"0", "1", "2", "3"}:
+            raise RuntimeError(
+                f"Unexpected nvidia-smi GPU indices: {[fields[0] for fields in rows]}"
+            )
+        for fields in rows:
             gpu = fields[0]
+            power_limit_w: float | str
+            try:
+                numeric_power_limit_w = float(fields[4])
+            except ValueError:
+                # Preserve the raw value so the mandatory health gate can emit
+                # an explicit invalidation instead of losing the entire sample.
+                power_limit_w = fields[4]
+            else:
+                if not math.isfinite(numeric_power_limit_w):
+                    # Keep telemetry.json standards-compliant while preserving
+                    # the unreadable value for the health gate.
+                    power_limit_w = fields[4]
+                else:
+                    power_limit_w = numeric_power_limit_w
             self._sample(timestamp_ns, "MET026", float(fields[1]) / 100, "ratio", f"gpu{gpu}")
             self._sample(
                 timestamp_ns, "MET058", float(fields[2]) * 1024 * 1024, "byte", f"gpu{gpu}"
             )
             self._sample(timestamp_ns, "MET027", float(fields[3]), "W", f"gpu{gpu}")
-            self._sample(timestamp_ns, "MET064", float(fields[4]), "Cel", f"gpu{gpu}")
-            self._sample(timestamp_ns, "MET063", float(fields[5]) * 1_000_000, "Hz", f"gpu{gpu}")
+            self._sample(timestamp_ns, "MET064", float(fields[5]), "Cel", f"gpu{gpu}")
+            self._sample(timestamp_ns, "MET063", float(fields[6]) * 1_000_000, "Hz", f"gpu{gpu}")
             self.events.append(
                 {
                     "timestamp_ns": timestamp_ns,
@@ -226,10 +285,11 @@ class TelemetryCollector:
                     "details_json": json.dumps(
                         {
                             "gpu_index": int(gpu),
-                            "temperature_c": float(fields[4]),
-                            "sm_clock_mhz": float(fields[5]),
-                            "throttle_reasons": fields[6],
-                            "uncorrected_volatile_ecc": int(fields[7]),
+                            "power_limit_w": power_limit_w,
+                            "temperature_c": float(fields[5]),
+                            "sm_clock_mhz": float(fields[6]),
+                            "throttle_reasons": fields[7],
+                            "uncorrected_volatile_ecc": int(fields[8]),
                         },
                         sort_keys=True,
                     ),
@@ -513,20 +573,42 @@ def _measurement_health(
     collector: TelemetryCollector,
     server_pid: int,
     server_log: Path,
+    expected_power_limits_w: dict[int, float],
 ) -> dict[str, Any]:
     errors = []
+    if set(expected_power_limits_w) != set(range(4)) or any(
+        not math.isfinite(value) or value <= 0 for value in expected_power_limits_w.values()
+    ):
+        raise ValueError("Expected power limits must define finite positive values for GPUs 0-3")
     gpu_events = [event for event in collector.events if event.get("event_type") == "gpu-health"]
     collection_errors = [
         event for event in collector.events if event.get("event_type") == "collector-error"
     ]
-    cycles = len(gpu_events) / 4 + len(collection_errors)
-    collection_error_ratio = len(collection_errors) / cycles if cycles else 1.0
+    cycle_timestamps = {
+        int(event["timestamp_ns"])
+        for event in [*gpu_events, *collection_errors]
+        if event.get("timestamp_ns") is not None
+    }
+    collection_error_ratio = (
+        len(collection_errors) / len(cycle_timestamps) if cycle_timestamps else 1.0
+    )
     if not gpu_events:
         errors.append("No GPU health samples were recorded")
     if collection_error_ratio > 0.01:
         errors.append(f"Telemetry collection error ratio was {collection_error_ratio:.6f}")
+    gpu_sample_counts: dict[int, int] = defaultdict(int)
+    cycle_gpu_counts: dict[int, dict[int, int]] = defaultdict(lambda: defaultdict(int))
+    software_power_cap_counts: dict[int, int] = defaultdict(int)
+    observed_power_limits: dict[int, list[float]] = defaultdict(list)
+    mismatched_power_limit_counts: dict[int, int] = defaultdict(int)
+    missing_power_limit_counts: dict[int, int] = defaultdict(int)
+    unreadable_power_limit_counts: dict[int, int] = defaultdict(int)
+    invalidating_clock_events: dict[int, set[int]] = defaultdict(set)
     for event in gpu_events:
         details = json.loads(str(event["details_json"]))
+        gpu_index = int(details.get("gpu_index", -1))
+        gpu_sample_counts[gpu_index] += 1
+        cycle_gpu_counts[int(event["timestamp_ns"])][gpu_index] += 1
         throttle = str(details.get("throttle_reasons", "")).strip().casefold()
         try:
             throttle_mask = 0 if throttle in {"0", "not active", "none"} else int(throttle, base=0)
@@ -535,16 +617,67 @@ def _measurement_health(
                 f"GPU {details.get('gpu_index')} returned an unreadable throttle mask: {throttle}"
             )
         else:
-            # NVML bit 0 is merely GPU-idle. Invalidate only the registered
-            # software/hardware power, generic hardware slowdown, or thermal bits.
-            if throttle_mask & THERMAL_OR_POWER_THROTTLE_MASK:
-                errors.append(
-                    f"GPU {details.get('gpu_index')} reported thermal/power throttling: {throttle}"
-                )
+            if throttle_mask & SOFTWARE_POWER_CAP_THROTTLE_MASK:
+                software_power_cap_counts[gpu_index] += 1
+            invalidating_mask = throttle_mask & INVALIDATING_GPU_CLOCK_EVENT_MASK
+            if invalidating_mask:
+                invalidating_clock_events[gpu_index].add(invalidating_mask)
+        power_limit = details.get("power_limit_w")
+        if power_limit is None:
+            missing_power_limit_counts[gpu_index] += 1
+        else:
+            try:
+                numeric_power_limit = float(power_limit)
+            except (TypeError, ValueError):
+                unreadable_power_limit_counts[gpu_index] += 1
+            else:
+                if not math.isfinite(numeric_power_limit):
+                    unreadable_power_limit_counts[gpu_index] += 1
+                else:
+                    observed_power_limits[gpu_index].append(numeric_power_limit)
+                    expected_power_limit = expected_power_limits_w.get(gpu_index)
+                    if expected_power_limit is None or not math.isclose(
+                        numeric_power_limit,
+                        expected_power_limit,
+                        rel_tol=0.0,
+                        abs_tol=POWER_LIMIT_TOLERANCE_W,
+                    ):
+                        mismatched_power_limit_counts[gpu_index] += 1
         if int(details.get("uncorrected_volatile_ecc", 0)) != 0:
-            errors.append(
-                f"GPU {details.get('gpu_index')} reported a volatile uncorrected ECC error"
-            )
+            errors.append(f"GPU {gpu_index} reported a volatile uncorrected ECC error")
+    for gpu_index, masks in sorted(invalidating_clock_events.items()):
+        formatted_masks = ", ".join(f"0x{mask:x}" for mask in sorted(masks))
+        errors.append(
+            f"GPU {gpu_index} reported an invalidating hardware/thermal clock event: "
+            f"{formatted_masks}"
+        )
+    for gpu_index, count in sorted(missing_power_limit_counts.items()):
+        errors.append(
+            f"GPU {gpu_index} omitted the mandatory configured power limit in {count} samples"
+        )
+    for gpu_index, count in sorted(unreadable_power_limit_counts.items()):
+        errors.append(
+            f"GPU {gpu_index} returned an unreadable configured power limit in {count} samples"
+        )
+    for gpu_index, count in sorted(mismatched_power_limit_counts.items()):
+        values = observed_power_limits[gpu_index]
+        expected_power_limit = expected_power_limits_w.get(gpu_index)
+        errors.append(
+            f"GPU {gpu_index} configured power limit differed from the preregistered "
+            f"{expected_power_limit} W limit in {count}/{len(values)} readable samples "
+            f"(observed range {min(values):.1f}-{max(values):.1f} W)"
+        )
+    incomplete_gpu_health_cycles = 0
+    expected_gpu_indices = set(expected_power_limits_w)
+    for timestamp_ns in cycle_timestamps:
+        counts = cycle_gpu_counts.get(timestamp_ns, {})
+        if set(counts) != expected_gpu_indices or any(count != 1 for count in counts.values()):
+            incomplete_gpu_health_cycles += 1
+    if incomplete_gpu_health_cycles:
+        errors.append(
+            f"Mandatory four-GPU health telemetry was incomplete in "
+            f"{incomplete_gpu_health_cycles}/{len(cycle_timestamps)} collection cycles"
+        )
     if not psutil.pid_exists(server_pid):
         errors.append("Server process exited during measurement")
         unexpected = []
@@ -555,6 +688,29 @@ def _measurement_health(
     log_text = server_log.read_text(errors="replace")
     if re.search(r"\bXid\b", log_text, re.IGNORECASE):
         errors.append("Server log contains an NVIDIA Xid event")
+    software_power_cap_by_gpu = {
+        str(gpu_index): {
+            "observation_count": sample_count,
+            "count": software_power_cap_counts[gpu_index],
+            "incidence": (
+                software_power_cap_counts[gpu_index] / sample_count if sample_count else 0.0
+            ),
+        }
+        for gpu_index in sorted(expected_power_limits_w)
+        for sample_count in [gpu_sample_counts[gpu_index]]
+    }
+    power_limit_by_gpu = {}
+    for gpu_index in sorted(expected_power_limits_w):
+        values = observed_power_limits[gpu_index]
+        power_limit_by_gpu[str(gpu_index)] = {
+            "readable_observation_count": len(values),
+            "mismatch_count": mismatched_power_limit_counts[gpu_index],
+            "missing_count": missing_power_limit_counts[gpu_index],
+            "unreadable_count": unreadable_power_limit_counts[gpu_index],
+            "minimum_w": min(values) if values else None,
+            "maximum_w": max(values) if values else None,
+        }
+    total_software_power_cap_samples = sum(software_power_cap_counts.values())
     return {
         "valid": not errors,
         "errors": errors,
@@ -562,6 +718,25 @@ def _measurement_health(
         "collection_errors": len(collection_errors),
         "collection_error_ratio": collection_error_ratio,
         "unexpected_gpu_processes": unexpected,
+        "software_power_cap": {
+            "nvml_mask": "0x4",
+            "observation_count": len(gpu_events),
+            "count": total_software_power_cap_samples,
+            "incidence": (
+                total_software_power_cap_samples / len(gpu_events) if gpu_events else 0.0
+            ),
+            "by_gpu": software_power_cap_by_gpu,
+        },
+        "configured_power_limit": {
+            "expected_w_by_gpu": {
+                str(index): value for index, value in sorted(expected_power_limits_w.items())
+            },
+            "tolerance_w": POWER_LIMIT_TOLERANCE_W,
+            "missing_sample_count": sum(missing_power_limit_counts.values()),
+            "unreadable_sample_count": sum(unreadable_power_limit_counts.values()),
+            "incomplete_gpu_health_cycle_count": incomplete_gpu_health_cycles,
+            "by_gpu": power_limit_by_gpu,
+        },
     }
 
 
@@ -954,6 +1129,20 @@ def _capacity_search(
     return capacity, all_results, points, search
 
 
+def _collector_policy_metadata() -> dict[str, Any]:
+    return {
+        "hardware_health_policy_version": HARDWARE_HEALTH_POLICY_VERSION,
+        "gpu_telemetry_query_fields": list(GPU_TELEMETRY_QUERY_FIELDS),
+        "collector_implementation_sha256": lifecycle_sha256_file(Path(__file__)),
+    }
+
+
+def _validate_retained_collector_policy(policy: dict[str, Any]) -> None:
+    for key, expected_value in _collector_policy_metadata().items():
+        if policy.get(key) != expected_value:
+            raise RuntimeError(f"Retained collector pilot has a stale {key}")
+
+
 def _collector_pilot(
     *,
     encode: Callable[[str], list[int]],
@@ -992,20 +1181,23 @@ def _collector_pilot(
         if collector:
             collector.start()
         started = time.monotonic()
-        rows = run_fixed_concurrency(
-            BASE_URL,
-            concurrency=8,
-            request_factory=factory,
-            duration_seconds=30,
-        )
-        elapsed = time.monotonic() - started
-        if collector:
-            collector.stop()
+        try:
+            rows = run_fixed_concurrency(
+                BASE_URL,
+                concurrency=8,
+                request_factory=factory,
+                duration_seconds=30,
+            )
+        finally:
+            elapsed = time.monotonic() - started
+            if collector:
+                collector.stop()
         throughputs[state].append(sum(result.row["output_tokens"] for result in rows) / elapsed)
     off = median(throughputs["off"])
     on = median(throughputs["on"])
     relative = (on - off) / off if off else None
     result = {
+        **_collector_policy_metadata(),
         "sequence": list(sequence),
         "output_token_throughput": throughputs,
         "median_off": off,
@@ -1314,7 +1506,10 @@ def _run_full(work_dir: Path) -> None:
     fixed_correctness = correctness_specs(study_root, seed=20260910, encode=encode)
     _run_treatment_resolution_pilots(root, work_dir)
 
-    pilot_root = work_dir / "collector-pilot"
+    # Preserve the original pilot, whose telemetry query did not sample
+    # power.limit. The amendment changes the collector itself, so its overhead
+    # decision must be established by a fresh, versioned pilot.
+    pilot_root = work_dir / "collector-pilot-amendment-001"
     reference_path = pilot_root / "device-correctness-reference.json"
     pilot_result_path = pilot_root / "result.json"
     if reference_path.is_file() and pilot_result_path.is_file():
@@ -1322,6 +1517,7 @@ def _run_full(work_dir: Path) -> None:
         collector_policy = load_data(pilot_result_path)
         if not isinstance(global_reference, list) or not isinstance(collector_policy, dict):
             raise RuntimeError("Retained collector pilot is malformed")
+        _validate_retained_collector_policy(collector_policy)
     else:
         pilot_server, _, _, _ = launch_server(
             configuration="CFG021", work_dir=pilot_root / "server", telemetry=False
@@ -1363,7 +1559,7 @@ def _run_full(work_dir: Path) -> None:
             server = None
             collector = None
             try:
-                preflight(
+                attempt_preflight = preflight(
                     root,
                     attempt / "preflight-before-server.json",
                     verify_weights=False,
@@ -1518,6 +1714,12 @@ def _run_full(work_dir: Path) -> None:
                     collector=collector,
                     server_pid=server.process.pid,
                     server_log=server.log_path,
+                    expected_power_limits_w={
+                        int(index): float(value)
+                        for index, value in attempt_preflight["hardware"][
+                            "expected_power_limits_w"
+                        ].items()
+                    },
                 )
                 if not health["valid"]:
                     raise RuntimeError(

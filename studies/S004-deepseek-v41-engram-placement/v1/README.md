@@ -11,6 +11,18 @@ available KV-token capacity, HBM and host displacement, context-by-concurrency
 TTFT/TPOT/throughput, scheduler state, PCIe activity, and failure boundaries.
 Five paired blocks use independent server initialization and identical traces.
 
+Preregistration amendment E0013-AMENDMENT-001 prospectively refines the hardware
+health rule after two CFG021 attempts encountered sparse NVIDIA `0x4`
+`SW_POWER_CAP` samples on a node reporting the expected 1000 W configured limit
+at preflight. New attempts retain and report that incidence rather than treating
+it alone as invalid, but must record the expected power limit for every GPU in
+every mandatory sample. Missing observations, configured power-limit drift,
+thermal or hardware slowdown, hardware power brake, Xid, and new ECC events
+remain invalidating. Both pre-amendment attempts remain invalid, preserved only
+in `.atlas/work`, and cannot enter the study.
+See [the amendment](experiments/E0013/AMENDMENT-001-software-power-capping.md)
+for its scope and temporal boundary.
+
 The Atlas-native controller is intentionally narrow rather than a replacement
 for a general benchmark suite: it preserves exact integer token IDs, the
 class-stratified Poisson schedule, dispatch-lag invalidation, exact output-token

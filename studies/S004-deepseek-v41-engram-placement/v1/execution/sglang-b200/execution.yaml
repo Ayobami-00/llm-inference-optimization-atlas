@@ -9,9 +9,9 @@ description: Runs the preregistered device, synchronous-host, and asynchronous-p
 status: active
 authors: [{name: Ayobami-00, github: Ayobami-00, roles: [software, investigator], conflicts: []}]
 created_at: '2026-09-10T00:00:00Z'
-updated_at: '2026-09-10T00:00:00Z'
+updated_at: '2026-09-10T22:35:09Z'
 license: Apache-2.0
-citations: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1, atlas://source/SRC0111@v1, atlas://source/SRC0112@v1]
+citations: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1, atlas://source/SRC0111@v1, atlas://source/SRC0112@v1, atlas://source/SRC0113@v1]
 provenance:
   method: repository-authored CUDA execution bundle with a frozen model manifest and runtime source fingerprint
   source_paths:
@@ -34,6 +34,13 @@ extensions:
     initialization: the all-treatment pilots materialize SGLang and FlashInfer compiled-kernel and autotune caches
     measurement_state: the populated cache is retained unchanged for every confirmatory server process
     readiness_scope: MET098 measures a warm-compilation-cache production restart
+  atlas.hardware-health-policy:
+    amendment: E0013-AMENDMENT-001
+    configured_power_limit: expected at 1000 W and required to be readable and unchanged in every mandatory sample
+    software_power_cap_0x4: retained and reported, non-invalidating by itself
+    invalidating_clock_event_mask: '0xE8'
+    other_invalidating_events: [GPU Xid, new ECC error, competing GPU process]
+    collector_overhead_pilot: repeated with the amended query; reuse requires exact policy, query, and implementation fingerprints
 platforms:
   - {os: linux, architecture: x86_64}
   - {os: macos, architecture: aarch64}
@@ -83,3 +90,4 @@ limitations:
   - The provider image exposes no immutable OCI digest, so RT004 pins the exact installed SGLang source files and complete package manifest instead.
   - Engram prefetch in the measured implementation is eligible only for single-row decode steps.
   - Shared-memory transparent huge pages remain disabled at the provider default; no host or kernel tuning is performed.
+  - NVIDIA 0x4 SW_POWER_CAP incidence under a continuously observed 1000 W configured limit is reported rather than filtered; results may not transfer to another power envelope.

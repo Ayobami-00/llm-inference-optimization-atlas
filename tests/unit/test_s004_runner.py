@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import time
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -12,14 +13,21 @@ import pytest
 import atlas.studies.runners.s004_client as s004_client
 import atlas.studies.runners.s004_lifecycle as s004_lifecycle
 from atlas.studies.runners.s004 import (
+    EXPECTED_GPU_POWER_LIMIT_W,
+    INVALIDATING_GPU_CLOCK_EVENT_MASK,
     MINIMUM_SLO_CLASS_OBSERVATIONS,
+    SOFTWARE_POWER_CAP_THROTTLE_MASK,
     THERMAL_OR_POWER_THROTTLE_MASK,
+    TelemetryCollector,
     _capacity_bisection_rate,
+    _collector_policy_metadata,
     _completed_attempt,
+    _measurement_health,
     _new_attempt_directory,
     _run_treatment_resolution_pilots,
     _scoped_breakdown,
     _slo_result,
+    _validate_retained_collector_policy,
 )
 from atlas.studies.runners.s004_aiperf import (
     AIPERF_VERSION,
@@ -33,6 +41,8 @@ from atlas.studies.runners.s004_lifecycle import (
     EXPECTED_RUNTIME_FILES,
     EXPECTED_SERVER_CONFIGURATION,
     EXPECTED_TREATMENT_SOURCE_FINGERPRINT,
+    expected_gpu_power_limits,
+    hardware_snapshot,
     host_memory_snapshot,
     resolve_treatment,
     resolved_server_configuration,
@@ -596,10 +606,342 @@ def test_slo_failure_without_completions_serializes_without_nan() -> None:
     json.dumps(result, allow_nan=False)
 
 
-def test_throttle_invalidation_mask_excludes_idle_and_includes_power_and_thermal() -> None:
+def test_throttle_invalidation_mask_excludes_idle_and_software_power_cap() -> None:
     assert 0x1 & THERMAL_OR_POWER_THROTTLE_MASK == 0
-    for reason in (0x4, 0x8, 0x20, 0x40, 0x80):
+    assert SOFTWARE_POWER_CAP_THROTTLE_MASK & THERMAL_OR_POWER_THROTTLE_MASK == 0
+    assert THERMAL_OR_POWER_THROTTLE_MASK == INVALIDATING_GPU_CLOCK_EVENT_MASK
+    for reason in (0x8, 0x20, 0x40, 0x80):
         assert reason & THERMAL_OR_POWER_THROTTLE_MASK
+
+
+def _gpu_health_event(
+    gpu_index: int,
+    throttle_reasons: str,
+    *,
+    timestamp_ns: int = 1,
+    power_limit_w: float | None = EXPECTED_GPU_POWER_LIMIT_W,
+    ecc_errors: int = 0,
+) -> dict[str, object]:
+    details: dict[str, object] = {
+        "gpu_index": gpu_index,
+        "temperature_c": 55.0,
+        "sm_clock_mhz": 1_800.0,
+        "throttle_reasons": throttle_reasons,
+        "uncorrected_volatile_ecc": ecc_errors,
+    }
+    if power_limit_w is not None:
+        details["power_limit_w"] = power_limit_w
+    return {
+        "timestamp_ns": timestamp_ns,
+        "event_type": "gpu-health",
+        "details_json": json.dumps(details),
+    }
+
+
+def _measurement_health_for_events(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    events: list[dict[str, object]],
+    *,
+    server_log_text: str = "",
+) -> dict[str, object]:
+    server_log = tmp_path / "server.log"
+    server_log.write_text(server_log_text)
+    monkeypatch.setattr("atlas.studies.runners.s004.psutil.pid_exists", lambda _pid: True)
+    monkeypatch.setattr("atlas.studies.runners.s004._unexpected_gpu_processes", lambda _pid: [])
+    collector = SimpleNamespace(events=events)
+    return _measurement_health(
+        collector=collector,
+        server_pid=123,
+        server_log=server_log,
+        expected_power_limits_w={gpu: EXPECTED_GPU_POWER_LIMIT_W for gpu in range(4)},
+    )
+
+
+def test_gpu_snapshot_records_configured_power_limit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_run(command: list[str], **_kwargs: object) -> SimpleNamespace:
+        if "pcie.rx_util" in command[1]:
+            return SimpleNamespace(stdout="".join(f"{gpu}, 10, 20\n" for gpu in range(4)))
+        return SimpleNamespace(
+            stdout="".join(f"{gpu}, 75, 1024, 900, 1000, 55, 1800, 0x4, 0\n" for gpu in range(4))
+        )
+
+    monkeypatch.setattr("atlas.studies.runners.s004.subprocess.run", fake_run)
+    collector = TelemetryCollector(tmp_path / "telemetry.json", server_pid=123)
+
+    collector._gpu_snapshot(1)
+
+    details = json.loads(collector.events[0]["details_json"])
+    assert details["power_limit_w"] == 1_000.0
+    assert details["temperature_c"] == 55.0
+    assert details["sm_clock_mhz"] == 1_800.0
+
+
+def test_collector_shutdown_failure_cannot_yield_eligible_evidence(tmp_path: Path) -> None:
+    class StuckThread:
+        def join(self, *, timeout: float) -> None:
+            assert timeout > 10
+
+        def is_alive(self) -> bool:
+            return True
+
+    output = tmp_path / "telemetry.json"
+    collector = TelemetryCollector(output, server_pid=123)
+    collector._thread = StuckThread()  # type: ignore[assignment]
+
+    with pytest.raises(RuntimeError, match="did not finish"):
+        collector.stop()
+
+    retained = json.loads(output.read_text())
+    assert retained["events"][-1]["event_type"] == "collector-error"
+    assert json.loads(retained["events"][-1]["details_json"])["terminal"] is True
+    assert collector._shutdown_failure is not None
+    collector.stop()
+
+
+def test_software_power_cap_is_reported_per_gpu_without_invalidating(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    events = [
+        _gpu_health_event(
+            gpu,
+            "0x4" if sample <= gpu else "0x0",
+            timestamp_ns=sample + 1,
+        )
+        for sample in range(2)
+        for gpu in range(4)
+    ]
+
+    result = _measurement_health_for_events(tmp_path, monkeypatch, events)
+
+    assert result["valid"] is True
+    assert result["errors"] == []
+    software_power_cap = result["software_power_cap"]
+    assert software_power_cap["observation_count"] == 8
+    assert software_power_cap["count"] == 7
+    assert software_power_cap["incidence"] == pytest.approx(7 / 8)
+    assert software_power_cap["by_gpu"]["0"] == {
+        "observation_count": 2,
+        "count": 1,
+        "incidence": 0.5,
+    }
+    assert software_power_cap["by_gpu"]["3"]["incidence"] == 1.0
+
+
+@pytest.mark.parametrize("mask", (0x8, 0x20, 0x40, 0x80))
+def test_hardware_and_thermal_clock_events_still_invalidate(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mask: int
+) -> None:
+    result = _measurement_health_for_events(
+        tmp_path,
+        monkeypatch,
+        [_gpu_health_event(gpu, hex(mask) if gpu == 0 else "0x0") for gpu in range(4)],
+    )
+
+    assert result["valid"] is False
+    assert any("invalidating hardware/thermal clock event" in error for error in result["errors"])
+
+
+def test_configured_power_limit_change_invalidates_measurement(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    result = _measurement_health_for_events(
+        tmp_path,
+        monkeypatch,
+        [
+            _gpu_health_event(
+                gpu,
+                "0x4" if gpu == 0 else "0x0",
+                timestamp_ns=timestamp_ns,
+                power_limit_w=950.0 if gpu == 0 and timestamp_ns == 2 else 1_000.0,
+            )
+            for timestamp_ns in (1, 2)
+            for gpu in range(4)
+        ],
+    )
+
+    assert result["valid"] is False
+    assert any("differed from the preregistered" in error for error in result["errors"])
+    assert result["configured_power_limit"]["by_gpu"]["0"] == {
+        "readable_observation_count": 2,
+        "mismatch_count": 1,
+        "missing_count": 0,
+        "unreadable_count": 0,
+        "minimum_w": 950.0,
+        "maximum_w": 1_000.0,
+    }
+
+
+def test_measurement_health_invalidates_missing_mandatory_power_limit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    result = _measurement_health_for_events(
+        tmp_path,
+        monkeypatch,
+        [
+            _gpu_health_event(
+                gpu,
+                "0x0",
+                power_limit_w=None if gpu == 0 else EXPECTED_GPU_POWER_LIMIT_W,
+            )
+            for gpu in range(4)
+        ],
+    )
+
+    assert result["valid"] is False
+    assert result["configured_power_limit"]["missing_sample_count"] == 1
+    assert any("omitted the mandatory" in error for error in result["errors"])
+
+
+def test_measurement_health_invalidates_unreadable_power_limit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    events = [_gpu_health_event(gpu, "0x0") for gpu in range(4)]
+    first_details = json.loads(str(events[0]["details_json"]))
+    first_details["power_limit_w"] = "[Not Supported]"
+    events[0]["details_json"] = json.dumps(first_details)
+
+    result = _measurement_health_for_events(tmp_path, monkeypatch, events)
+
+    assert result["valid"] is False
+    assert result["configured_power_limit"]["unreadable_sample_count"] == 1
+    assert any("unreadable configured power limit" in error for error in result["errors"])
+
+
+def test_measurement_health_requires_all_four_gpus_in_each_cycle(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    events = [_gpu_health_event(gpu, "0x0") for gpu in range(3)]
+
+    result = _measurement_health_for_events(tmp_path, monkeypatch, events)
+
+    assert result["valid"] is False
+    assert result["configured_power_limit"]["incomplete_gpu_health_cycle_count"] == 1
+    assert any("four-GPU health telemetry was incomplete" in error for error in result["errors"])
+
+
+def test_software_power_cap_mixed_with_thermal_event_still_invalidates(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    result = _measurement_health_for_events(
+        tmp_path,
+        monkeypatch,
+        [_gpu_health_event(gpu, "0x24" if gpu == 0 else "0x0") for gpu in range(4)],
+    )
+
+    assert result["valid"] is False
+    assert result["software_power_cap"]["count"] == 1
+    assert any("0x20" in error for error in result["errors"])
+
+
+def test_measurement_health_invalidates_nonfinite_power_limit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    result = _measurement_health_for_events(
+        tmp_path,
+        monkeypatch,
+        [
+            _gpu_health_event(
+                gpu,
+                "0x0",
+                power_limit_w=math.nan if gpu == 0 else EXPECTED_GPU_POWER_LIMIT_W,
+            )
+            for gpu in range(4)
+        ],
+    )
+
+    assert result["valid"] is False
+    assert result["configured_power_limit"]["unreadable_sample_count"] == 1
+
+
+def test_measurement_health_invalidates_duplicate_gpu_in_cycle(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    events = [_gpu_health_event(gpu, "0x0") for gpu in range(4)]
+    events.append(_gpu_health_event(0, "0x0"))
+
+    result = _measurement_health_for_events(tmp_path, monkeypatch, events)
+
+    assert result["valid"] is False
+    assert result["configured_power_limit"]["incomplete_gpu_health_cycle_count"] == 1
+
+
+def test_collection_error_ratio_counts_unique_cycles(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    events = [
+        _gpu_health_event(gpu, "0x0", timestamp_ns=timestamp_ns)
+        for timestamp_ns in range(1, 100)
+        for gpu in range(4)
+    ]
+    events.append(
+        {
+            "timestamp_ns": 1,
+            "event_type": "collector-error",
+            "details_json": json.dumps({"error": "load snapshot failed after GPU sampling"}),
+        }
+    )
+
+    result = _measurement_health_for_events(tmp_path, monkeypatch, events)
+
+    assert result["collection_error_ratio"] == pytest.approx(1 / 99)
+    assert result["valid"] is False
+    assert any("collection error ratio" in error for error in result["errors"])
+
+
+def test_measurement_health_requires_explicit_four_gpu_expected_limits(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    server_log = tmp_path / "server.log"
+    server_log.write_text("")
+    monkeypatch.setattr("atlas.studies.runners.s004.psutil.pid_exists", lambda _pid: True)
+    collector = SimpleNamespace(events=[_gpu_health_event(gpu, "0x0") for gpu in range(4)])
+
+    with pytest.raises(ValueError, match="GPUs 0-3"):
+        _measurement_health(
+            collector=collector,
+            server_pid=123,
+            server_log=server_log,
+            expected_power_limits_w={0: EXPECTED_GPU_POWER_LIMIT_W},
+        )
+
+
+def test_ecc_and_xid_events_remain_invalidating(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    events = [_gpu_health_event(gpu, "0x0", ecc_errors=1 if gpu == 2 else 0) for gpu in range(4)]
+
+    result = _measurement_health_for_events(
+        tmp_path,
+        monkeypatch,
+        events,
+        server_log_text="NVRM: Xid 79, GPU has fallen off the bus",
+    )
+
+    assert result["valid"] is False
+    assert any("uncorrected ECC" in error for error in result["errors"])
+    assert any("Xid" in error for error in result["errors"])
+
+
+@pytest.mark.parametrize(
+    ("field", "replacement"),
+    (
+        ("hardware_health_policy_version", "pre-amendment"),
+        ("gpu_telemetry_query_fields", ["index"]),
+        ("collector_implementation_sha256", "0" * 64),
+    ),
+)
+def test_retained_collector_policy_requires_exact_provenance(
+    field: str, replacement: object
+) -> None:
+    policy = _collector_policy_metadata()
+    _validate_retained_collector_policy(policy)
+    policy[field] = replacement
+
+    with pytest.raises(RuntimeError, match=f"stale {field}"):
+        _validate_retained_collector_policy(policy)
 
 
 def test_scoped_breakdown_separates_unique_and_shared_prefix_cells() -> None:
@@ -708,6 +1050,17 @@ def test_full_runner_resume_skips_only_retained_complete_candidates(tmp_path: Pa
     assert _new_attempt_directory(tmp_path, 1, "CFG021").name == "block-1-CFG021-retry-2"
 
 
+def test_pre_amendment_invalid_attempt_cannot_be_requalified(tmp_path: Path) -> None:
+    attempt = tmp_path / "attempts/block-1-CFG021"
+    attempt.mkdir(parents=True)
+    (attempt / "attempt.json").write_text(
+        json.dumps({"status": "failed-or-invalid", "error": "pre-amendment invalidation"})
+    )
+
+    assert _completed_attempt(tmp_path, 1, "CFG021") is None
+    assert _new_attempt_directory(tmp_path, 1, "CFG021").name == "block-1-CFG021-retry-1"
+
+
 def test_model_manifest_verifier_checks_canonical_metadata_and_file_bytes(
     tmp_path: Path,
 ) -> None:
@@ -734,6 +1087,83 @@ def test_model_manifest_verifier_checks_canonical_metadata_and_file_bytes(
     assert verify_model_manifest(repository, model)["valid"] is True
     (model / "config.json").write_bytes(b"changed")
     assert verify_model_manifest(repository, model)["valid"] is False
+
+
+def test_expected_gpu_power_limits_are_loaded_from_hw002(tmp_path: Path) -> None:
+    hardware_path = tmp_path / "registry/hardware/HW002-four-nvidia-b200.yaml"
+    hardware_path.parent.mkdir(parents=True)
+    record = {
+        "nodes": [
+            {
+                "accelerators": [
+                    {"id": f"gpu{gpu}", "power": {"limit_watts": 1_000}} for gpu in range(4)
+                ]
+            }
+        ]
+    }
+    with hardware_path.open("w") as stream:
+        yaml_writer().dump(record, stream)
+
+    assert expected_gpu_power_limits(tmp_path) == {
+        0: 1_000.0,
+        1: 1_000.0,
+        2: 1_000.0,
+        3: 1_000.0,
+    }
+
+
+def test_hardware_snapshot_rejects_power_limit_that_differs_from_hw002(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fake_run(command: list[str], **_kwargs: object) -> SimpleNamespace:
+        if "--query-compute-apps" in command[1]:
+            return SimpleNamespace(stdout="")
+        return SimpleNamespace(
+            stdout="".join(
+                f"{gpu}, NVIDIA B200, 183360, 595.91.07, 55, 900, "
+                f"{950 if gpu == 2 else 1000}, 0x0, 0\n"
+                for gpu in range(4)
+            )
+        )
+
+    monkeypatch.setattr(s004_lifecycle.subprocess, "run", fake_run)
+    monkeypatch.setattr(s004_lifecycle.platform, "platform", lambda: "test-platform")
+    monkeypatch.setattr(s004_lifecycle.platform, "machine", lambda: "x86_64")
+    monkeypatch.setattr(s004_lifecycle, "host_memory_snapshot", lambda: {})
+    monkeypatch.setattr(s004_lifecycle, "host_memory_policy_snapshot", lambda: {})
+
+    result = hardware_snapshot({gpu: 1_000.0 for gpu in range(4)})
+
+    assert result["valid"] is False
+    assert result["power_limit_mismatches"] == [
+        {"gpu_index": 2, "expected_w": 1_000.0, "actual_w": 950.0}
+    ]
+
+
+def test_hardware_snapshot_requires_unique_gpu_indices_zero_through_three(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fake_run(command: list[str], **_kwargs: object) -> SimpleNamespace:
+        if "--query-compute-apps" in command[1]:
+            return SimpleNamespace(stdout="")
+        return SimpleNamespace(
+            stdout="".join(
+                f"{gpu}, NVIDIA B200, 183360, 595.91.07, 55, 900, 1000, 0x0, 0\n"
+                for gpu in (0, 0, 1, 2)
+            )
+        )
+
+    monkeypatch.setattr(s004_lifecycle.subprocess, "run", fake_run)
+    monkeypatch.setattr(s004_lifecycle.platform, "platform", lambda: "test-platform")
+    monkeypatch.setattr(s004_lifecycle.platform, "machine", lambda: "x86_64")
+    monkeypatch.setattr(s004_lifecycle, "host_memory_snapshot", lambda: {})
+    monkeypatch.setattr(s004_lifecycle, "host_memory_policy_snapshot", lambda: {})
+
+    result = hardware_snapshot({gpu: 1_000.0 for gpu in range(4)})
+
+    assert result["valid"] is False
+    assert result["gpu_indices_valid"] is False
+    assert result["observed_gpu_indices"] == [0, 0, 1, 2]
 
 
 def test_host_memory_snapshot_normalizes_kibibytes_to_bytes(tmp_path: Path) -> None:

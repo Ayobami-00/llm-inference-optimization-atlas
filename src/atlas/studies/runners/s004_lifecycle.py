@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import platform
 import re
@@ -22,6 +23,7 @@ BASE_URL = "http://127.0.0.1:30000"
 MODEL_PATH = Path("/workspace/models/DeepSeek-V4.1-Flash-dba1be0")
 MODEL_REPOSITORY = "deepseek-ai/DeepSeek-V4.1-Flash"
 MODEL_REVISION = "dba1be0a40aa45a94ad051997016db3960a90277"
+EXPECTED_HARDWARE_RECORD = Path("registry/hardware/HW002-four-nvidia-b200.yaml")
 EXPECTED_RUNTIME_FILES: dict[str, tuple[str, int]] = {
     "sglang/srt/models/deepseek_v4.py": (
         "d69b85051bcf4535993d9c2a6625a1e86386e99e1954bb9c2c25e47cd577a8a9",
@@ -216,7 +218,29 @@ def host_memory_policy_snapshot() -> dict[str, Any]:
     }
 
 
-def hardware_snapshot() -> dict[str, Any]:
+def expected_gpu_power_limits(repository_root: Path) -> dict[int, float]:
+    record = load_data(repository_root / EXPECTED_HARDWARE_RECORD)
+    if not isinstance(record, dict):
+        raise RuntimeError("HW002 is not a valid hardware record")
+    limits: dict[int, float] = {}
+    for node in record.get("nodes", []):
+        if not isinstance(node, dict):
+            continue
+        for accelerator in node.get("accelerators", []):
+            if not isinstance(accelerator, dict):
+                continue
+            match = re.fullmatch(r"gpu([0-9]+)", str(accelerator.get("id", "")))
+            power = accelerator.get("power")
+            if match and isinstance(power, dict) and power.get("limit_watts") is not None:
+                limits[int(match.group(1))] = float(power["limit_watts"])
+    if set(limits) != set(range(4)):
+        raise RuntimeError("HW002 must define a configured power limit for GPU indices 0-3")
+    return limits
+
+
+def hardware_snapshot(
+    expected_power_limits_w: dict[int, float] | None = None,
+) -> dict[str, Any]:
     query = (
         "index,name,memory.total,driver_version,temperature.gpu,power.draw,power.limit,"
         "clocks_throttle_reasons.active,ecc.errors.uncorrected.volatile.total"
@@ -227,7 +251,7 @@ def hardware_snapshot() -> dict[str, Any]:
         text=True,
         check=True,
     )
-    gpus = []
+    gpus: list[dict[str, Any]] = []
     for line in result.stdout.splitlines():
         fields = [field.strip() for field in line.split(",")]
         if len(fields) != 9:
@@ -255,12 +279,32 @@ def hardware_snapshot() -> dict[str, Any]:
         text=True,
         check=False,
     ).stdout.splitlines()
+    observed_gpu_indices = [int(gpu["index"]) for gpu in gpus]
+    gpu_indices_valid = len(observed_gpu_indices) == 4 and set(observed_gpu_indices) == set(
+        range(4)
+    )
+    power_limit_mismatches = []
+    if expected_power_limits_w is not None:
+        for gpu in gpus:
+            gpu_index = int(gpu["index"])
+            expected = expected_power_limits_w.get(gpu_index)
+            actual = float(gpu["power_limit_w"])
+            if expected is None or not math.isclose(
+                actual,
+                expected,
+                rel_tol=0.0,
+                abs_tol=0.1,
+            ):
+                power_limit_mismatches.append(
+                    {"gpu_index": gpu_index, "expected_w": expected, "actual_w": actual}
+                )
     valid = (
-        len(gpus) == 4
+        gpu_indices_valid
         and all("B200" in str(gpu["model"]) for gpu in gpus)
         and all(gpu["driver"] == "595.91.07" for gpu in gpus)
         and not [line for line in processes if line.strip()]
         and all(gpu["uncorrected_volatile_ecc"] == 0 for gpu in gpus)
+        and not power_limit_mismatches
     )
     return {
         "platform": platform.platform(),
@@ -268,6 +312,14 @@ def hardware_snapshot() -> dict[str, Any]:
         "host_memory": host_memory_snapshot(),
         "host_memory_policy": host_memory_policy_snapshot(),
         "gpus": gpus,
+        "observed_gpu_indices": observed_gpu_indices,
+        "gpu_indices_valid": gpu_indices_valid,
+        "expected_power_limits_w": (
+            {str(index): value for index, value in sorted(expected_power_limits_w.items())}
+            if expected_power_limits_w is not None
+            else None
+        ),
+        "power_limit_mismatches": power_limit_mismatches,
         "competing_compute_process_count": len([line for line in processes if line.strip()]),
         "valid": valid,
     }
@@ -350,7 +402,7 @@ def preflight(
 ) -> dict[str, Any]:
     if platform.system().lower() != "linux" or platform.machine().lower() != "x86_64":
         raise RuntimeError("The full S004 profile requires Linux x86_64")
-    hardware = hardware_snapshot()
+    hardware = hardware_snapshot(expected_gpu_power_limits(repository_root))
     runtime = runtime_fingerprint()
     model = (
         verify_model_manifest(repository_root)
@@ -360,7 +412,10 @@ def preflight(
     result = {"hardware": hardware, "runtime": runtime, "model": model}
     _write_json(output, result)
     if not hardware["valid"]:
-        raise RuntimeError("Four idle NVIDIA B200 accelerators with clean ECC state are required")
+        raise RuntimeError(
+            "Four idle NVIDIA B200 accelerators with clean ECC state and the HW002 "
+            "configured power limits are required"
+        )
     if not runtime["valid"]:
         raise RuntimeError("Pinned SGLang runtime fingerprint does not match RT004")
     if not model["valid"]:
