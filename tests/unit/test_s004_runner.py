@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+import atlas.studies.runners.s004_client as s004_client
 from atlas.studies.runners.s004 import (
     MINIMUM_SLO_CLASS_OBSERVATIONS,
     THERMAL_OR_POWER_THROTTLE_MASK,
@@ -24,6 +25,7 @@ from atlas.studies.runners.s004_aiperf import (
     compare_aiperf_summary,
 )
 from atlas.studies.runners.s004_client import RequestResult
+from atlas.studies.runners.s004_client import healthcheck as client_healthcheck
 from atlas.studies.runners.s004_lifecycle import (
     EXPECTED_RUNTIME_FILES,
     EXPECTED_TREATMENT_SOURCE_FINGERPRINT,
@@ -211,6 +213,30 @@ def test_request_accounting_rejects_missing_duplicate_and_unexpected_rows() -> N
         )
     with pytest.raises(ValueError, match="unexpected"):
         reconcile_request_ids([request], [{"request_id": "other"}])
+
+
+def test_healthcheck_accepts_sglang_empty_health_body(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class Response:
+        def __init__(self, body: bytes) -> None:
+            self.body = body
+
+        def __enter__(self) -> Response:
+            return self
+
+        def __exit__(self, *_args: object) -> None:
+            return None
+
+        def read(self) -> bytes:
+            return self.body
+
+    responses = iter((Response(b""), Response(b'{"version":"test"}')))
+    monkeypatch.setattr(
+        s004_client.urllib.request, "urlopen", lambda *_args, **_kwargs: next(responses)
+    )
+
+    assert client_healthcheck("http://127.0.0.1:30000") == {"version": "test"}
 
 
 @pytest.mark.parametrize(

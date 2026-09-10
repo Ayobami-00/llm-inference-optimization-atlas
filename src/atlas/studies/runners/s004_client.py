@@ -44,8 +44,15 @@ def _json_request(
     return data
 
 
+def _status_request(url: str, *, timeout: float = 30) -> None:
+    request = urllib.request.Request(url, method="GET")
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        # SGLang's health endpoint deliberately returns an empty 200 response.
+        response.read()
+
+
 def healthcheck(base_url: str, *, timeout: float = 30) -> dict[str, Any]:
-    _json_request(f"{base_url}/health_generate", timeout=timeout)
+    _status_request(f"{base_url}/health_generate", timeout=timeout)
     return _json_request(f"{base_url}/server_info", timeout=timeout)
 
 
