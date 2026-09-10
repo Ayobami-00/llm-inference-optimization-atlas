@@ -187,6 +187,59 @@ def test_pull_request_gate_checks_approval_type_branch_and_artifacts(tmp_path: P
     assert result.checked_manifests == 1
 
 
+def test_pull_request_gate_skips_changes_outside_studies_without_a_manifest(
+    tmp_path: Path,
+) -> None:
+    repository = "Ayobami-00/llm-inference-optimization-atlas"
+    event = {
+        "repository": {"full_name": repository},
+        "pull_request": {
+            "url": f"https://api.github.com/repos/{repository}/pulls/20",
+            "body": "Tooling-only change",
+            "head": {"sha": "a" * 40, "ref": "feat/tooling-change"},
+        },
+    }
+    event_path = tmp_path / "event.json"
+    event_path.write_text(json.dumps(event))
+
+    def fetch(url: str) -> Any:
+        assert "/files?" in url
+        return [
+            {"filename": "src/atlas/comparisons/service.py"},
+            {"filename": "reference/schemas/v1/studies/comparison.schema.json"},
+            {"filename": "site/src/App.tsx"},
+        ]
+
+    result = check_pull_request_approval(ROOT, event_path, "test", fetcher=fetch)
+
+    assert result.ok
+    assert result.checked_manifests == 0
+
+
+def test_pull_request_gate_requires_manifest_for_study_changes(tmp_path: Path) -> None:
+    repository = "Ayobami-00/llm-inference-optimization-atlas"
+    event = {
+        "repository": {"full_name": repository},
+        "pull_request": {
+            "url": f"https://api.github.com/repos/{repository}/pulls/20",
+            "body": "Study change without proposal",
+            "head": {"sha": "a" * 40, "ref": "feat/unapproved-study"},
+        },
+    }
+    event_path = tmp_path / "event.json"
+    event_path.write_text(json.dumps(event))
+
+    def fetch(url: str) -> Any:
+        assert "/files?" in url
+        return [{"filename": "studies/S004-test/v1/study.yaml"}]
+
+    result = check_pull_request_approval(ROOT, event_path, "test", fetcher=fetch)
+
+    assert not result.ok
+    assert result.checked_manifests == 0
+    assert any("study artifacts" in issue["message"] for issue in result.issues)
+
+
 def test_pull_request_gate_rejects_unapproved_issue(tmp_path: Path) -> None:
     repository = "Ayobami-00/llm-inference-optimization-atlas"
     event = {

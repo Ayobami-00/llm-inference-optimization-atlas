@@ -153,7 +153,46 @@
           "type": "string"
         },
         "analysis": {
-          "type": "object"
+          "type": "object",
+          "properties": {
+            "contrasts": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "baseline",
+                  "candidate"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                  },
+                  "baseline": {
+                    "$ref": "../common/reference.schema.json"
+                  },
+                  "candidate": {
+                    "$ref": "../common/reference.schema.json"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "seed": {
+              "type": "integer"
+            },
+            "resamples": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "confidence_level": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "exclusiveMaximum": 1
+            }
+          }
         },
         "stopping_rule": {
           "type": "string"

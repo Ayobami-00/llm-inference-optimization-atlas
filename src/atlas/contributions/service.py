@@ -160,6 +160,19 @@ def _expected_runs(experiments: list[dict[str, Any]]) -> int:
     return expected
 
 
+def _expected_comparisons(experiments: list[dict[str, Any]]) -> int:
+    expected = 0
+    for experiment in experiments:
+        contrasts = experiment.get("analysis", {}).get("contrasts")
+        if isinstance(contrasts, list) and contrasts:
+            expected += len(contrasts)
+            continue
+        candidates = experiment.get("candidates", [])
+        if isinstance(candidates, list):
+            expected += len(candidates)
+    return expected
+
+
 def _count_label(count: int, singular: str, plural: str | None = None) -> str:
     return f"{count} {singular if count == 1 else (plural or f'{singular}s')}"
 
@@ -228,7 +241,10 @@ def contribution_status(root: Path, study: str) -> ContributionStatus:
     accepted_comparisons = [
         comparison for comparison in comparisons if comparison.get("status") == "accepted"
     ]
-    analysis_complete = bool(experiments) and len(accepted_comparisons) >= len(experiments)
+    expected_comparisons = _expected_comparisons(experiments)
+    analysis_complete = (
+        expected_comparisons > 0 and len(accepted_comparisons) >= expected_comparisons
+    )
     findings = by_kind.get("Finding", [])
     interpretation_complete = bool(accepted_comparisons) and len(findings) >= len(
         accepted_comparisons
@@ -284,7 +300,8 @@ def contribution_status(root: Path, study: str) -> ContributionStatus:
         ContributionStage(
             "Controlled comparisons",
             analysis_complete,
-            f"{len(accepted_comparisons)} accepted comparisons for {len(experiments)} experiments.",
+            f"{len(accepted_comparisons)}/{expected_comparisons} expected comparisons accepted "
+            f"for {len(experiments)} experiments.",
             "Run atlas compare for every experiment and review the generated effects.",
         ),
         ContributionStage(

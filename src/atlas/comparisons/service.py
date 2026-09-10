@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import json
+import math
 import re
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeGuard
 
 import numpy as np
 
@@ -13,6 +15,10 @@ from atlas.utilities.serialization import load_data, yaml_writer
 
 class ComparisonError(RuntimeError):
     """A controlled comparison could not be produced."""
+
+
+def _finite_number(value: Any) -> TypeGuard[int | float]:
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
 
 
 def _find_experiment(root: Path, value: str) -> Path:
@@ -66,15 +72,49 @@ def _accepted_runs(experiment_root: Path) -> list[tuple[dict[str, Any], Path]]:
     return values
 
 
-def _metric_value(run_root: Path, metric: str) -> tuple[float, str]:
+def _scope_key(scope: dict[str, Any]) -> str:
+    if not scope:
+        raise ComparisonError("Metric breakdown scope must not be empty")
+    if not all(isinstance(key, str) for key in scope):
+        raise ComparisonError("Metric breakdown scope values must be scalar JSON values")
+    for value in scope.values():
+        if isinstance(value, float) and not math.isfinite(value):
+            raise ComparisonError("Metric breakdown scope values must be finite")
+        if not isinstance(value, (str, int, float, bool)):
+            raise ComparisonError("Metric breakdown scope values must be scalar JSON values")
+    return json.dumps(scope, sort_keys=True, separators=(",", ":"))
+
+
+def _metric_observations(
+    run_root: Path, metric: str
+) -> tuple[float, str, dict[str, tuple[dict[str, Any], float]]]:
     summary = load_data(run_root / "metrics" / "summary.json")
     if not isinstance(summary, dict):
         raise ComparisonError(f"Summary must be an object: {run_root}")
     metrics = summary.get("metrics", {})
     value = metrics.get(metric) if isinstance(metrics, dict) else None
-    if not isinstance(value, dict) or not isinstance(value.get("value"), (int, float)):
+    if not isinstance(value, dict) or not _finite_number(value.get("value")):
         raise ComparisonError(f"Summary {run_root} has no numeric {metric} value")
-    return float(value["value"]), str(value.get("unit", "1"))
+    breakdown = value.get("breakdown", [])
+    if not isinstance(breakdown, list):
+        raise ComparisonError(f"Summary {run_root} has invalid {metric} breakdown")
+    scoped: dict[str, tuple[dict[str, Any], float]] = {}
+    for index, observation in enumerate(breakdown):
+        if not isinstance(observation, dict):
+            raise ComparisonError(
+                f"Summary {run_root} {metric} breakdown {index} must be an object"
+            )
+        scope = observation.get("scope")
+        scoped_value = observation.get("value")
+        if not isinstance(scope, dict) or not _finite_number(scoped_value):
+            raise ComparisonError(
+                f"Summary {run_root} {metric} breakdown {index} requires scope and value"
+            )
+        key = _scope_key(scope)
+        if key in scoped:
+            raise ComparisonError(f"Summary {run_root} has duplicate {metric} scope {key}")
+        scoped[key] = (scope, float(scoped_value))
+    return float(value["value"]), str(value.get("unit", "1")), scoped
 
 
 def _bootstrap_interval(
@@ -135,6 +175,165 @@ def _relative_effect(*, absolute: float, baseline: float) -> float | None:
     return absolute / baseline
 
 
+def _reference_id(reference: str) -> str:
+    return reference.rsplit("/", 1)[-1].split("@", 1)[0]
+
+
+def _planned_contrasts(experiment: dict[str, Any]) -> list[dict[str, str]]:
+    baseline = str(experiment["baseline"])
+    candidates = [str(value) for value in experiment.get("candidates", [])]
+    allowed = {baseline, *candidates}
+    raw = experiment.get("analysis", {}).get("contrasts")
+    if raw is None:
+        return [
+            {
+                "id": f"{_reference_id(baseline).lower()}-vs-{_reference_id(candidate).lower()}",
+                "baseline": baseline,
+                "candidate": candidate,
+            }
+            for candidate in candidates
+        ]
+    if not isinstance(raw, list) or not raw:
+        raise ComparisonError("Experiment analysis.contrasts must be a non-empty list")
+    contrasts: list[dict[str, str]] = []
+    identifiers: set[str] = set()
+    pairs: set[frozenset[str]] = set()
+    for index, value in enumerate(raw):
+        if not isinstance(value, dict):
+            raise ComparisonError(f"Experiment contrast {index} must be an object")
+        identifier = value.get("id")
+        contrast_baseline = value.get("baseline")
+        contrast_candidate = value.get("candidate")
+        if not isinstance(identifier, str) or not re.fullmatch(
+            r"[a-z0-9]+(?:-[a-z0-9]+)*", identifier
+        ):
+            raise ComparisonError(f"Experiment contrast {index} has an invalid id")
+        if contrast_baseline not in allowed or contrast_candidate not in allowed:
+            raise ComparisonError(
+                f"Experiment contrast {identifier} references a configuration outside "
+                "the experiment"
+            )
+        if contrast_baseline == contrast_candidate:
+            raise ComparisonError(
+                f"Experiment contrast {identifier} must compare different configurations"
+            )
+        pair = frozenset((str(contrast_baseline), str(contrast_candidate)))
+        if identifier in identifiers or pair in pairs:
+            raise ComparisonError(f"Experiment contrast {identifier} is duplicated")
+        identifiers.add(identifier)
+        pairs.add(pair)
+        contrasts.append(
+            {
+                "id": identifier,
+                "baseline": str(contrast_baseline),
+                "candidate": str(contrast_candidate),
+            }
+        )
+    return contrasts
+
+
+def _analysis_settings(experiment: dict[str, Any]) -> tuple[int, float, int]:
+    analysis = experiment.get("analysis", {})
+    if not isinstance(analysis, dict):
+        raise ComparisonError("Experiment analysis must be an object")
+    resamples = analysis.get("resamples", 10000)
+    confidence = analysis.get("confidence_level", 0.95)
+    seed = analysis.get("seed", 20260825)
+    if not isinstance(resamples, int) or isinstance(resamples, bool) or resamples < 1:
+        raise ComparisonError("Experiment analysis.resamples must be a positive integer")
+    if not isinstance(confidence, (int, float)) or not 0 < confidence < 1:
+        raise ComparisonError("Experiment analysis.confidence_level must be between zero and one")
+    if not isinstance(seed, int) or isinstance(seed, bool):
+        raise ComparisonError("Experiment analysis.seed must be an integer")
+    return resamples, float(confidence), seed
+
+
+def _pairing_key(run: dict[str, Any]) -> tuple[int, int]:
+    return int(run["replicate"]), int(run["seed"])
+
+
+def _runs_by_pairing_key(
+    runs: list[tuple[dict[str, Any], Path]], configuration: str
+) -> dict[tuple[int, int], tuple[dict[str, Any], Path]]:
+    keyed: dict[tuple[int, int], tuple[dict[str, Any], Path]] = {}
+    for run, path in runs:
+        if run.get("configuration") != configuration:
+            continue
+        key = _pairing_key(run)
+        if key in keyed:
+            raise ComparisonError(
+                f"Duplicate accepted replicate/seed pair {key} for {configuration}"
+            )
+        keyed[key] = (run, path)
+    return keyed
+
+
+def _effect(
+    root: Path,
+    metric_reference: str,
+    baseline_values: np.ndarray,
+    candidate_values: np.ndarray,
+    *,
+    unit: str,
+    paired: bool,
+    resamples: int,
+    confidence: float,
+    seed: int,
+    scope: dict[str, Any] | None = None,
+) -> tuple[dict[str, Any], str]:
+    baseline_mean = float(np.mean(baseline_values))
+    candidate_mean = float(np.mean(candidate_values))
+    absolute = candidate_mean - baseline_mean
+    lower, upper = _bootstrap_interval(
+        baseline_values,
+        candidate_values,
+        paired=paired,
+        resamples=resamples,
+        confidence=confidence,
+        seed=seed,
+    )
+    value: dict[str, Any] = {
+        "metric": metric_reference,
+        "baseline": baseline_mean,
+        "candidate": candidate_mean,
+        "absolute": absolute,
+        "relative": _relative_effect(absolute=absolute, baseline=baseline_mean),
+        "confidence_interval": {
+            "lower": lower,
+            "upper": upper,
+            "level": confidence,
+        },
+        "unit": unit,
+    }
+    if scope is not None:
+        value["scope"] = scope
+    direction = _metric_direction(root, metric_reference)
+    return value, _comparison_result(direction, lower, upper)
+
+
+def _matching_scope_keys(
+    baseline: list[dict[str, tuple[dict[str, Any], float]]],
+    candidate: list[dict[str, tuple[dict[str, Any], float]]],
+    *,
+    metric: str,
+    contrast: str,
+) -> set[str]:
+    expected = set(baseline[0])
+    if any(set(scopes) != expected for scopes in baseline + candidate):
+        raise ComparisonError(f"Metric breakdown scope mismatch for {metric} in {contrast}")
+    return expected
+
+
+def _consistent_unit(
+    observations: list[tuple[float, str, dict[str, tuple[dict[str, Any], float]]]],
+    metric: str,
+) -> str:
+    units = {unit for _, unit, _ in observations}
+    if len(units) != 1:
+        raise ComparisonError(f"Metric unit mismatch for {metric}: {sorted(units)}")
+    return units.pop()
+
+
 def _compatibility(
     baseline: dict[str, Any], candidate: dict[str, Any], changed_factors: list[str]
 ) -> list[str]:
@@ -179,37 +378,28 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
     if not isinstance(experiment, dict):
         raise ComparisonError(f"Invalid experiment: {experiment_root}")
     runs = _accepted_runs(experiment_root)
-    baseline_reference = experiment["baseline"]
-    baseline_runs = [
-        (run, path) for run, path in runs if run.get("configuration") == baseline_reference
-    ]
-    if len(baseline_runs) < 3:
-        raise ComparisonError("Accepted comparisons require at least three eligible baseline runs")
-    baseline_config = _artifact_for_reference(root, baseline_reference)
+    resamples, confidence, analysis_seed = _analysis_settings(experiment)
 
     outputs = []
-    for candidate_reference in experiment.get("candidates", []):
-        candidate_runs = [
-            (run, path) for run, path in runs if run.get("configuration") == candidate_reference
-        ]
-        if len(candidate_runs) < 3:
+    for contrast in _planned_contrasts(experiment):
+        baseline_reference = contrast["baseline"]
+        candidate_reference = contrast["candidate"]
+        baseline_by_key = _runs_by_pairing_key(runs, baseline_reference)
+        candidate_by_key = _runs_by_pairing_key(runs, candidate_reference)
+        common_keys = sorted(set(baseline_by_key) & set(candidate_by_key))
+        if len(common_keys) < 3:
             raise ComparisonError(
-                f"Accepted comparisons require three eligible runs for {candidate_reference}"
+                f"Accepted comparison {contrast['id']} requires at least three paired "
+                "replicate/seed runs"
             )
+        selected_baseline = [baseline_by_key[key] for key in common_keys]
+        selected_candidate = [candidate_by_key[key] for key in common_keys]
+        paired = True
+        baseline_config = _artifact_for_reference(root, baseline_reference)
         candidate_config = _artifact_for_reference(root, candidate_reference)
         checks = _compatibility(
             baseline_config, candidate_config, list(experiment.get("changed_factors", []))
         )
-        baseline_by_seed = {run["seed"]: (run, path) for run, path in baseline_runs}
-        candidate_by_seed = {run["seed"]: (run, path) for run, path in candidate_runs}
-        common_seeds = sorted(set(baseline_by_seed) & set(candidate_by_seed))
-        paired = len(common_seeds) >= 3
-        if paired:
-            selected_baseline = [baseline_by_seed[seed] for seed in common_seeds]
-            selected_candidate = [candidate_by_seed[seed] for seed in common_seeds]
-        else:
-            selected_baseline = baseline_runs
-            selected_candidate = candidate_runs
 
         baseline_references = [
             f"atlas://run/{run['id']}@v{run['version']}" for run, _ in selected_baseline
@@ -227,50 +417,52 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
             continue
 
         effects = []
-        results = []
+        overall_results = []
         for metric_reference in experiment["metrics"]["primary"]:
             metric_id = metric_reference.rsplit("/", 1)[-1].split("@", 1)[0]
-            baseline_values_and_units = [
-                _metric_value(path, metric_id) for _, path in selected_baseline
+            baseline_observations = [
+                _metric_observations(path, metric_id) for _, path in selected_baseline
             ]
-            candidate_values_and_units = [
-                _metric_value(path, metric_id) for _, path in selected_candidate
+            candidate_observations = [
+                _metric_observations(path, metric_id) for _, path in selected_candidate
             ]
-            units = {unit for _, unit in baseline_values_and_units + candidate_values_and_units}
-            if len(units) != 1:
-                raise ComparisonError(f"Metric unit mismatch for {metric_id}: {sorted(units)}")
-            baseline_values = np.array([value for value, _ in baseline_values_and_units])
-            candidate_values = np.array([value for value, _ in candidate_values_and_units])
-            baseline_mean = float(np.mean(baseline_values))
-            candidate_mean = float(np.mean(candidate_values))
-            absolute = candidate_mean - baseline_mean
-            relative = _relative_effect(absolute=absolute, baseline=baseline_mean)
-            lower, upper = _bootstrap_interval(
-                baseline_values,
-                candidate_values,
+            unit = _consistent_unit(baseline_observations + candidate_observations, metric_id)
+            overall_effect, overall_result = _effect(
+                root,
+                metric_reference,
+                np.array([value for value, _, _ in baseline_observations]),
+                np.array([value for value, _, _ in candidate_observations]),
+                unit=unit,
                 paired=paired,
-                resamples=10000,
-                confidence=0.95,
-                seed=20260825,
+                resamples=resamples,
+                confidence=confidence,
+                seed=analysis_seed,
             )
-            direction = _metric_direction(root, metric_reference)
-            results.append(_comparison_result(direction, lower, upper))
-            effects.append(
-                {
-                    "metric": metric_reference,
-                    "baseline": baseline_mean,
-                    "candidate": candidate_mean,
-                    "absolute": absolute,
-                    "relative": relative,
-                    "confidence_interval": {
-                        "lower": lower,
-                        "upper": upper,
-                        "level": 0.95,
-                    },
-                    "unit": units.pop(),
-                }
+            effects.append(overall_effect)
+            overall_results.append(overall_result)
+
+            expected_scopes = _matching_scope_keys(
+                [scoped for _, _, scoped in baseline_observations],
+                [scoped for _, _, scoped in candidate_observations],
+                metric=metric_id,
+                contrast=contrast["id"],
             )
-        overall = results[0] if len(set(results)) == 1 else "mixed"
+            for scoped_index, key in enumerate(sorted(expected_scopes), start=1):
+                scope = baseline_observations[0][2][key][0]
+                scoped_effect, _ = _effect(
+                    root,
+                    metric_reference,
+                    np.array([scoped[key][1] for _, _, scoped in baseline_observations]),
+                    np.array([scoped[key][1] for _, _, scoped in candidate_observations]),
+                    unit=unit,
+                    paired=paired,
+                    resamples=resamples,
+                    confidence=confidence,
+                    seed=analysis_seed + scoped_index,
+                    scope=scope,
+                )
+                effects.append(scoped_effect)
+        overall = overall_results[0] if len(set(overall_results)) == 1 else "mixed"
         comparison_id = next_identifier(root, "comparison")
         timestamp = datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
         comparison = {
@@ -282,10 +474,11 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
             "kind": "Comparison",
             "id": comparison_id,
             "version": 1,
-            "slug": f"{experiment['slug']}-{comparison_id.lower()}",
-            "title": f"{experiment['title']} comparison",
+            "slug": f"{experiment['slug']}-{contrast['id']}-{comparison_id.lower()}",
+            "title": f"{experiment['title']}: {contrast['id']}",
             "description": (
-                f"Controlled effects for {candidate_reference} against {baseline_reference}."
+                f"Controlled {contrast['id']} effects for {candidate_reference} "
+                f"against {baseline_reference}."
             ),
             "status": "accepted",
             "authors": experiment["authors"],
@@ -303,14 +496,17 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
             },
             "extensions": {},
             "experiment": f"atlas://experiment/{experiment['id']}@v{experiment['version']}",
+            "contrast": contrast,
             "baseline_runs": baseline_references,
             "candidate_runs": candidate_references,
             "changed_axes": experiment["changed_factors"],
             "compatibility": {"passed": True, "checks": checks},
             "method": {
                 "paired": paired,
-                "confidence_level": 0.95,
-                "bootstrap_resamples": 10000,
+                "confidence_level": confidence,
+                "bootstrap_resamples": resamples,
+                "bootstrap_seed": analysis_seed,
+                "pairing_keys": ["replicate", "seed"],
             },
             "effects": effects,
             "quality_eligible": True,

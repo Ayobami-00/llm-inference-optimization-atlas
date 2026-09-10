@@ -47,6 +47,7 @@ analysis:
   method: paired_bootstrap
   resamples: 10000
   confidence_level: 0.95
+  seed: 20260825
 stopping_rule: "Complete all planned replicates unless Q0 fails or a safety limit is reached."
 failure_policy: "Retain failed attempts as drafts; exclude invalid runs from claims without deleting them."
 background_sources: []

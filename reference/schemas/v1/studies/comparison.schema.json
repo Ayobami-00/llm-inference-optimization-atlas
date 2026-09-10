@@ -30,6 +30,27 @@
         "experiment": {
           "$ref": "../common/reference.schema.json"
         },
+        "contrast": {
+          "type": "object",
+          "required": [
+            "id",
+            "baseline",
+            "candidate"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "baseline": {
+              "$ref": "../common/reference.schema.json"
+            },
+            "candidate": {
+              "$ref": "../common/reference.schema.json"
+            }
+          },
+          "additionalProperties": false
+        },
         "baseline_runs": {
           "type": "array",
           "minItems": 1,
@@ -90,6 +111,21 @@
             "bootstrap_resamples": {
               "type": "integer",
               "minimum": 1
+            },
+            "bootstrap_seed": {
+              "type": "integer"
+            },
+            "pairing_keys": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "replicate",
+                  "seed"
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 2,
+              "uniqueItems": true
             }
           },
           "additionalProperties": false
@@ -133,6 +169,17 @@
               },
               "unit": {
                 "type": "string"
+              },
+              "scope": {
+                "type": "object",
+                "minProperties": 1,
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean"
+                  ]
+                }
               }
             },
             "additionalProperties": false

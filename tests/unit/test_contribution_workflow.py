@@ -4,7 +4,10 @@ import shutil
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 from atlas.contributions import contribution_status, start_contribution
+from atlas.contributions.service import _expected_comparisons
 from atlas.identities import next_identifiers
 from atlas.utilities.serialization import yaml_writer
 from atlas.validation import Validator
@@ -135,6 +138,48 @@ def test_next_identifiers_are_consecutive_after_the_highest_existing_id(
         "E0009",
         "E0010",
     ]
+
+
+def test_next_identifiers_include_nested_ontology_entries(tmp_path: Path) -> None:
+    records = tmp_path / "reference" / "ontology" / "v1" / "metrics"
+    records.mkdir(parents=True)
+    with (records / "m0.yaml").open("w") as stream:
+        yaml_writer().dump(
+            {"id": "METRICS-M0", "entries": [{"id": "MET096"}, {"id": "MET041"}]},
+            stream,
+        )
+    top_level = tmp_path / "records"
+    top_level.mkdir()
+    with (top_level / "metric.yaml").open("w") as stream:
+        yaml_writer().dump({"id": "MET094"}, stream)
+
+    assert next_identifiers(tmp_path, "metric", count=3) == [
+        "MET097",
+        "MET098",
+        "MET099",
+    ]
+
+
+def test_nested_identity_namespace_exhaustion_is_rejected(tmp_path: Path) -> None:
+    records = tmp_path / "records"
+    records.mkdir()
+    with (records / "metrics.yaml").open("w") as stream:
+        yaml_writer().dump({"entries": [{"id": "MET999"}]}, stream)
+
+    with pytest.raises(ValueError, match="namespace is exhausted"):
+        next_identifiers(tmp_path, "metric")
+
+
+def test_expected_comparisons_count_registered_contrasts() -> None:
+    experiments = [
+        {
+            "candidates": ["candidate-a", "candidate-b"],
+            "analysis": {"contrasts": [{"id": "a"}, {"id": "b"}, {"id": "c"}]},
+        },
+        {"candidates": ["candidate-c"], "analysis": {}},
+    ]
+
+    assert _expected_comparisons(experiments) == 4
 
 
 def test_all_contribution_templates_validate_against_v1_schemas() -> None:
