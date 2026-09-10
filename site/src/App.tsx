@@ -69,6 +69,27 @@ function artifactCode(reference: string): string {
   return reference.split("/").at(-1)?.replace(/@v\d+$/, "") ?? reference;
 }
 
+const canonicalMetricNames: Readonly<Record<string, string>> = {
+  MET010: "Client TTFT",
+  MET012: "Queue delay",
+  MET013: "Time per output token",
+  MET014: "Inter-token latency",
+  MET015: "End-to-end latency",
+  MET019: "Output token throughput",
+  MET021: "SLO goodput",
+  MET092: "Retrieval recall at k",
+  MET097: "Available KV-cache token capacity",
+  MET098: "Server readiness latency",
+  MET099: "SLO-qualified offered-load capacity",
+};
+
+function metricLabel(reference: string, unit = ""): string {
+  const code = artifactCode(reference);
+  const name = canonicalMetricNames[code];
+  if (name) return `${name} (${code})`;
+  return unit ? `${code} · ${unit}` : code;
+}
+
 const repositoryUrl = "https://github.com/Ayobami-00/llm-inference-optimization-atlas";
 const tourStorageKey = "atlas:s003-tour:v1";
 const tourStudyPath = "studies/S003-cpu-enterprise-rag/v1/";
@@ -266,6 +287,85 @@ function scopeValue(value: unknown): string {
   return JSON.stringify(value) ?? "Unavailable";
 }
 
+function compareScopeValues(left: string, right: string): number {
+  return left.localeCompare(right, undefined, { numeric: true });
+}
+
+function signedPercentage(relative: number): string {
+  const percentage = relative * 100;
+  if (Math.abs(percentage) < 0.05) return "0.0%";
+  return `${percentage > 0 ? "+" : ""}${percentage.toFixed(1)}%`;
+}
+
+function signedChangeDescription(relative: number | null): string {
+  if (relative === null) return "Relative effect unavailable";
+  if (Math.abs(relative) < 0.0005) return "Candidate unchanged";
+  return `Candidate ${Math.abs(relative * 100).toFixed(1)}% ${relative > 0 ? "higher" : "lower"}`;
+}
+
+function signedEffectColor(relative: number | null, maximum: number): string {
+  if (relative === null || Math.abs(relative) < 0.0005) return "rgba(112, 124, 118, 0.12)";
+  const intensity = Math.min(0.52, 0.14 + Math.abs(relative) / maximum * 0.38);
+  return relative < 0
+    ? `rgba(50, 126, 160, ${intensity})`
+    : `rgba(198, 139, 48, ${intensity})`;
+}
+
+interface EffectHeatmapFacet {
+  key: string;
+  scope: Record<string, unknown>;
+  effects: Map<string, Record<string, unknown>>;
+  contexts: string[];
+  concurrencies: string[];
+}
+
+function effectHeatmapFacets(
+  effects: Record<string, unknown>[],
+  dimensions: string[],
+): EffectHeatmapFacet[] {
+  if (!dimensions.includes("context_tokens") || !dimensions.includes("concurrency")) return [];
+  const facetDimensions = dimensions.filter(
+    (dimension) => dimension !== "context_tokens" && dimension !== "concurrency",
+  );
+  const facets = new Map<string, EffectHeatmapFacet>();
+  effects.forEach((effect) => {
+    const scope = effect.scope as Record<string, unknown>;
+    const facetScope = Object.fromEntries(
+      facetDimensions.map((dimension) => [dimension, scope[dimension]]),
+    );
+    const key = JSON.stringify(facetScope);
+    const facet: EffectHeatmapFacet = facets.get(key) ?? {
+      key,
+      scope: facetScope,
+      effects: new Map(),
+      contexts: [],
+      concurrencies: [],
+    };
+    const context = scopeValue(scope.context_tokens);
+    const concurrency = scopeValue(scope.concurrency);
+    facet.effects.set(`${context}\u0000${concurrency}`, effect);
+    if (!facet.contexts.includes(context)) facet.contexts.push(context);
+    if (!facet.concurrencies.includes(concurrency)) facet.concurrencies.push(concurrency);
+    facets.set(key, facet);
+  });
+  return [...facets.values()]
+    .map((facet) => ({
+      ...facet,
+      contexts: facet.contexts.sort(compareScopeValues),
+      concurrencies: facet.concurrencies.sort(compareScopeValues),
+    }))
+    .sort((left, right) => left.key.localeCompare(right.key, undefined, { numeric: true }));
+}
+
+function facetLabel(scope: Record<string, unknown>): string {
+  const entries = Object.entries(scope);
+  return entries.length > 0
+    ? entries
+        .map(([dimension, value]) => `${titleCase(dimension)}: ${titleCase(scopeValue(value))}`)
+        .join(" · ")
+    : "All workload scopes";
+}
+
 function EffectList({ detail }: { detail: EntityDetail }) {
   const rawEffects = Array.isArray(detail.artifact.effects) ? detail.artifact.effects : [];
   const effects = rawEffects.filter(
@@ -328,6 +428,9 @@ function EffectList({ detail }: { detail: EntityDetail }) {
       typeof effect.relative === "number" ? Math.abs(effect.relative) : 0,
     ),
   );
+  const selectedMetricUnit = String(metricEffects[0]?.unit ?? "");
+  const selectedMetricLabel = metricLabel(selectedMetric, selectedMetricUnit);
+  const heatmapFacets = effectHeatmapFacets(visibleScoped, dimensions);
   const contrast =
     typeof detail.artifact.contrast === "object" && detail.artifact.contrast !== null
       ? (detail.artifact.contrast as Record<string, unknown>)
@@ -357,9 +460,12 @@ function EffectList({ detail }: { detail: EntityDetail }) {
                   setScopeFilters({});
                 }}
               >
-                {metrics.map((value) => (
-                  <option value={value} key={value}>{value}</option>
-                ))}
+                {metrics.map((value) => {
+                  const unit = String(
+                    effects.find((effect) => String(effect.metric ?? "Metric") === value)?.unit ?? "",
+                  );
+                  return <option value={value} key={value}>{metricLabel(value, unit)}</option>;
+                })}
               </select>
             </label>
           )}
@@ -388,7 +494,8 @@ function EffectList({ detail }: { detail: EntityDetail }) {
       )}
       <div className="effect-list">
         {visibleEffects.filter((effect) => !effect.scope).map((record, index) => {
-          const relative = typeof record.relative === "number" ? record.relative * 100 : null;
+          const relative = typeof record.relative === "number" ? record.relative : null;
+          const relativePercentage = relative === null ? null : relative * 100;
           const interval =
             typeof record.confidence_interval === "object" && record.confidence_interval !== null
               ? (record.confidence_interval as Record<string, unknown>)
@@ -397,12 +504,8 @@ function EffectList({ detail }: { detail: EntityDetail }) {
           return (
             <article className="effect" key={`${String(record.metric)}-${index}`}>
               <div>
-                <strong>{String(record.metric ?? "Metric")}</strong>
-                <span>
-                  {relative === null
-                    ? "Relative effect unavailable"
-                    : `${relative.toFixed(1)}% relative`}
-                </span>
+                <strong>{metricLabel(String(record.metric ?? "Metric"), unit)}</strong>
+                <span>{signedChangeDescription(relative)}</span>
               </div>
               <dl className="effect-values">
                 <div><dt>Baseline</dt><dd>{effectNumber(record.baseline, unit)}</dd></div>
@@ -417,9 +520,9 @@ function EffectList({ detail }: { detail: EntityDetail }) {
                   </dd>
                 </div>
               </dl>
-              {relative !== null && (
-                <div className="effect-track" aria-label={`${relative.toFixed(1)} percent relative`}>
-                  <span style={{ width: `${Math.min(100, Math.max(4, Math.abs(relative)))}%` }} />
+              {relativePercentage !== null && (
+                <div className="effect-track" aria-label={signedChangeDescription(relative)}>
+                  <span style={{ width: `${Math.min(100, Math.max(4, Math.abs(relativePercentage)))}%` }} />
                 </div>
               )}
             </article>
@@ -427,55 +530,117 @@ function EffectList({ detail }: { detail: EntityDetail }) {
         })}
       </div>
       {visibleScoped.length > 0 && (
-        <div className="effect-table-wrap">
-          <table
-            className={dimensions.includes("context_tokens") && dimensions.includes("concurrency") ? "effect-table effect-heatmap" : "effect-table"}
-            aria-label="Scoped measured effects"
-          >
-            <caption>{artifactCode(selectedMetric)} effects by exact workload scope</caption>
-            <thead>
-              <tr>
-                {dimensions.map((dimension) => <th scope="col" key={dimension}>{titleCase(dimension)}</th>)}
-                <th scope="col">Baseline</th>
-                <th scope="col">Candidate</th>
-                <th scope="col">Absolute</th>
-                <th scope="col">Relative</th>
-                <th scope="col">Confidence interval</th>
-              </tr>
-            </thead>
-            <tbody>
-              {visibleScoped.map((effect, index) => {
-                const scope = effect.scope as Record<string, unknown>;
-                const relative = typeof effect.relative === "number" ? effect.relative : null;
-                const interval =
-                  typeof effect.confidence_interval === "object" && effect.confidence_interval !== null
-                    ? (effect.confidence_interval as Record<string, unknown>)
-                    : null;
-                const unit = String(effect.unit ?? "");
-                const intensity = relative === null ? 0 : Math.min(0.8, 0.12 + Math.abs(relative) / maxRelative * 0.68);
-                const color = relative !== null && relative < 0
-                  ? `rgba(220, 113, 94, ${intensity})`
-                  : `rgba(89, 184, 148, ${intensity})`;
-                return (
-                  <tr key={`${JSON.stringify(scope)}-${index}`}>
-                    {dimensions.map((dimension) => <th scope="row" key={dimension}>{scopeValue(scope[dimension])}</th>)}
-                    <td>{effectNumber(effect.baseline, unit)}</td>
-                    <td>{effectNumber(effect.candidate, unit)}</td>
-                    <td>{effectNumber(effect.absolute, unit)}</td>
-                    <td style={{ backgroundColor: color }}>
-                      {relative === null ? "Unavailable" : `${(relative * 100).toFixed(1)}%`}
-                    </td>
-                    <td>
-                      {interval
-                        ? `${effectNumber(interval.lower, unit)} to ${effectNumber(interval.upper, unit)}`
-                        : "Unavailable"}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <>
+          <div className="effect-change-key" aria-label="Signed-change color key">
+            <p>
+              Color shows whether the candidate value is lower or higher than the baseline. It does
+              not by itself mean improvement or regression.
+            </p>
+            <ul>
+              <li><i aria-hidden="true" className="effect-swatch effect-swatch-lower" />Candidate lower</li>
+              <li><i aria-hidden="true" className="effect-swatch effect-swatch-neutral" />Unchanged or unavailable</li>
+              <li><i aria-hidden="true" className="effect-swatch effect-swatch-higher" />Candidate higher</li>
+            </ul>
+          </div>
+          {heatmapFacets.length > 0 && (
+            <div className="effect-matrices" aria-label="Context by concurrency effect heatmaps">
+              <div className="effect-matrix-heading">
+                <strong>{selectedMetricLabel}</strong>
+                <span>Rows are context tokens; columns are concurrent requests.</span>
+              </div>
+              {heatmapFacets.map((facet) => (
+                <div className="effect-matrix-wrap" key={facet.key}>
+                  <table
+                    className="effect-matrix"
+                    aria-label={`${selectedMetricLabel} context by concurrency heatmap, ${facetLabel(facet.scope)}`}
+                  >
+                    <caption>{facetLabel(facet.scope)}</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Context ↓ / concurrency →</th>
+                        {facet.concurrencies.map((concurrency) => (
+                          <th scope="col" key={concurrency}>{concurrency}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {facet.contexts.map((context) => (
+                        <tr key={context}>
+                          <th scope="row">{context}</th>
+                          {facet.concurrencies.map((concurrency) => {
+                            const effect = facet.effects.get(`${context}\u0000${concurrency}`);
+                            if (!effect) return <td className="effect-cell-missing" key={concurrency}>—</td>;
+                            const relative = typeof effect.relative === "number" ? effect.relative : null;
+                            const unit = String(effect.unit ?? "");
+                            const description = [
+                              signedChangeDescription(relative),
+                              `baseline ${effectNumber(effect.baseline, unit)}`,
+                              `candidate ${effectNumber(effect.candidate, unit)}`,
+                            ].join("; ");
+                            return (
+                              <td
+                                key={concurrency}
+                                style={{ backgroundColor: signedEffectColor(relative, maxRelative) }}
+                                title={description}
+                              >
+                                {relative === null ? "N/A" : signedPercentage(relative)}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="effect-table-wrap">
+            <table className="effect-table" aria-label="Scoped measured effects">
+              <caption>{selectedMetricLabel} effects by exact workload scope</caption>
+              <thead>
+                <tr>
+                  {dimensions.map((dimension) => <th scope="col" key={dimension}>{titleCase(dimension)}</th>)}
+                  <th scope="col">Baseline</th>
+                  <th scope="col">Candidate</th>
+                  <th scope="col">Absolute</th>
+                  <th scope="col">Relative</th>
+                  <th scope="col">Confidence interval</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleScoped.map((effect, index) => {
+                  const scope = effect.scope as Record<string, unknown>;
+                  const relative = typeof effect.relative === "number" ? effect.relative : null;
+                  const interval =
+                    typeof effect.confidence_interval === "object" && effect.confidence_interval !== null
+                      ? (effect.confidence_interval as Record<string, unknown>)
+                      : null;
+                  const unit = String(effect.unit ?? "");
+                  return (
+                    <tr key={`${JSON.stringify(scope)}-${index}`}>
+                      {dimensions.map((dimension) => <th scope="row" key={dimension}>{scopeValue(scope[dimension])}</th>)}
+                      <td>{effectNumber(effect.baseline, unit)}</td>
+                      <td>{effectNumber(effect.candidate, unit)}</td>
+                      <td>{effectNumber(effect.absolute, unit)}</td>
+                      <td
+                        style={{ backgroundColor: signedEffectColor(relative, maxRelative) }}
+                        title={signedChangeDescription(relative)}
+                      >
+                        {relative === null ? "Unavailable" : signedPercentage(relative)}
+                      </td>
+                      <td>
+                        {interval
+                          ? `${effectNumber(interval.lower, unit)} to ${effectNumber(interval.upper, unit)}`
+                          : "Unavailable"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </section>
   );

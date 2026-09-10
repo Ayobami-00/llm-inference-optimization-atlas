@@ -126,6 +126,15 @@
               "minItems": 2,
               "maxItems": 2,
               "uniqueItems": true
+            },
+            "effect_metrics": {
+              "description": "Ordered effect-metric plan frozen from the experiment when the comparison was generated.",
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "../common/reference.schema.json"
+              }
             }
           },
           "additionalProperties": false
