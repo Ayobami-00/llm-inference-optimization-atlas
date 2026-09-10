@@ -5,7 +5,12 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from atlas.metrics.tables import REQUEST_COLUMNS, SAMPLE_COLUMNS, validate_result_tables
+from atlas.metrics.tables import (
+    OPTIONAL_REQUEST_COLUMNS,
+    REQUEST_COLUMNS,
+    SAMPLE_COLUMNS,
+    validate_result_tables,
+)
 
 
 def _empty_table(columns: dict[str, tuple[pa.DataType, str | None]]) -> pa.Table:
@@ -30,3 +35,22 @@ def test_arrow_contract_checks_types_and_units(tmp_path: Path) -> None:
     )
     pq.write_table(bad, tmp_path / "requests.parquet")
     assert any("request_id must be string" in error for error in validate_result_tables(tmp_path))
+
+
+def test_optional_workload_dimensions_are_checked_when_present(tmp_path: Path) -> None:
+    pq.write_table(
+        _empty_table({**REQUEST_COLUMNS, **OPTIONAL_REQUEST_COLUMNS}),
+        tmp_path / "requests.parquet",
+    )
+    pq.write_table(_empty_table(SAMPLE_COLUMNS), tmp_path / "samples.parquet")
+    assert validate_result_tables(tmp_path) == []
+
+    bad = _empty_table({**REQUEST_COLUMNS, **OPTIONAL_REQUEST_COLUMNS}).set_column(
+        len(REQUEST_COLUMNS) + 2,
+        pa.field("target_context_tokens", pa.string(), metadata={b"unit": b"token"}),
+        pa.array([], type=pa.string()),
+    )
+    pq.write_table(bad, tmp_path / "requests.parquet")
+    assert any(
+        "target_context_tokens must be int64" in error for error in validate_result_tables(tmp_path)
+    )

@@ -75,7 +75,8 @@ a {
 
 button:focus-visible,
 a:focus-visible,
-input:focus-visible {
+input:focus-visible,
+select:focus-visible {
   outline: 2px solid var(--signal);
   outline-offset: 2px;
 }
@@ -1918,6 +1919,52 @@ input:focus-visible {
   gap: 12px;
 }
 
+.effect-contrast {
+  display: grid;
+  gap: 5px;
+  padding: 10px;
+  margin: 8px 0 12px;
+  border: 1px solid var(--line);
+  background: var(--panel-soft);
+}
+
+.effect-contrast strong {
+  font-size: 12px;
+}
+
+.effect-contrast span {
+  font-size: 11px;
+}
+
+.effect-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+  margin: 10px 0 14px;
+}
+
+.effect-filters label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.effect-filters select {
+  min-width: 0;
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink);
+  background: #ffffff;
+  font: inherit;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
 .effect > div:first-child {
   display: flex;
   justify-content: space-between;
@@ -1927,6 +1974,31 @@ input:focus-visible {
 .effect strong,
 .effect span {
   font-size: 10px;
+}
+
+.effect-values {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 12px;
+  margin: 9px 0 0;
+}
+
+.effect-values div {
+  min-width: 0;
+}
+
+.effect-values dt {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.effect-values dd {
+  margin: 1px 0 0;
+  color: var(--ink);
+  font-size: 11px;
+  overflow-wrap: anywhere;
 }
 
 .effect-track {
@@ -1940,6 +2012,52 @@ input:focus-visible {
   display: block;
   height: 100%;
   background: var(--signal);
+}
+
+.effect-table-wrap {
+  margin-top: 14px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+}
+
+.effect-table {
+  width: 100%;
+  min-width: 660px;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.effect-table caption {
+  padding: 8px;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: left;
+  background: #ffffff;
+}
+
+.effect-table th,
+.effect-table td {
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--line);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.effect-table thead th {
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  background: var(--panel-soft);
+}
+
+.effect-table tbody th {
+  color: var(--ink);
+  font-weight: 600;
+  background: #fafbf9;
+}
+
+.effect-heatmap tbody td:nth-last-child(2) {
+  font-weight: 800;
 }
 
 .provenance {

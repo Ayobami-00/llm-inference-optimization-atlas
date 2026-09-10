@@ -19,6 +19,11 @@ uv run atlas proposal render proposal.yaml
 uv run atlas proposal create-issue proposal.yaml
 ```
 
+If the default package cache is not writable in a restricted development
+environment, direct the package runner to an ignored writable cache for that
+session, for example `UV_CACHE_DIR=.atlas/cache/uv uv run atlas ...`. This changes
+only dependency caching; it does not change proposal or evidence semantics.
+
 The final command is an external write and asks for confirmation. Automation
 labels a valid proposal `proposal:valid`, comments with field-specific corrections
 when it is invalid, and only maintainers apply `proposal:approved`. Any subsequent
@@ -60,6 +65,13 @@ Resolve reusable model, runtime, hardware, dataset, and evaluator records. Add a
 external source only when a new concept or registry fact needs it. Preregister
 baseline, candidates, frozen/changed factors, quality gates, metrics, seeds,
 replicates, order, stopping rules, and failure policy before running candidates.
+
+Multi-condition experiments may preregister `analysis.contrasts` to compare any
+two declared configurations directly. Metric summaries may include scoped
+`breakdown` values for exact workload strata such as content family, context
+length, and concurrency. Scope sets must match across paired runs; the comparison
+command rejects missing, duplicate, or mismatched strata instead of aggregating
+them implicitly.
 
 Execution implementation can organize bundle-local source and configuration as
 needed. Preserve the mandatory wrapper contract and document preparation,

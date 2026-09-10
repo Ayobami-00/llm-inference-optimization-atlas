@@ -20,7 +20,9 @@ not already represented; existing IDs and semantics remain stable.
 `requests.parquet` has one row per logical attempt and includes request/session/class identity,
 timestamps, outcome, input/output token counts, queue time, client/server TTFT when available, TPOT,
 ITL summary, E2E, and quality eligibility. Units are stored in Arrow field metadata and validated by
-the CLI.
+the CLI. Studies with stratified workloads may additionally record `load_cell_id`, `content_family`,
+`target_context_tokens`, `target_concurrency`, and `target_offered_rate`; these columns are optional so
+existing evidence remains valid.
 
 ## Samples and events
 
@@ -65,6 +67,10 @@ in diagnostic runs and should not silently supply headline latency.
 `summary.json` is derived from raw tables. It records count, mean, p50, p90, p95, conditional p99,
 outcomes, throughput, goodput, resources, quality status, window, and generation metadata. Raw compact
 evidence is canonical; the summary can be regenerated and checked.
+
+A metric may include a `breakdown` array of `{scope, value}` observations. Scope is an exact set of
+scalar workload dimensions. Comparisons match canonical scopes exactly and reject duplicate, missing,
+or mismatched cells rather than silently aggregating them.
 
 Parquet format grounding is `atlas://source/SRC0076@v1`; runtime telemetry context includes
 `atlas://source/SRC0083@v1` and `atlas://source/SRC0084@v1`.

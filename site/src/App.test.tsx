@@ -80,12 +80,40 @@ const detail: EntityDetail = {
   artifact: {
     mechanism: "Paged allocation avoids contiguous reservation.",
     candidate_optimizations: [referencedNode.artifact_ref, "atlas://optimization/OPT999@v1"],
+    contrast: {
+      id: "host-sync-vs-prefetch",
+      baseline: "atlas://configuration/CFG022@v1",
+      candidate: "atlas://configuration/CFG023@v1",
+    },
     effects: [
       {
         metric: "atlas://metric/MET012@v1",
+        baseline: 0,
+        candidate: 5144.17,
         absolute: 5144.17,
         relative: null,
+        confidence_interval: { lower: 4500, upper: 5600, level: 0.95 },
         unit: "ms",
+      },
+      {
+        metric: "atlas://metric/MET019@v1",
+        baseline: 90,
+        candidate: 100,
+        absolute: 10,
+        relative: 0.1111,
+        confidence_interval: { lower: 4, upper: 16, level: 0.95 },
+        unit: "token/s",
+        scope: { content_family: "code", context_tokens: 32768, concurrency: 8 },
+      },
+      {
+        metric: "atlas://metric/MET019@v1",
+        baseline: 80,
+        candidate: 96,
+        absolute: 16,
+        relative: 0.2,
+        confidence_interval: { lower: 8, upper: 24, level: 0.95 },
+        unit: "token/s",
+        scope: { content_family: "natural", context_tokens: 32768, concurrency: 16 },
       },
     ],
   },
@@ -171,6 +199,16 @@ describe("Atlas explorer", () => {
     expect(screen.getByRole("heading", { name: "Optimization record" })).toBeVisible();
     expect(screen.getByText("Paged allocation avoids contiguous reservation.")).toBeVisible();
     expect(screen.getByText("Relative effect unavailable")).toBeVisible();
+    expect(screen.getByLabelText("Comparison contrast")).toHaveTextContent(
+      "Host Sync Vs PrefetchCFG022 → CFG023",
+    );
+    fireEvent.change(screen.getByLabelText("Metric"), {
+      target: { value: "atlas://metric/MET019@v1" },
+    });
+    expect(screen.getByRole("table", { name: "Scoped measured effects" })).toBeVisible();
+    expect(screen.getByText("MET019 effects by exact workload scope")).toBeVisible();
+    expect(screen.getByLabelText("Content Family")).toBeVisible();
+    expect(screen.getByText("11.1%")).toBeVisible();
     const recordLink = screen.getByRole("link", {
       name: "Open Continuous batching in the repository",
     });

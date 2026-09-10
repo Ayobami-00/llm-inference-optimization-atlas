@@ -253,17 +253,147 @@ function revealNodeBesideDrawer(core: Core, nodeId: string): boolean {
   return revealNodeBesidePanel(core, nodeId, ".entity-drawer", "selectedNodeVisible");
 }
 
+function effectNumber(value: unknown, unit = ""): string {
+  if (typeof value !== "number") return "Unavailable";
+  const magnitude = Math.abs(value);
+  const rendered = magnitude >= 1000 ? value.toLocaleString(undefined, { maximumFractionDigits: 1 }) : value.toLocaleString(undefined, { maximumFractionDigits: 3 });
+  return `${rendered}${unit ? ` ${unit}` : ""}`;
+}
+
+function scopeValue(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  return JSON.stringify(value) ?? "Unavailable";
+}
+
 function EffectList({ detail }: { detail: EntityDetail }) {
-  const effects = detail.artifact.effects;
-  if (!Array.isArray(effects) || effects.length === 0) return null;
+  const rawEffects = Array.isArray(detail.artifact.effects) ? detail.artifact.effects : [];
+  const effects = rawEffects.filter(
+    (effect): effect is Record<string, unknown> => typeof effect === "object" && effect !== null,
+  );
+  const metrics = [...new Set(effects.map((effect) => String(effect.metric ?? "Metric")))];
+  const [metric, setMetric] = useState("");
+  const [scopeFilters, setScopeFilters] = useState<Record<string, string>>({});
+  useEffect(() => {
+    setMetric("");
+    setScopeFilters({});
+  }, [detail.node.id]);
+  if (effects.length === 0) return null;
+
+  const selectedMetric = metric || metrics[0];
+  const metricEffects = effects.filter((effect) => String(effect.metric ?? "Metric") === selectedMetric);
+  const scopedEffects = metricEffects.filter(
+    (effect) => typeof effect.scope === "object" && effect.scope !== null,
+  );
+  const dimensions = [
+    ...new Set(
+      scopedEffects.flatMap((effect) => Object.keys(effect.scope as Record<string, unknown>)),
+    ),
+  ].sort();
+  const dimensionValues = Object.fromEntries(
+    dimensions.map((dimension) => [
+      dimension,
+      [
+        ...new Set(
+          scopedEffects.map((effect) =>
+            scopeValue((effect.scope as Record<string, unknown>)[dimension]),
+          ),
+        ),
+      ].sort((left, right) => left.localeCompare(right, undefined, { numeric: true })),
+    ]),
+  );
+  const visibleEffects = metricEffects.filter((effect) => {
+    if (typeof effect.scope !== "object" || effect.scope === null) return true;
+    const scope = effect.scope as Record<string, unknown>;
+    return Object.entries(scopeFilters).every(
+      ([dimension, selected]) => !selected || scopeValue(scope[dimension]) === selected,
+    );
+  });
+  const visibleScoped = visibleEffects
+    .filter((effect) => typeof effect.scope === "object" && effect.scope !== null)
+    .sort((left, right) => {
+      const leftScope = left.scope as Record<string, unknown>;
+      const rightScope = right.scope as Record<string, unknown>;
+      return dimensions
+        .map((dimension) =>
+          scopeValue(leftScope[dimension]).localeCompare(scopeValue(rightScope[dimension]), undefined, {
+            numeric: true,
+          }),
+        )
+        .find((comparison) => comparison !== 0) ?? 0;
+    });
+  const maxRelative = Math.max(
+    0.01,
+    ...visibleScoped.map((effect) =>
+      typeof effect.relative === "number" ? Math.abs(effect.relative) : 0,
+    ),
+  );
+  const contrast =
+    typeof detail.artifact.contrast === "object" && detail.artifact.contrast !== null
+      ? (detail.artifact.contrast as Record<string, unknown>)
+      : null;
+
   return (
     <section className="drawer-section">
       <p className="eyebrow">Measured effects</p>
+      {contrast && (
+        <div className="effect-contrast" aria-label="Comparison contrast">
+          <strong>{titleCase(String(contrast.id ?? "Planned contrast").replaceAll("-", " "))}</strong>
+          <span>
+            <RecordReference reference={String(contrast.baseline)} /> →{" "}
+            <RecordReference reference={String(contrast.candidate)} />
+          </span>
+        </div>
+      )}
+      {(metrics.length > 1 || dimensions.some((dimension) => dimensionValues[dimension].length > 1)) && (
+        <div className="effect-filters" aria-label="Effect scope filters">
+          {metrics.length > 1 && (
+            <label>
+              Metric
+              <select
+                value={selectedMetric}
+                onChange={(event) => {
+                  setMetric(event.target.value);
+                  setScopeFilters({});
+                }}
+              >
+                {metrics.map((value) => (
+                  <option value={value} key={value}>{value}</option>
+                ))}
+              </select>
+            </label>
+          )}
+          {dimensions.map((dimension) =>
+            dimensionValues[dimension].length > 1 ? (
+              <label key={dimension}>
+                {titleCase(dimension)}
+                <select
+                  value={scopeFilters[dimension] ?? ""}
+                  onChange={(event) =>
+                    setScopeFilters((current) => ({
+                      ...current,
+                      [dimension]: event.target.value,
+                    }))
+                  }
+                >
+                  <option value="">All</option>
+                  {dimensionValues[dimension].map((value) => (
+                    <option value={value} key={value}>{value}</option>
+                  ))}
+                </select>
+              </label>
+            ) : null,
+          )}
+        </div>
+      )}
       <div className="effect-list">
-        {effects.map((effect, index) => {
-          if (typeof effect !== "object" || effect === null) return null;
-          const record = effect as Record<string, unknown>;
+        {visibleEffects.filter((effect) => !effect.scope).map((record, index) => {
           const relative = typeof record.relative === "number" ? record.relative * 100 : null;
+          const interval =
+            typeof record.confidence_interval === "object" && record.confidence_interval !== null
+              ? (record.confidence_interval as Record<string, unknown>)
+              : null;
+          const unit = String(record.unit ?? "");
           return (
             <article className="effect" key={`${String(record.metric)}-${index}`}>
               <div>
@@ -274,6 +404,19 @@ function EffectList({ detail }: { detail: EntityDetail }) {
                     : `${relative.toFixed(1)}% relative`}
                 </span>
               </div>
+              <dl className="effect-values">
+                <div><dt>Baseline</dt><dd>{effectNumber(record.baseline, unit)}</dd></div>
+                <div><dt>Candidate</dt><dd>{effectNumber(record.candidate, unit)}</dd></div>
+                <div><dt>Absolute</dt><dd>{effectNumber(record.absolute, unit)}</dd></div>
+                <div>
+                  <dt>Confidence interval</dt>
+                  <dd>
+                    {interval
+                      ? `${effectNumber(interval.lower, unit)} to ${effectNumber(interval.upper, unit)}`
+                      : "Unavailable"}
+                  </dd>
+                </div>
+              </dl>
               {relative !== null && (
                 <div className="effect-track" aria-label={`${relative.toFixed(1)} percent relative`}>
                   <span style={{ width: `${Math.min(100, Math.max(4, Math.abs(relative)))}%` }} />
@@ -283,6 +426,57 @@ function EffectList({ detail }: { detail: EntityDetail }) {
           );
         })}
       </div>
+      {visibleScoped.length > 0 && (
+        <div className="effect-table-wrap">
+          <table
+            className={dimensions.includes("context_tokens") && dimensions.includes("concurrency") ? "effect-table effect-heatmap" : "effect-table"}
+            aria-label="Scoped measured effects"
+          >
+            <caption>{artifactCode(selectedMetric)} effects by exact workload scope</caption>
+            <thead>
+              <tr>
+                {dimensions.map((dimension) => <th scope="col" key={dimension}>{titleCase(dimension)}</th>)}
+                <th scope="col">Baseline</th>
+                <th scope="col">Candidate</th>
+                <th scope="col">Absolute</th>
+                <th scope="col">Relative</th>
+                <th scope="col">Confidence interval</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleScoped.map((effect, index) => {
+                const scope = effect.scope as Record<string, unknown>;
+                const relative = typeof effect.relative === "number" ? effect.relative : null;
+                const interval =
+                  typeof effect.confidence_interval === "object" && effect.confidence_interval !== null
+                    ? (effect.confidence_interval as Record<string, unknown>)
+                    : null;
+                const unit = String(effect.unit ?? "");
+                const intensity = relative === null ? 0 : Math.min(0.8, 0.12 + Math.abs(relative) / maxRelative * 0.68);
+                const color = relative !== null && relative < 0
+                  ? `rgba(220, 113, 94, ${intensity})`
+                  : `rgba(89, 184, 148, ${intensity})`;
+                return (
+                  <tr key={`${JSON.stringify(scope)}-${index}`}>
+                    {dimensions.map((dimension) => <th scope="row" key={dimension}>{scopeValue(scope[dimension])}</th>)}
+                    <td>{effectNumber(effect.baseline, unit)}</td>
+                    <td>{effectNumber(effect.candidate, unit)}</td>
+                    <td>{effectNumber(effect.absolute, unit)}</td>
+                    <td style={{ backgroundColor: color }}>
+                      {relative === null ? "Unavailable" : `${(relative * 100).toFixed(1)}%`}
+                    </td>
+                    <td>
+                      {interval
+                        ? `${effectNumber(interval.lower, unit)} to ${effectNumber(interval.upper, unit)}`
+                        : "Unavailable"}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </section>
   );
 }

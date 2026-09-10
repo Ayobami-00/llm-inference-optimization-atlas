@@ -76,11 +76,18 @@ def next_identifiers(root: Path, kind: str, *, count: int = 1) -> list[str]:
             data: Any = load_data(path)
         except Exception:
             continue
-        if not isinstance(data, dict) or not isinstance(data.get("id"), str):
+        if not isinstance(data, dict):
             continue
-        match = pattern.fullmatch(data["id"])
-        if match:
-            maximum = max(maximum, int(match.group("number")))
+        identifiers = [data.get("id")]
+        entries = data.get("entries", [])
+        if isinstance(entries, list):
+            identifiers.extend(entry.get("id") for entry in entries if isinstance(entry, dict))
+        for identifier in identifiers:
+            if not isinstance(identifier, str):
+                continue
+            match = pattern.fullmatch(identifier)
+            if match:
+                maximum = max(maximum, int(match.group("number")))
     limit = 10**spec.width - 1
     if maximum + count > limit:
         raise ValueError(f"The {spec.kind} identity namespace is exhausted")

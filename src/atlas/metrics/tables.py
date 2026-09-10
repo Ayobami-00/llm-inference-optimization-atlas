@@ -22,6 +22,14 @@ REQUEST_COLUMNS: dict[str, tuple[pa.DataType, str | None]] = {
     "quality_passed": (pa.bool_(), None),
 }
 
+OPTIONAL_REQUEST_COLUMNS: dict[str, tuple[pa.DataType, str | None]] = {
+    "load_cell_id": (pa.string(), None),
+    "content_family": (pa.string(), None),
+    "target_context_tokens": (pa.int64(), "token"),
+    "target_concurrency": (pa.int64(), "count"),
+    "target_offered_rate": (pa.float64(), "request/s"),
+}
+
 SAMPLE_COLUMNS: dict[str, tuple[pa.DataType, str | None]] = {
     "timestamp_ns": (pa.int64(), "ns"),
     "metric_id": (pa.string(), None),
@@ -37,7 +45,12 @@ EVENT_COLUMNS: dict[str, tuple[pa.DataType, str | None]] = {
 }
 
 
-def _validate_table(path: Path, expected: dict[str, tuple[pa.DataType, str | None]]) -> list[str]:
+def _validate_table(
+    path: Path,
+    expected: dict[str, tuple[pa.DataType, str | None]],
+    *,
+    optional: dict[str, tuple[pa.DataType, str | None]] | None = None,
+) -> list[str]:
     if not path.is_file():
         return [f"Missing table: {path}"]
     try:
@@ -45,10 +58,11 @@ def _validate_table(path: Path, expected: dict[str, tuple[pa.DataType, str | Non
     except Exception as error:
         return [f"Cannot read {path}: {error}"]
     errors = []
-    for name, (arrow_type, unit) in expected.items():
+    for name, (arrow_type, unit) in {**expected, **(optional or {})}.items():
         field_index = schema.get_field_index(name)
         if field_index < 0:
-            errors.append(f"{path}: missing required column {name}")
+            if name in expected:
+                errors.append(f"{path}: missing required column {name}")
             continue
         field = schema.field(field_index)
         if field.type != arrow_type:
@@ -63,7 +77,13 @@ def _validate_table(path: Path, expected: dict[str, tuple[pa.DataType, str | Non
 
 def validate_result_tables(metrics_root: Path) -> list[str]:
     errors = []
-    errors.extend(_validate_table(metrics_root / "requests.parquet", REQUEST_COLUMNS))
+    errors.extend(
+        _validate_table(
+            metrics_root / "requests.parquet",
+            REQUEST_COLUMNS,
+            optional=OPTIONAL_REQUEST_COLUMNS,
+        )
+    )
     errors.extend(_validate_table(metrics_root / "samples.parquet", SAMPLE_COLUMNS))
     events = metrics_root / "events.parquet"
     if events.exists():
