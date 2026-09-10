@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from atlas.experiment_analysis import ExperimentAnalysisError, planned_effect_metrics
 from atlas.schemas import SchemaCatalog
 from atlas.utilities.repository import repository_relative
 from atlas.utilities.serialization import load_data
@@ -115,6 +116,19 @@ class Validator:
                         validation_error.message,
                     )
                 )
+            if not errors and data.get("kind") == "Experiment":
+                try:
+                    planned_effect_metrics(data)
+                except ExperimentAnalysisError as analysis_error:
+                    report.issues.append(
+                        ValidationIssue(
+                            "error",
+                            "experiment-analysis",
+                            relative,
+                            "/analysis/effect_metrics",
+                            str(analysis_error),
+                        )
+                    )
 
         if strict:
             self._validate_ids_and_references(report)
