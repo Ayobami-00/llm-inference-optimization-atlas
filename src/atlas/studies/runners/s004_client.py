@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -21,6 +22,7 @@ class RequestResult:
     response: dict[str, Any]
     token_timestamps_ns: tuple[int, ...]
     scheduling_lag_seconds: float
+    worker_started_ns: int | None = None
 
 
 def _json_request(
@@ -103,6 +105,7 @@ def _append_new_token_times(
 
 
 def send_request(base_url: str, spec: RequestSpec, *, timeout: float = 360) -> RequestResult:
+    worker_started_ns = time.monotonic_ns()
     payload = {
         "rid": spec.request_id,
         "input_ids": list(spec.input_ids),
@@ -219,7 +222,7 @@ def send_request(base_url: str, spec: RequestSpec, *, timeout: float = 360) -> R
         "http_status": status,
         "error": error,
     }
-    return RequestResult(row, response_record, tuple(token_times), 0.0)
+    return RequestResult(row, response_record, tuple(token_times), 0.0, worker_started_ns)
 
 
 def run_fixed_concurrency(
@@ -280,10 +283,18 @@ def run_open_loop(
     timeout: float = 360,
     maximum_workers: int = 1024,
 ) -> list[RequestResult]:
-    started = time.monotonic()
     future_deadlines: dict[Future[RequestResult], float] = {}
     workers = max(1, min(maximum_workers, len(specs)))
     with ThreadPoolExecutor(max_workers=workers) as pool:
+        # ThreadPoolExecutor starts workers lazily. Prestart the bounded pool
+        # behind a barrier so thread-creation time cannot contaminate the
+        # preregistered Poisson dispatch-lag check.
+        barrier = threading.Barrier(workers + 1)
+        warmers = [pool.submit(barrier.wait, 30) for _ in range(workers)]
+        barrier.wait(timeout=30)
+        for warmer in warmers:
+            warmer.result()
+        started = time.monotonic()
         for spec in specs:
             offset = float(spec.scheduled_offset_seconds or 0.0)
             deadline = started + offset
@@ -294,8 +305,16 @@ def run_open_loop(
         results = []
         for future in as_completed(future_deadlines):
             item = future.result()
-            actual_start = int(item.row["t0_ns"]) / 1e9
+            actual_start = int(item.worker_started_ns or item.row["t0_ns"]) / 1e9
             lag = max(0.0, actual_start - future_deadlines[future])
             row = {**item.row, "scheduling_lag_ms": lag * 1000}
-            results.append(RequestResult(row, item.response, item.token_timestamps_ns, lag))
+            results.append(
+                RequestResult(
+                    row,
+                    item.response,
+                    item.token_timestamps_ns,
+                    lag,
+                    item.worker_started_ns,
+                )
+            )
     return sorted(results, key=lambda item: item.row["t0_ns"])

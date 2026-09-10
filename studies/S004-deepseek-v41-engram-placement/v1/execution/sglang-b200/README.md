@@ -69,6 +69,12 @@ state, treatment resolution, capacity points, and full telemetry stay ignored
 under `.atlas/work`. Only successfully validated candidates are promoted, at
 which time Atlas allocates their permanent run IDs.
 
+The open-loop client prestarts its bounded worker pool before starting each
+Poisson clock. Dispatch lag is measured at worker entry, independently of HTTP
+payload construction. Each capacity point writes its excluded stabilization
+trace and its measured trace, rows, and responses before applying the lag or
+SLO gates, so an invalid point remains auditable under `.atlas/work`.
+
 If a full invocation is interrupted, rerun the S004 runner against the same
 timestamped work directory. Candidate-complete block/configuration pairs and a
 complete collector pilot are discovered and skipped. A retained treatment

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import time
 from collections import Counter, defaultdict
 from pathlib import Path
 from types import SimpleNamespace
@@ -26,7 +27,7 @@ from atlas.studies.runners.s004_aiperf import (
     aiperf_payload,
     compare_aiperf_summary,
 )
-from atlas.studies.runners.s004_client import RequestResult
+from atlas.studies.runners.s004_client import RequestResult, run_open_loop
 from atlas.studies.runners.s004_client import healthcheck as client_healthcheck
 from atlas.studies.runners.s004_lifecycle import (
     EXPECTED_RUNTIME_FILES,
@@ -278,6 +279,39 @@ def test_healthcheck_accepts_sglang_empty_health_body(
     )
 
     assert client_healthcheck("http://127.0.0.1:30000") == {"version": "test"}
+
+
+def test_open_loop_lag_uses_prestarted_worker_entry(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    spec = matrix_request(
+        context_tokens=1024,
+        concurrency=1,
+        family="natural_language",
+        seed=41001,
+        ordinal=0,
+        encode=_encode,
+        vocab_size=1024,
+        special_token_ids=set(),
+    )
+    spec = type(spec)(**{**spec.__dict__, "scheduled_offset_seconds": 0.0})
+
+    def fake_send_request(_base_url: str, _spec: object, *, timeout: float) -> RequestResult:
+        del timeout
+        worker_started_ns = time.monotonic_ns()
+        return RequestResult(
+            row={"t0_ns": worker_started_ns + 5_000_000_000},
+            response={},
+            token_timestamps_ns=(),
+            scheduling_lag_seconds=0,
+            worker_started_ns=worker_started_ns,
+        )
+
+    monkeypatch.setattr(s004_client, "send_request", fake_send_request)
+    result = run_open_loop("http://unused", [spec])
+
+    assert result[0].scheduling_lag_seconds < 0.05
+    assert result[0].row["scheduling_lag_ms"] < 50
 
 
 @pytest.mark.parametrize(

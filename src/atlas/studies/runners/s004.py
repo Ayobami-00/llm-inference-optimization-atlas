@@ -833,7 +833,8 @@ def _capacity_search(
     bisecting = False
     low = 0.0
     high = math.inf
-    for _point_index in range(8):
+    evidence_root = progress_path.parent / "capacity-point-evidence"
+    for point_index in range(8):
         flush_cache(base_url)
         # Stabilization is sent and retained separately from the measurement evidence.
         stabilization = capacity_trace(
@@ -844,7 +845,19 @@ def _capacity_search(
             vocab_size=vocab_size,
             special_token_ids=special_ids,
         )
-        run_open_loop(base_url, stabilization)
+        stabilization_results = run_open_loop(base_url, stabilization)
+        reconcile_request_ids(stabilization, _rows(stabilization_results))
+        point_root = evidence_root / f"point-{point_index + 1}-{rate:.8f}"
+        _write_json(
+            point_root / "stabilization.json",
+            {
+                "excluded_from_analysis": True,
+                "trace_fingerprint": trace_fingerprint(stabilization),
+                "trace": [spec.public_record() for spec in stabilization],
+                "rows": _rows(stabilization_results),
+                "responses": _responses(stabilization_results),
+            },
+        )
         measurement = capacity_trace(
             rate=rate,
             duration_seconds=120,
@@ -855,6 +868,16 @@ def _capacity_search(
         )
         result = run_open_loop(base_url, measurement)
         reconcile_request_ids(measurement, _rows(result))
+        _write_json(
+            point_root / "measurement.json",
+            {
+                "excluded_from_analysis": False,
+                "trace_fingerprint": trace_fingerprint(measurement),
+                "trace": [spec.public_record() for spec in measurement],
+                "rows": _rows(result),
+                "responses": _responses(result),
+            },
+        )
         slo = _slo_result(result)
         recovery = _wait_for_queue_recovery(base_url)
         slo["queue_recovery"] = recovery
