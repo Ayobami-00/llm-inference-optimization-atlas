@@ -95,5 +95,10 @@ scope, artifacts, resources, and risks. Reviewers may accept run evidence while
 requesting narrower findings. Merge closes the proposal and rebuilds the global
 and per-study Pages projections.
 
+The approval gate applies to PRs that change files under `studies/`, and to any
+PR that explicitly includes a `contribution.yaml`. Ordinary platform, schema,
+documentation, and site maintenance can use the normal development workflow;
+adding study artifacts without a contribution manifest still fails closed.
+
 At any point, `atlas contribution status <study>` reports the first unfinished
 stage. Add `--check` when CI or a script should fail until publication-ready.

@@ -35,6 +35,7 @@ CONTRIBUTION_TYPES = {
     "methodology": "methodology",
     "tooling": "methodology",
 }
+CONTRIBUTION_REQUIRED_PREFIXES = ("studies/",)
 
 
 @dataclass(frozen=True)
@@ -209,9 +210,20 @@ def check_pull_request_approval(
     changed = set(changed_files)
     manifests = [path for path in changed_files if PurePosixPath(path).name == "contribution.yaml"]
     if not manifests:
+        contribution_paths = [
+            path for path in changed_files if path.startswith(CONTRIBUTION_REQUIRED_PREFIXES)
+        ]
+        if not contribution_paths:
+            return ApprovalReport(True)
         return ApprovalReport(
             False,
-            issues=[_problem("contribution.yaml", "/", "PR must add or update contribution.yaml")],
+            issues=[
+                _problem(
+                    "contribution.yaml",
+                    "/",
+                    "PRs changing study artifacts must add or update contribution.yaml",
+                )
+            ],
         )
 
     catalog = SchemaCatalog(root / "reference" / "schemas" / "v1")
