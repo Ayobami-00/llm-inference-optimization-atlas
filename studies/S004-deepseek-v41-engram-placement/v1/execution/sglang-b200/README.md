@@ -105,3 +105,23 @@ from the raw server log and verifies its retained preflight and `/server_info`;
 failed attempts are kept in numbered retry directories. After all 15 primary
 candidates complete, the runner performs one non-confirmatory 256K
 natural-language feasibility request under CFG023.
+
+Before promotion, finalize each mutable `R0000` candidate and then run the
+ordinary evidence validator:
+
+```bash
+python -m atlas.studies.runners.s004_finalize .atlas/work/.../candidates/runs/block-1-CFG021
+atlas evidence validate .atlas/work/.../candidates/runs/block-1-CFG021
+atlas evidence promote .atlas/work/.../candidates/runs/block-1-CFG021
+```
+
+Finalization derives, rather than hand-authors, the publication flags from the
+retained capacity points and search boundary. `slo_passed` means at least one
+tested offered rate satisfied every preregistered class SLO. `slo_eligible`
+means the capacity result has a reportable resolved or censored boundary.
+Consequently, a left-censored search is eligible evidence with
+`slo_passed: false` and `MET099: 0`: zero means no qualifying rate in the
+declared tested domain, not a claim of zero physical service capacity. The
+finalizer records its policy and implementation fingerprints and reseals the
+draft checksum manifest. It refuses an allocated run, so accepted evidence is
+never mutated.

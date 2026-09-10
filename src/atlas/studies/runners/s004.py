@@ -36,6 +36,7 @@ from atlas.studies.runners.s004_client import (
     run_fixed_concurrency,
     run_open_loop,
 )
+from atlas.studies.runners.s004_finalize import apply_slo_status
 from atlas.studies.runners.s004_lifecycle import (
     BASE_URL,
     CONDITION_ENVIRONMENT,
@@ -1745,6 +1746,7 @@ def _run_full(work_dir: Path) -> None:
                         ],
                     }
                 )
+                apply_slo_status(summary)
                 if aiperf_validation is not None:
                     summary["independent_load_generator_validation"] = {
                         **aiperf_validation,

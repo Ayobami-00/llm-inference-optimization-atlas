@@ -132,6 +132,12 @@ analysis:
   resamples: 10000
   confidence_level: 0.95
   seed: 20260910
+  effect_metrics:
+    - atlas://metric/MET099@v1
+    - atlas://metric/MET010@v1
+    - atlas://metric/MET013@v1
+    - atlas://metric/MET014@v1
+    - atlas://metric/MET019@v1
   report_absolute_and_relative: true
   pairing_keys: [replicate, seed, exact canonical scope]
   contrasts:
