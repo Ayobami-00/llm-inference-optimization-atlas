@@ -1,0 +1,120 @@
+%YAML 1.2
+---
+$schema: https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/contributions/proposal.schema.json
+schema_version: 1
+kind: Proposal
+id: P0036
+version: 1
+slug: deepseek-v4-1-flash-engram-placement-and-prefetch-on-4x-nvidia-b200
+title: DeepSeek-V4.1 Flash Engram placement and prefetch on 4x NVIDIA B200
+description: Establish when DeepSeek-V4.1 Flash should keep Engram tables in HBM, move them to host RAM, or use host RAM with asynchronous prefetch on a 4x B200 SGLang deployment.
+status: proposed
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - proposer
+    conflicts: []
+created_at: '2026-09-10T16:10:08Z'
+updated_at: '2026-09-10T16:10:39Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: github-issue-form
+  source_paths:
+    - https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/36
+  generated: true
+extensions:
+  github.issue-url: https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/36
+proposal_type: study
+summary: Establish when DeepSeek-V4.1 Flash should keep Engram tables in HBM, move them to host RAM, or use host RAM with asynchronous prefetch on a 4x B200 SGLang deployment.
+motivation: DeepSeek-V4.1 introduces a large Engram parameter table that can trade HBM residency for host-device traffic. Operators lack controlled, replicated evidence showing the net KV-capacity gain, performance cost, prefetch recovery, correctness boundary, and SLO-qualified serving capacity on Blackwell hardware.
+scope:
+  study_id: S004
+  slug: deepseek-v41-engram-placement
+  product_brief: A text-generation service running DeepSeek-V4.1 Flash on one 4x NVIDIA B200 node must select an Engram placement mode for interactive and long-context production traffic without trading away correctness or SLO-qualified capacity.
+  archetype: atlas://workload/W004@v1
+  traffic_regimes:
+    - atlas://traffic/T001@v1
+    - atlas://traffic/T002@v1
+    - atlas://traffic/T004@v1
+  models:
+    - atlas://model/M006@v1
+  hardware:
+    - atlas://hardware/HW002@v1
+  runtimes:
+    - atlas://runtime/RT004@v1
+  research_questions:
+    - How much usable HBM and KV-token capacity does host-resident Engram recover relative to device-resident Engram?
+    - How do synchronous host access and asynchronous prefetch affect TTFT, TPOT, output throughput, and host-device pressure across context and concurrency strata?
+    - Which Engram mode maximizes SLO-qualified offered-load capacity for the preregistered long-context production mixture?
+    - Do placement or prefetch change deterministic model outputs, failure behavior, or resolved runtime mode?
+  included:
+    - DeepSeek-V4.1 Flash revision dba1be0a40aa45a94ad051997016db3960a90277
+    - One privacy-safe 4x NVIDIA B200 PCIe/NVLink topology
+    - One immutable SGLang build with TP4, EP4, PP1, and DP1
+    - Device, synchronous-host, and host-prefetch Engram configurations
+    - Controlled natural-language, code, and high-entropy prompt families
+    - Context lengths from 1024 through 131072 tokens
+    - Concurrency from 1 through 64 where preregistered
+    - Open-loop Poisson capacity search and overload behavior
+    - Five paired independently initialized full-profile replicates
+    - Q0 exact greedy-output equivalence
+  excluded:
+    - Vision, tool calling, sampling, speculative decoding, DSpark, and disaggregation
+    - Cross-node, cross-hardware, cross-runtime, or cross-model generalization
+    - Host kernel, huge-page, or memory-lock tuning without separate approval
+    - Confirmatory claims from the optional 256K feasibility probe
+    - Model-quality claims beyond deterministic execution equivalence
+  configurations:
+    - device-resident Engram with host table and prefetch disabled
+    - synchronous host-resident Engram with prefetch disabled
+    - host-resident Engram with asynchronous KV prefetch enabled
+  primary_metric: atlas://metric/MET099@v1
+  guardrail_metrics:
+    - atlas://metric/MET097@v1
+    - atlas://metric/MET098@v1
+    - atlas://metric/MET010@v1
+    - atlas://metric/MET013@v1
+    - atlas://metric/MET019@v1
+    - atlas://metric/MET028@v1
+    - atlas://metric/MET029@v1
+  replicates: 5
+  bootstrap_resamples: 10000
+  confidence_level: 0.95
+  cost_cap_usd: 500
+artifacts:
+  - study
+  - workload
+  - quality_contract
+  - slo_profile
+  - model_revision
+  - hardware_topology
+  - runtime_build
+  - dataset_revision
+  - evaluator
+  - metric_definitions
+  - configurations
+  - hypothesis
+  - experiment
+  - execution_bundle
+  - runs
+  - comparisons
+  - findings
+  - decision
+resources:
+  compute: One 4x NVIDIA B200 node for approximately 9-14 hours, with a hard total compute and bandwidth budget cap of 500 USD.
+  downloads: DeepSeek-V4.1 Flash revision dba1be0a40aa45a94ad051997016db3960a90277; 57 frozen files and 510.31 GB total, with a partial snapshot already present on the node.
+  storage: Approximately 650 GB for model weights, runtime preparation, logs, and draft evidence; only compact accepted evidence is committed.
+risks:
+  - The active SGLang V4.1 implementation may change or lack immutable source metadata.
+  - Host-resident Engram may require pinned-memory or memory-lock settings unavailable on the rented node.
+  - Prefetch may silently fall back outside its CUDA, backend, or decode eligibility conditions.
+  - Very long-context and high-concurrency cells may OOM; failures remain visible evidence.
+  - Provider contention, throttling, telemetry gaps, or load-generator lag may invalidate attempts.
+  - Five system replicates limit transferability and precision for small effects.
+  - Model and source licensing must be verified before evidence publication.
+  - The paid node can exceed budget if stopped-state and elapsed cost are not monitored.
+approval:
+  state: approved
+  issue_url: https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/36

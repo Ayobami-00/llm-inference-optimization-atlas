@@ -1,0 +1,41 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/slo/slo-profile.schema.json
+schema_version: 1
+kind: SLOProfile
+id: SLO004
+version: 1
+slug: deepseek-v41-long-context-production-slo
+title: DeepSeek-V4.1 long-context production SLO
+description: Per-context p95 first-token and per-output-token latency plus global reliability constraints for the capacity mixture.
+status: planned
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [investigator], conflicts: []}]
+created_at: '2026-09-10T16:11:26Z'
+updated_at: '2026-09-10T17:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered research SLO
+  source_paths: [https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/36]
+  generated: false
+  parent_artifacts: [atlas://proposal/P0036@v1]
+extensions:
+  atlas.capacity-definition:
+    sustainable: SLOs pass during the full 120-second measurement window after 60-second stabilization, the queue recovers, and the next healthcheck passes.
+    selected_point: highest tested offered rate satisfying every applicable class and reliability constraint in the replicate.
+request_classes:
+  - name: context-8k
+    constraints:
+      - {metric: client_ttft, percentile: p95, operator: lte, threshold: 2500, unit: ms}
+      - {metric: tpot, percentile: p95, operator: lte, threshold: 50, unit: ms}
+  - name: context-32k
+    constraints:
+      - {metric: client_ttft, percentile: p95, operator: lte, threshold: 6000, unit: ms}
+      - {metric: tpot, percentile: p95, operator: lte, threshold: 50, unit: ms}
+  - name: context-128k
+    constraints:
+      - {metric: client_ttft, percentile: p95, operator: lte, threshold: 20000, unit: ms}
+      - {metric: tpot, percentile: p95, operator: lte, threshold: 60, unit: ms}
+reliability: {minimum_success_rate: 0.99, maximum_error_rate: 0.01, maximum_timeout_rate: 0.01}
+capacity: {minimum_slo_goodput: 0, unit: request/s}
+economics: {maximum_total_cost: 500, currency: USD}
+energy: {measurement: informational}
+frozen_before_experiment: true

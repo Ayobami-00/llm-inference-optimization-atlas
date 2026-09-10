@@ -1,0 +1,109 @@
+schema_version: 1
+study: S004
+model_revision: dba1be0a40aa45a94ad051997016db3960a90277
+encoding_revision: dba1be0a40aa45a94ad051997016db3960a90277
+analysis_seed: 20260910
+replicate_seeds: [41001, 41002, 41003, 41004, 41005]
+configuration_order:
+  - {block: 1, order: [CFG021, CFG022, CFG023]}
+  - {block: 2, order: [CFG021, CFG022, CFG023]}
+  - {block: 3, order: [CFG023, CFG022, CFG021]}
+  - {block: 4, order: [CFG021, CFG023, CFG022]}
+  - {block: 5, order: [CFG023, CFG021, CFG022]}
+generation:
+  endpoint: /generate
+  input: token_ids
+  output_tokens_matrix: 64
+  output_tokens_capacity: 256
+  output_tokens_correctness: 32
+  sampling: {temperature: 0, top_p: 1, top_k: 1}
+  request_timeout_seconds: 360
+  timing:
+    clock: client_monotonic_ns
+    first_token_event: first streamed chunk containing an output token ID
+    token_timestamps_retained: true
+    retries: disabled
+content_generation:
+  natural_language:
+    method: seeded-grammar
+    vocabulary: operational incidents, service dependencies, timelines, and remediation prose
+  code:
+    method: seeded-program-templates
+    vocabulary: Python functions, tests, traces, comments, and identifiers
+  high_entropy:
+    method: seeded-affine-token-permutation
+    vocabulary: ordinary non-special tokenizer IDs traversed without replacement until the vocabulary is exhausted, then deterministically cycled
+  exact_length_policy: encode a fixed family seed, repeat or deterministically permute ordinary token IDs to the target, then assert exact length
+  unique_prefix_policy: prepend a seed-derived 32-token nonce outside the repeated-prefix probe
+controlled_matrix:
+  contexts:
+    - {tokens: 1024, concurrencies: [1, 8, 32, 64]}
+    - {tokens: 8192, concurrencies: [1, 8, 32, 64]}
+    - {tokens: 32768, concurrencies: [1, 8, 32]}
+    - {tokens: 131072, concurrencies: [1, 4, 8]}
+  content_families: [natural_language, code, high_entropy]
+  content_weight: equal
+  warmup_requests: max(32, 2 * target_concurrency)
+  warmup_excluded: true
+  measurement_seconds: 120
+  minimum_completed_requests: 30
+  maximum_extended_measurement_seconds: 300
+  p99_minimum_observations: 100
+repeated_prefix_probe:
+  context_tokens: 32768
+  target_concurrency: 8
+  shared_prefix_ratio: 0.5
+  content_families: [natural_language, code, high_entropy]
+  role: exploratory
+production_capacity:
+  arrival_process: open_loop_poisson
+  class_assignment: seeded_shuffle_after_minimum-one-per-class_and_largest-remainder_apportionment
+  context_mix:
+    - {tokens: 8192, weight: 0.50, request_class: context-8k}
+    - {tokens: 32768, weight: 0.35, request_class: context-32k}
+    - {tokens: 131072, weight: 0.15, request_class: context-128k}
+  content_families: [natural_language, code, high_entropy]
+  content_weight: equal_within_context
+  stabilization_seconds: 60
+  measurement_seconds: 120
+  search:
+    initial_rate_request_per_second: 0.02
+    geometric_multiplier: 2
+    stop_after_consecutive_slo_failures: 2
+    bisection_relative_width: 0.10
+    maximum_load_points: 8
+  recovery:
+    require_empty_waiting_queue: true
+    require_healthcheck: true
+  pairing:
+    same_seeded_trace_for_every_configuration_at_a_given_rate: true
+  interpretation:
+    boundary_status: resolved, right-censored, left-censored, or unresolved
+    capacity_value: highest tested rate satisfying all constraints, even when the boundary is censored
+correctness:
+  prompt_source: correctness-cases.jsonl
+  contexts: [1024, 8192, 32768, 131072]
+  batch_shapes: [1, 8]
+  prompts_per_content_family: 2
+  comparison: exact_output_token_ids
+optional_probe:
+  context_tokens: 262144
+  output_tokens: 64
+  configuration: CFG023
+  content_family: natural_language
+  concurrency: 1
+  replicates: 1
+  role: feasibility_only
+  confirmatory: false
+invalidation:
+  - gpu_xid_or_new_ecc_error
+  - thermal_or_power_throttling_during_measurement
+  - competing_gpu_process
+  - fraction_of_requests_dispatched_more_than_10ms_late_above_0.01
+  - missing_mandatory_request_evidence
+  - model_runtime_or_configuration_fingerprint_mismatch
+  - server_restart_during_measurement
+  - requested_engram_mode_not_resolved
+budget:
+  hard_cap_usd: 500
+  pause_before_cap: true

@@ -1,0 +1,121 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/hardware/hardware-topology.schema.json
+schema_version: 1
+kind: HardwareTopology
+id: HW002
+version: 1
+slug: four-nvidia-b200-pcie-nvlink
+title: Four NVIDIA B200 PCIe/NVLink topology
+description: Privacy-safe inventory of the single rented 4x B200 node used by S004.
+status: active
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [inventory-curator], conflicts: []}]
+created_at: '2026-09-10T00:00:00Z'
+updated_at: '2026-09-10T00:00:00Z'
+license: hardware-metadata
+citations: [atlas://source/SRC0098@v1]
+provenance:
+  method: filtered lscpu, numactl, nvidia-smi, and provider inventory
+  source_paths: [local-system-inventory]
+  generated: false
+  notes: Direct identifiers and PCI bus addresses are deliberately omitted.
+extensions:
+  atlas.inventory:
+    gpu_topology_label: NV18 between every accelerator pair
+    gpu_memory_bandwidth_bytes_per_second: 6070800000000
+    pcie_generation: 5
+    pcie_width: 16
+    measured_pcie_bandwidth_bytes_per_second: 53000000000
+  atlas.provider-default-memory-policy:
+    transparent_hugepage_enabled: 'always [madvise] never'
+    transparent_hugepage_shmem_enabled: 'always within_size advise [never] deny force'
+    memlock_soft_bytes: 8388608
+    settings_modified_for_inventory: false
+nodes:
+  - id: node0
+    cpus:
+      - id: cpu0
+        vendor: Intel
+        model: Xeon Platinum 8559C
+        architecture: x86_64
+        sockets: 2
+        physical_cores: 96
+        logical_threads: 192
+        core_groups:
+          - {name: numa0, physical_cores: 48, logical_threads: 96}
+          - {name: numa1, physical_cores: 48, logical_threads: 96}
+        isa_extensions: [x86-64]
+        caches: []
+        numa_nodes: 2
+        backends: [oneDNN, OpenMP]
+    accelerators:
+      - id: gpu0
+        kind: discrete_gpu
+        vendor: NVIDIA
+        model: B200
+        architecture: Blackwell
+        memory: {id: gpu0-memory, kind: device, capacity_bytes: 192265846784, bandwidth_bytes_per_second: 6070800000000, shared: false}
+        supported_dtypes: [float32, bfloat16, float16, float8, float4]
+        backends: [CUDA, NCCL, NVLink]
+        power: {limit_watts: 1000}
+      - id: gpu1
+        kind: discrete_gpu
+        vendor: NVIDIA
+        model: B200
+        architecture: Blackwell
+        memory: {id: gpu1-memory, kind: device, capacity_bytes: 192265846784, bandwidth_bytes_per_second: 6070800000000, shared: false}
+        supported_dtypes: [float32, bfloat16, float16, float8, float4]
+        backends: [CUDA, NCCL, NVLink]
+        power: {limit_watts: 1000}
+      - id: gpu2
+        kind: discrete_gpu
+        vendor: NVIDIA
+        model: B200
+        architecture: Blackwell
+        memory: {id: gpu2-memory, kind: device, capacity_bytes: 192265846784, bandwidth_bytes_per_second: 6070800000000, shared: false}
+        supported_dtypes: [float32, bfloat16, float16, float8, float4]
+        backends: [CUDA, NCCL, NVLink]
+        power: {limit_watts: 1000}
+      - id: gpu3
+        kind: discrete_gpu
+        vendor: NVIDIA
+        model: B200
+        architecture: Blackwell
+        memory: {id: gpu3-memory, kind: device, capacity_bytes: 192265846784, bandwidth_bytes_per_second: 6070800000000, shared: false}
+        supported_dtypes: [float32, bfloat16, float16, float8, float4]
+        backends: [CUDA, NCCL, NVLink]
+        power: {limit_watts: 1000}
+    memory_domains:
+      - {id: system-numa0, kind: system, capacity_bytes: 1071588048896, shared: true}
+      - {id: system-numa1, kind: system, capacity_bytes: 1071602728960, shared: true}
+    power: {gpu_limit_watts_total: 4000}
+    thermal: {state_at_inventory: unmeasured}
+topology_edges:
+  - {source: cpu0, target: system-numa0, kind: numa, bidirectional: true}
+  - {source: cpu0, target: system-numa1, kind: numa, bidirectional: true}
+  - {source: system-numa0, target: gpu0, kind: pcie, bandwidth_bytes_per_second: 53000000000, bidirectional: true}
+  - {source: system-numa0, target: gpu1, kind: pcie, bandwidth_bytes_per_second: 53000000000, bidirectional: true}
+  - {source: system-numa0, target: gpu2, kind: pcie, bandwidth_bytes_per_second: 53000000000, bidirectional: true}
+  - {source: system-numa1, target: gpu3, kind: pcie, bandwidth_bytes_per_second: 53000000000, bidirectional: true}
+  - {source: gpu0, target: gpu1, kind: nvlink, bidirectional: true}
+  - {source: gpu0, target: gpu2, kind: nvlink, bidirectional: true}
+  - {source: gpu0, target: gpu3, kind: nvlink, bidirectional: true}
+  - {source: gpu1, target: gpu2, kind: nvlink, bidirectional: true}
+  - {source: gpu1, target: gpu3, kind: nvlink, bidirectional: true}
+  - {source: gpu2, target: gpu3, kind: nvlink, bidirectional: true}
+network:
+  - {kind: internet, measured_upload_bits_per_second: 1834300000, measured_download_bits_per_second: 9435500000}
+storage:
+  - {kind: local-nvme, capacity_bytes: 994050048000, measured_read_bytes_per_second: 46592000000}
+software:
+  os: Ubuntu 24.04
+  kernel: Linux 7.0.0-1011-aws
+  architecture: x86_64
+  drivers: [{name: NVIDIA, version: 595.91.07}]
+  firmware: []
+cloud:
+  provider_class: third-party GPU marketplace
+  tenancy: single-renter container on verified host
+inventory:
+  method: filtered runtime commands plus provider-declared bandwidth and storage data
+  captured_at: '2026-09-10T16:31:00Z'
+  accuracy: detected
+redactions: [serial_number, uuid, mac_address, hostname, username, private_ip, cloud_account]

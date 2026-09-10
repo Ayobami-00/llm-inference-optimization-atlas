@@ -1,0 +1,62 @@
+# SGLang 4x B200 execution bundle
+
+This bundle is the sole confirmatory execution path for E0013. Its full profile
+requires the privacy-safe HW002 topology and the exact RT004 runtime source
+fingerprint. The portable quick profile uses a local fake server only to test
+request accounting, lifecycle cleanup, evidence serialization, and validation;
+it cannot support a finding.
+
+Run `atlas execution prepare S004 sglang-b200` on the B200 node before the full
+profile. Preparation resumes the official pinned Hugging Face snapshot into
+`/workspace/models/DeepSeek-V4.1-Flash-dba1be0`, downloads only the 57 paths in
+`inputs/model-manifest.yaml`, and verifies every byte before success. This
+custom preparation path is necessary because two weight shards exceed 100 GB
+and require resumable transfers.
+
+The provider image already contains the CUDA/SGLang scientific stack but lacks
+Atlas's YAML reader. Install the lockfile-pinned `ruamel-yaml==0.19.1` into the
+isolated `/workspace/atlas-deps` target and place that target plus the checkout's
+`src` directory on `PYTHONPATH` when invoking Atlas. The execution scripts do
+this automatically. Runtime fingerprinting deliberately removes `PYTHONPATH`
+before inventorying the underlying SGLang image, so this tool-only dependency
+does not alter the frozen scientific package manifest.
+
+```bash
+uv pip install --target /workspace/atlas-deps 'ruamel-yaml==0.19.1'
+```
+
+Install the independent standard-driver audit into its own virtual environment;
+do not install it into the SGLang image environment. The full runner verifies
+the exact AIPerf version before starting a model process.
+
+```bash
+uv venv --python 3.12 /workspace/aiperf-venv
+uv pip install --python /workspace/aiperf-venv/bin/python 'aiperf==0.12.0'
+```
+
+During block 1, each configuration receives one non-confirmatory AIPerf audit
+of 96 exact-token 32K requests at concurrency 8. Payloads and all AIPerf exports
+remain under `.atlas/work`; the run summary retains only the version, payload
+fingerprint, shape checks, and agreement result. AIPerf disagreement prevents
+headline publication until investigated, but its observations are not pooled
+with the confirmatory Atlas measurements.
+
+Before a full run, export `ATLAS_S004_PRIOR_SPEND_USD` with the provider's actual
+study spend to date. If the current provider rate differs from the frozen
+31.303 USD/hour planning rate, also export `ATLAS_S004_HOURLY_RATE_USD`. The
+runner refuses to start without prior spend and records a live budget ledger
+under `.atlas/work`. It forecasts every block before launch and
+stops before the total could reach the preregistered 500 USD ceiling.
+
+Every condition starts in a new SGLang process. Logs, invalid attempts, failure
+state, treatment resolution, capacity points, and full telemetry stay ignored
+under `.atlas/work`. Only successfully validated candidates are promoted, at
+which time Atlas allocates their permanent run IDs.
+
+If a full invocation is interrupted, rerun the S004 runner against the same
+timestamped work directory. Candidate-complete block/configuration pairs and a
+complete collector pilot are discovered and skipped; failed attempts are kept
+in numbered retry directories. After all 15 primary candidates complete, the
+runner performs one non-confirmatory 256K natural-language feasibility request
+under CFG023, or records that the probe was skipped when its one-hour forecast
+would approach the budget ceiling.

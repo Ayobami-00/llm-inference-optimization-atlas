@@ -1,0 +1,60 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/runtimes/runtime-build.schema.json
+schema_version: 1
+kind: RuntimeBuild
+id: RT004
+version: 1
+slug: sglang-deepseek-v41-preview-85f8105
+title: SGLang DeepSeek-V4.1 preview at 85f8105
+description: Source-fingerprinted CUDA 13 preview runtime used to study DeepSeek-V4.1 Engram placement on B200.
+status: planned
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [curator, investigator], conflicts: []}]
+created_at: '2026-09-10T00:00:00Z'
+updated_at: '2026-09-10T00:00:00Z'
+license: Apache-2.0
+citations: [atlas://source/SRC0062@v1, atlas://source/SRC0111@v1]
+provenance:
+  method: installed-package inventory and byte comparison of the four treatment-defining source files with the official SGLang pull-request commit
+  source_paths: [https://github.com/sgl-project/sglang/commit/85f8105f5d2e2e0bdea70ff50cb5449bf9567053]
+  generated: false
+  notes: The provider preview image reports SGLANG_BUILD_COMMIT=unknown; execution is gated on the recorded source hashes.
+extensions:
+  atlas.runtime-fingerprint:
+    treatment_source_files_aggregate_sha256: c292344963d409e4fb0a6c35de3ec94939121e43d5b99a78eb8e416d2c77fbd6
+    installed_package_manifest_sha256: 6e7610e65ff433cfd252d5f44677dc4740779991ad050071e56c7420d752daca
+    deepseek_v4_py_sha256: d69b85051bcf4535993d9c2a6625a1e86386e99e1954bb9c2c25e47cd577a8a9
+    engram_py_sha256: e8aba7161f19f0320944dda1aa3608d014620ea808045e810de89bc32d615626
+    environ_py_sha256: 27bfe2a3b90c76d8d233fc17d7c46906741c6102208fa3265f5a13b6faaac962
+    config_py_sha256: 1035a371c565f5870d9390d9031606949d83b97eb2357279ddcb93b7e1ea76cd
+    build_declared_commit: unknown
+    build_declared_image: local/sglang:dev
+    container_digest: pending-before-execution
+runtime: sglang
+upstream:
+  repository: https://github.com/sgl-project/sglang
+  version: 0.0.0.dev0
+  commit: 85f8105f5d2e2e0bdea70ff50cb5449bf9567053
+language: {name: Python, version: '3.12'}
+frameworks:
+  - {name: torch, version: 2.13.0+cu130}
+  - {name: transformers, version: 5.12.1}
+  - {name: flashinfer-python, version: 0.6.18}
+  - {name: sglang-kernel, version: 0.4.6.post1}
+  - {name: sgl-deep-gemm, version: 0.1.7}
+  - {name: sgl-deep-ep, version: 0.1.2}
+backends:
+  - {name: CUDA, version: '13.0; nvcc 13.0.88; cuda-toolkit package 13.0.3.0', selected: true}
+  - {name: FlashInfer CuTeDSL MXFP8, version: 0.6.18, selected: true}
+collectives: [{name: NCCL, package_version: 2.30.7, torch_runtime_version: 2.29.7}]
+kernels:
+  - {name: DeepGEMM, version: 0.1.7, precision: [fp8, fp4]}
+  - {name: FlashInfer CuTeDSL, version: 0.6.18, precision: [mxfp8]}
+build:
+  compiler: CUDA 13.0 nvcc 13.0.88
+  flags: [sm100, editable-source-install]
+  patches: []
+  artifact_sha256: c292344963d409e4fb0a6c35de3ec94939121e43d5b99a78eb8e416d2c77fbd6
+capabilities: [tensor-parallelism, expert-parallelism, DeepSeek-V4.1, Engram-device-table, Engram-host-table, Engram-KV-prefetch]
+limitations:
+  - The upstream DeepSeek-V4.1 support pull request was open when this preregistration was written.
+  - Prefetch requires a shared host table, PP1, DP-attention disabled, no vision layers, FlashInfer CuTeDSL MXFP8, and a single-row decode step.
+  - The provider-managed preview image does not expose an OCI digest; full execution remains blocked until an immutable runtime digest or equivalent clean-build fingerprint is recorded.

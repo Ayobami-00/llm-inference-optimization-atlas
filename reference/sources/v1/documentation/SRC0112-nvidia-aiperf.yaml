@@ -1,0 +1,31 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0112
+version: 1
+slug: nvidia-aiperf
+title: NVIDIA AIPerf
+description: Official NVIDIA load-generation and performance-measurement tooling for OpenAI-compatible inference endpoints.
+status: active
+authors: [{name: Atlas maintainers, roles: [curator], conflicts: []}]
+created_at: '2026-09-10T00:00:00Z'
+updated_at: '2026-09-10T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the official NVIDIA AIPerf repository and package release
+  source_paths:
+    - https://github.com/ai-dynamo/aiperf
+    - https://pypi.org/project/aiperf/0.12.0/
+  generated: false
+extensions: {}
+type: official_documentation
+source_authors: [NVIDIA AIPerf maintainers and contributors]
+url: https://github.com/ai-dynamo/aiperf
+published: {year: 2026}
+upstream:
+  product: AIPerf
+  version: 0.12.0
+  retrieved_at: '2026-09-10'
+topics: [benchmarking, load-generation, inference, reproducibility]
+relevance: Supplies the independent standard load generator used to audit S004's Atlas-native request timing on an exact-token 32K/concurrency-8 cell.

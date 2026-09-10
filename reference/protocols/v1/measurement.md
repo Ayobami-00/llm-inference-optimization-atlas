@@ -20,9 +20,11 @@ not already represented; existing IDs and semantics remain stable.
 `requests.parquet` has one row per logical attempt and includes request/session/class identity,
 timestamps, outcome, input/output token counts, queue time, client/server TTFT when available, TPOT,
 ITL summary, E2E, and quality eligibility. Units are stored in Arrow field metadata and validated by
-the CLI. Studies with stratified workloads may additionally record `load_cell_id`, `content_family`,
-`target_context_tokens`, `target_concurrency`, and `target_offered_rate`; these columns are optional so
-existing evidence remains valid.
+the CLI. A study may retain optional `retry_count`, `scheduling_lag_ms`, `slo_eligible`, and per-token
+`token_timestamps_ns` fields when its protocol needs exact request reconstruction. Stratified workloads
+may additionally record `load_cell_id`, `content_family`, `target_context_tokens`,
+`target_concurrency`, and `target_offered_rate`; all of these columns are optional so existing evidence
+remains valid.
 
 ## Samples and events
 

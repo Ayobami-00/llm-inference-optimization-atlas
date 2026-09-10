@@ -1,0 +1,137 @@
+%YAML 1.2
+---
+schema_version: 1
+kind: Experiment
+id: E0013
+version: 1
+slug: deepseek-v41-engram-placement-and-prefetch
+title: Engram device placement, synchronous host access, and asynchronous host prefetch
+description: Paired five-block ablation of three DeepSeek-V4.1 Engram modes on
+  four B200 accelerators under exact-length long-context workloads.
+status: planned
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [investigator], conflicts: []}]
+created_at: '2026-09-10T16:11:26Z'
+updated_at: '2026-09-10T17:00:00Z'
+license: Apache-2.0
+citations: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1, atlas://source/SRC0111@v1, atlas://source/SRC0112@v1]
+provenance:
+  method: preregistered-paired-ablation
+  source_paths:
+    - studies/S004-deepseek-v41-engram-placement/v1/inputs/trace-spec.yaml
+    - https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/36
+  generated: false
+  parent_artifacts: [atlas://proposal/P0036@v1]
+extensions:
+  atlas.randomized-order:
+    block-1: [CFG021, CFG022, CFG023]
+    block-2: [CFG021, CFG022, CFG023]
+    block-3: [CFG023, CFG022, CFG021]
+    block-4: [CFG021, CFG023, CFG022]
+    block-5: [CFG023, CFG021, CFG022]
+  atlas.decision-thresholds:
+    minimum_capacity_improvement: 0.15
+    alternative_success: enables-an-otherwise-infeasible-workload-class
+    maximum_batch1_output-throughput-regression: 0.01
+    effective_prefetch: positive-paired-throughput-effect-over-host-sync-at-concurrency-at-least-8
+  atlas.scope-policy:
+    scoped_effects: exploratory-unless-named-in-HYP013
+    p99_minimum_observations: 100
+    zero_or_unstable_relative_denominator: null
+  atlas.preexecution-gates:
+    - Public proposal issue 36 remains approved.
+    - This design is committed and pushed before model preparation resumes.
+    - The exact SGLang source or equivalent clean-build fingerprint is resolved.
+    - Each requested Engram mode passes a treatment-resolution pilot.
+    - Forecast and accumulated Vast.ai cost remain below 500 USD.
+  atlas.independent-load-generator-validation:
+    tool: NVIDIA AIPerf 0.12.0
+    role: non-confirmatory instrumentation cross-check
+    scope: block 1 for CFG021, CFG022, and CFG023 at 32768 tokens and concurrency 8
+    requests: 96
+    endpoint: OpenAI-compatible /v1/completions with exact integer token-ID prompts
+    cache_policy: flush before and after the AIPerf request set
+    comparison_metrics: [mean TTFT, mean ITL, output token throughput]
+    agreement_rule: symmetric relative difference at most 10 percent, or an absolute difference at most 10 ms TTFT, 1 ms ITL, or 1 token/s throughput
+    failure_policy: disagreement blocks headline use until investigated but never enters the confirmatory estimate
+$schema: https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/experiment.schema.json
+study: atlas://study/S004@v1
+question: When should DeepSeek-V4.1 Flash keep Engram on the accelerator, use
+  synchronous host access, or use asynchronous host prefetch on four B200s?
+hypothesis: atlas://hypothesis/HYP013@v1
+design: ablation
+baseline: atlas://configuration/CFG021@v1
+candidates: [atlas://configuration/CFG022@v1, atlas://configuration/CFG023@v1]
+changed_factors: [Engram table placement, asynchronous Engram prefetch]
+frozen_factors:
+  - Model and tokenizer revision plus every model-file checksum.
+  - Four-B200 topology, SGLang build, CUDA stack, and container image.
+  - TP=4, EP=4, PP=1, DP=1 with DP attention disabled.
+  - Scheduler, dynamic batch ceiling, static memory fraction, and decode graph ceiling.
+  - MXFP8 backend, greedy decoding, text-only model override, and one-token decode steps.
+  - Trace generator, per-rate trace, seed, connection reuse, timeouts, and server/cache initialization policy within each paired block.
+  - Shared pinned host-table layout between host-sync and host-prefetch.
+protocol:
+  warmup:
+    requests: max(32, 2 * target_concurrency)
+    excluded: true
+  measurement:
+    controlled_matrix_seconds: 120
+    controlled_matrix_maximum_extension_seconds: 300
+    capacity_stabilization_seconds: 60
+    capacity_measurement_seconds: 120
+    minimum_long_context_completions: 30
+    correctness_before_performance: true
+  replicates: 5
+  seeds: [41001, 41002, 41003, 41004, 41005]
+  ordering: randomized
+metrics:
+  primary: [atlas://metric/MET099@v1]
+  secondary:
+    - atlas://metric/MET097@v1
+    - atlas://metric/MET098@v1
+    - atlas://metric/MET010@v1
+    - atlas://metric/MET013@v1
+    - atlas://metric/MET014@v1
+    - atlas://metric/MET019@v1
+    - atlas://metric/MET023@v1
+    - atlas://metric/MET024@v1
+    - atlas://metric/MET026@v1
+    - atlas://metric/MET027@v1
+    - atlas://metric/MET031@v1
+    - atlas://metric/MET032@v1
+    - atlas://metric/MET041@v1
+    - atlas://metric/MET043@v1
+    - atlas://metric/MET053@v1
+    - atlas://metric/MET058@v1
+    - atlas://metric/MET059@v1
+    - atlas://metric/MET063@v1
+    - atlas://metric/MET064@v1
+  guardrails:
+    - atlas://metric/MET028@v1
+    - atlas://metric/MET029@v1
+    - atlas://metric/MET030@v1
+quality_gate: Q0
+expected_mechanism: Host placement releases fixed Engram HBM for KV-cache
+  capacity; deterministic addressing lets asynchronous prefetch overlap lookup
+  transfer with intervening decoder computation.
+analysis:
+  method: paired_bootstrap
+  resamples: 10000
+  confidence_level: 0.95
+  seed: 20260910
+  report_absolute_and_relative: true
+  pairing_keys: [replicate, seed, exact canonical scope]
+  contrasts:
+    - {id: device-vs-host-sync, baseline: atlas://configuration/CFG021@v1, candidate: atlas://configuration/CFG022@v1}
+    - {id: host-sync-vs-host-prefetch, baseline: atlas://configuration/CFG022@v1, candidate: atlas://configuration/CFG023@v1}
+    - {id: device-vs-host-prefetch, baseline: atlas://configuration/CFG021@v1, candidate: atlas://configuration/CFG023@v1}
+stopping_rule: Stop after five valid paired blocks, or earlier for Q0 failure,
+  unresolved treatment, a safety invalidation, or before actual or forecast
+  project spend reaches 500 USD. Each capacity search stops after at most eight
+  load points, after two consecutive SLO failures and bisection to a boundary
+  within 10 percent.
+failure_policy: Preserve every interrupted, failed, OOM, fallback, and invalid
+  attempt under .atlas/work; never silently remove outliers; promote only runs
+  with complete mandatory evidence, matching fingerprints, resolved requested
+  treatment, and no machine-checkable invalidation event.
+background_sources: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1, atlas://source/SRC0111@v1, atlas://source/SRC0112@v1]

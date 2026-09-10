@@ -1,0 +1,82 @@
+%YAML 1.2
+---
+$schema: https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/study.schema.json
+schema_version: 1
+kind: Study
+id: S004
+version: 1
+slug: deepseek-v41-engram-placement
+title: DeepSeek-V4.1 Flash Engram placement and prefetch on 4x NVIDIA B200
+description: Establish when a text-only DeepSeek-V4.1 Flash deployment should keep Engram in HBM, use synchronous host access, or arm asynchronous host prefetch.
+status: planned
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [investigator], conflicts: []}]
+created_at: '2026-09-10T16:11:26Z'
+updated_at: '2026-09-10T17:00:00Z'
+license: Apache-2.0
+citations: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1, atlas://source/SRC0111@v1, atlas://source/SRC0098@v1]
+provenance:
+  method: approved proposal and frozen preregistration
+  source_paths: [https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/36]
+  generated: false
+  parent_artifacts: [atlas://proposal/P0036@v1]
+extensions:
+  atlas.preregistration:
+    analysis_seed: 20260910
+    hard_budget_usd: 500
+    benchmark_allowed_before_commit: false
+    benchmark_allowed_after_push: true
+    execution_gates:
+      - preregistration committed and pushed
+      - full model manifest verified
+      - immutable runtime digest or equivalent clean-build fingerprint recorded
+      - requested Engram treatment resolves without fallback
+      - collector overhead pilot passes
+  atlas.support-boundary:
+    observation: The preview runtime disables Engram KV prefetch when the resolved model configuration has vision layers and applies prefetch only to single-row decode steps.
+    policy: Resolve an explicit text-only deployment profile before confirmatory execution; retain any unsupported or fallback attempt only under .atlas/work.
+archetype: atlas://workload/W004@v1
+proposal:
+  id: atlas://proposal/P0036@v1
+  issue_url: https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/36
+  approval: approved
+product_brief: A text-generation service running DeepSeek-V4.1 Flash on one 4x NVIDIA B200 node must select an Engram placement mode for interactive and long-context production traffic without trading away correctness or SLO-qualified capacity.
+research_questions:
+  - How much usable HBM and KV-token capacity does host-resident Engram recover relative to device-resident Engram?
+  - How do synchronous host access and asynchronous prefetch affect TTFT, TPOT, output throughput, and host-device pressure across context and concurrency strata?
+  - Which Engram mode maximizes SLO-qualified offered-load capacity for the preregistered long-context production mixture?
+  - Do placement or prefetch change deterministic model outputs, failure behavior, or resolved runtime mode?
+boundaries:
+  included:
+    - DeepSeek-V4.1 Flash revision dba1be0a40aa45a94ad051997016db3960a90277
+    - One privacy-safe 4x NVIDIA B200 PCIe/NVLink topology
+    - One immutable SGLang build with TP4, EP4, PP1, and DP1
+    - Device, synchronous-host, and host-prefetch Engram configurations
+    - Controlled natural-language, code, and high-entropy prompt families
+    - Context lengths from 1024 through 131072 tokens
+    - Concurrency from 1 through 64 where preregistered
+    - Open-loop Poisson capacity search and overload behavior
+    - Five paired independently initialized full-profile replicates
+    - Q0 exact greedy-output equivalence
+  excluded:
+    - Vision requests, tool calling, sampling, speculative decoding, DSpark, and disaggregation
+    - Cross-node, cross-hardware, cross-runtime, or cross-model generalization
+    - Host kernel, huge-page, or memory-lock tuning without separate approval
+    - Confirmatory claims from the optional 256K feasibility probe
+    - Model-quality claims beyond deterministic execution equivalence
+contracts:
+  workload: atlas://workload-spec/WS004@v1
+  quality: atlas://quality-contract/QC004@v1
+  slo: atlas://slo/SLO004@v1
+candidate_space:
+  models: [atlas://model/M006@v1]
+  hardware: [atlas://hardware/HW002@v1]
+  runtimes: [atlas://runtime/RT004@v1]
+maintainers: [Ayobami-00]
+lifecycle: {phase: PHASE-7, phase_status: completed}
+completion_criteria:
+  - The model, runtime, generated traces, requested treatment, and resolved treatment are checksum-verified.
+  - E0013 has five accepted independently initialized paired blocks for CFG021, CFG022, and CFG023.
+  - Q0 passes before any performance finding is eligible.
+  - Three preregistered contrasts report overall and exactly matched scoped effects with paired 95% bootstrap intervals.
+  - A deployment decision or explicit no-recommendation is reviewed.
+  - Total paid compute and bandwidth remains at or below 500 USD.

@@ -1,0 +1,89 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/workloads/workload-spec.schema.json
+schema_version: 1
+kind: WorkloadSpec
+id: WS004
+version: 1
+slug: deepseek-v41-engram-placement-workload
+title: DeepSeek-V4.1 text-only long-context Engram workload
+description: Frozen exact-length controlled matrix, correctness replay, prefix probe, and Poisson SLO-capacity mixture.
+status: planned
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [investigator], conflicts: []}]
+created_at: '2026-09-10T16:11:26Z'
+updated_at: '2026-09-10T17:00:00Z'
+license: Apache-2.0
+citations: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1]
+provenance:
+  method: preregistered deterministic workload design
+  source_paths:
+    - studies/S004-deepseek-v41-engram-placement/v1/inputs/trace-spec.yaml
+    - studies/S004-deepseek-v41-engram-placement/v1/inputs/correctness-cases.jsonl
+  generated: false
+  parent_artifacts: [atlas://dataset/DS004@v1, atlas://proposal/P0036@v1]
+extensions:
+  atlas.controlled-matrix:
+    contexts:
+      - {tokens: 1024, concurrencies: [1, 8, 32, 64]}
+      - {tokens: 8192, concurrencies: [1, 8, 32, 64]}
+      - {tokens: 32768, concurrencies: [1, 8, 32]}
+      - {tokens: 131072, concurrencies: [1, 4, 8]}
+    content_families: [natural_language, code, high_entropy]
+    generated_tokens: 64
+    measurement_seconds: 120
+    maximum_extension_seconds: 300
+    minimum_long_context_completions: 30
+    p99_minimum_observations: 100
+  atlas.correctness:
+    contexts: [1024, 8192, 32768, 131072]
+    batch_shapes: [1, 8]
+    prompts_per_content_family: 2
+    generated_tokens: 32
+  atlas.prefix-probe: {context_tokens: 32768, concurrency: 8, shared_prefix_ratio: 0.5, confirmatory: false}
+  atlas.capacity-search:
+    arrival_process: open_loop_poisson
+    class_assignment: minimum-one-per-class then largest-remainder apportionment and seeded shuffle
+    context_weights: {'8192': 0.50, '32768': 0.35, '131072': 0.15}
+    generated_tokens: 256
+    stabilization_seconds: 60
+    measurement_seconds: 120
+    maximum_load_points: 8
+    boundary_relative_width: 0.10
+  atlas.trace-policy:
+    same_trace_within_paired_block: true
+    exact_token_lengths_required: true
+    primary_prefixes_unique: true
+    output_endpoint: /generate
+    input_form: token_ids
+archetype: atlas://workload/W004@v1
+product_brief: Select an Engram placement for a text-only long-context generation service without losing exact behavior or production SLO capacity.
+semantic:
+  source_type: generated
+  source: atlas://dataset/DS004@v1
+  license: Apache-2.0
+  fingerprint: 5691aa440528d18fd8f5492baeecba36766439686dc4702cb71c4be41fd4ccc6
+  sampling: {method: deterministic seeded expansion, unit: exact-length request}
+  filters: [text-only, no tool calls, no sampling]
+  transformations:
+    - Encode with the pinned DeepSeek-V4.1 encoding implementation.
+    - Truncate or append deterministic ordinary-token fillers and assert the exact target length.
+    - Add a unique 32-token prefix except in the declared repeated-prefix probe.
+traffic:
+  profiles: [atlas://traffic/T001@v1, atlas://traffic/T002@v1, atlas://traffic/T004@v1]
+request_shape:
+  classes:
+    - {name: context-8k, weight: 0.50, input_tokens: {exact: 8192}, output_tokens: {exact: 256}, context_tokens: {exact: 8192}}
+    - {name: context-32k, weight: 0.35, input_tokens: {exact: 32768}, output_tokens: {exact: 256}, context_tokens: {exact: 32768}}
+    - {name: context-128k, weight: 0.15, input_tokens: {exact: 131072}, output_tokens: {exact: 256}, context_tokens: {exact: 131072}}
+locality:
+  prefix_reuse: 0
+  session_reuse: 0
+  document_reuse: 0
+  temporal_locality: Seeded randomized order with unique primary prefixes; a separate 50% shared-prefix probe is labelled exploratory.
+  popularity_skew: None in the controlled matrix; production context classes follow the frozen 50/35/15 mixture.
+replay: {mode: shape, output_control: fixed_tokens}
+load_generation:
+  warmup_requests: 128
+  measurement_requests: 30
+  seeds: [41001, 41002, 41003, 41004, 41005]
+server_state: warm_empty_cache
+quality_contract: atlas://quality-contract/QC004@v1
+slo_profile: atlas://slo/SLO004@v1

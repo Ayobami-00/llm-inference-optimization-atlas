@@ -1,0 +1,44 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/quality/evaluator.schema.json
+schema_version: 1
+kind: Evaluator
+id: EV004
+version: 1
+slug: engram-exact-output-equivalence
+title: Engram exact output-token equivalence evaluator
+description: Rejects missing, failed, malformed, non-finite, fallback, or token-divergent placement results relative to device mode.
+status: active
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [evaluator-author, investigator], conflicts: []}]
+created_at: '2026-09-10T00:00:00Z'
+updated_at: '2026-09-10T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: repository-authored deterministic evaluator
+  source_paths: [src/atlas/studies/evaluators.py]
+  generated: false
+extensions: {}
+evaluator_type: deterministic_rules
+implementation:
+  repository_path: src/atlas/studies/evaluators.py
+  entrypoint: atlas.studies.evaluators:evaluate_engram_equivalence
+  revision: S004-prereg-v1
+  sha256: 9684808fe07d3511a6b35cfa5c60bed0e6b13ba4dc4bc4f9ea4cf6811ebbd9b2
+datasets: [atlas://dataset/DS004@v1]
+inputs:
+  reference: device-mode output token IDs for the paired block, trace, prompt, length, and batch shape
+  candidate: output token IDs, outcome, finite-state flag, response validation, and treatment-resolution state
+outputs:
+  dimensions: request completion, finite output, well-formed response, no unexpected fallback, and exact token agreement
+  details: per-request exact-match results
+metrics: [atlas://metric/MET030@v1]
+determinism: {level: exact, seeds: [41001, 41002, 41003, 41004, 41005], tolerance: 0}
+pass_criteria:
+  request_completion_rate: 1
+  finite_output_rate: 1
+  well_formed_response_rate: 1
+  no_unexpected_fallback_rate: 1
+  exact_output_token_agreement: 1
+sandbox: {executes_untrusted_code: false, network: disabled, controls: [token-id comparison only]}
+limitations:
+  - Exact agreement detects implementation drift but does not measure semantic quality.
+  - It cannot detect finite but identically wrong outputs shared by all configurations.

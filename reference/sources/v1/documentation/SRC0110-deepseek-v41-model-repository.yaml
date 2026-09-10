@@ -1,0 +1,29 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0110
+version: 1
+slug: deepseek-v41-model-repository
+title: DeepSeek-V4.1-Flash Model Repository
+description: Official immutable model configuration, encoding reference, weights, and model card.
+status: active
+authors: [{name: Atlas maintainers, roles: [curator], conflicts: []}]
+created_at: '2026-09-10T00:00:00Z'
+updated_at: '2026-09-10T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the official model repository
+  source_paths: [https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash]
+  generated: false
+extensions: {}
+type: official_documentation
+source_authors: [DeepSeek-AI]
+url: https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/tree/dba1be0a40aa45a94ad051997016db3960a90277
+published: {year: 2026}
+upstream:
+  product: DeepSeek-V4.1-Flash
+  revision: dba1be0a40aa45a94ad051997016db3960a90277
+  retrieved_at: '2026-09-10'
+topics: [model, tokenizer, weights, configuration]
+relevance: Pins the exact model, tokenizer implementation, and 48 weight shards used by S004.

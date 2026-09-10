@@ -1,0 +1,80 @@
+%YAML 1.2
+---
+schema_version: 1
+kind: RuntimeConfiguration
+id: RTCFG021
+version: 1
+slug: deepseek-v41-engram-device
+title: DeepSeek-V4.1 Engram device placement
+description: Four-B200 reference configuration with Engram tables resident on
+  the accelerator and asynchronous Engram prefetch disabled.
+status: planned
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles: [investigator]
+    conflicts: []
+created_at: '2026-09-10T16:11:26Z'
+updated_at: '2026-09-10T17:00:00Z'
+license: Apache-2.0
+citations: [atlas://source/SRC0110@v1, atlas://source/SRC0111@v1]
+provenance:
+  method: preregistered-runtime-configuration
+  source_paths: [https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/36]
+  generated: false
+  parent_artifacts: [atlas://proposal/P0036@v1]
+extensions:
+  atlas.condition:
+    label: A — device
+    engram_placement: device
+    asynchronous_prefetch: false
+    requested_mode: device
+    resolved_mode: pending-treatment-resolution-pilot
+  atlas.server-arguments:
+    model_path: /workspace/models/DeepSeek-V4.1-Flash-dba1be0
+    trust_remote_code: true
+    mem_fraction_static: 0.80
+    cuda_graph_max_bs_decode: 64
+    fp8_gemm_backend: flashinfer_cutedsl
+    json_model_override_args: '{"vision_config": null}'
+    reasoning_parser: deepseek-v41
+    tool_call_parser: deepseekv41
+  atlas.support-boundary:
+    text_only_override_required: true
+    rationale: The pinned SGLang preview disables Engram KV prefetch when the
+      resolved model configuration contains vision layers.
+$schema: https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/runtimes/runtime-configuration.schema.json
+runtime_build: atlas://runtime/RT004@v1
+model: atlas://model/M006@v1
+hardware: atlas://hardware/HW002@v1
+scheduling: {policy: fifo}
+batching: {dynamic: true, maximum_requests: 64, cuda_graph_max_bs_decode: 64}
+cache:
+  prefix_cache: true
+  implementation: radix
+  hicache: false
+  bounded_replay: false
+precision:
+  representation: mixed-fp8-fp4
+  mxfp8_backend: flashinfer-cutedsl
+decoding:
+  method: greedy
+  temperature: 0
+  maximum_new_tokens: 256
+  speculative: false
+  dspark: false
+parallelism: {data: 1, tensor: 4, expert: 4, pipeline: 1, dp_attention: false}
+communication: {distributed: true, backend: nccl, accelerator_fabric: nvlink}
+memory:
+  context_tokens: 262400
+  mem_fraction_static: 0.80
+  engram_table: device
+  offload: false
+threads: {load_generator: 1, telemetry: 1}
+api: {protocol: sglang-native, endpoint: /generate, input: token_ids, streaming: true}
+environment:
+  - {name: SGLANG_ENABLE_DSV41_ENGRAM_HOST_TABLE, value: '0', redacted: false}
+  - {name: SGLANG_ENABLE_DSV41_ENGRAM_KV_PREFETCH, value: '0', redacted: false}
+  - {name: SGLANG_DSV41_ENGRAM_HOST_TABLE_PIN, value: '1', redacted: false}
+  - {name: SGLANG_DSV41_ENGRAM_HOST_TABLE_LAYOUT, value: shared, redacted: false}
+  - {name: SGLANG_ENABLE_DSV41_ENGRAM_DROP_PAGE_CACHE, value: '0', redacted: false}

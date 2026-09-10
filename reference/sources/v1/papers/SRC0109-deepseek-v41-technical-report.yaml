@@ -1,0 +1,29 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0109
+version: 1
+slug: deepseek-v41-technical-report
+title: DeepSeek-V4.1-Flash Technical Report
+description: Primary architecture and inference-system report for DeepSeek-V4.1-Flash.
+status: active
+authors: [{name: Atlas maintainers, roles: [curator], conflicts: []}]
+created_at: '2026-09-10T00:00:00Z'
+updated_at: '2026-09-10T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the official model repository
+  source_paths: [https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash]
+  generated: false
+extensions: {}
+type: paper
+source_authors: [DeepSeek-AI]
+url: https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/resolve/dba1be0a40aa45a94ad051997016db3960a90277/DeepSeek_V41_Tech_Report.pdf
+published: {year: 2026}
+upstream:
+  product: DeepSeek-V4.1-Flash
+  revision: dba1be0a40aa45a94ad051997016db3960a90277
+  retrieved_at: '2026-09-10'
+topics: [architecture, inference, conditional-memory, kv-cache]
+relevance: Defines the model scale, Engram topology, context window, and intended host-memory prefetch mechanism studied by S004.

@@ -45,8 +45,9 @@ def test_optional_workload_dimensions_are_checked_when_present(tmp_path: Path) -
     pq.write_table(_empty_table(SAMPLE_COLUMNS), tmp_path / "samples.parquet")
     assert validate_result_tables(tmp_path) == []
 
-    bad = _empty_table({**REQUEST_COLUMNS, **OPTIONAL_REQUEST_COLUMNS}).set_column(
-        len(REQUEST_COLUMNS) + 2,
+    valid = _empty_table({**REQUEST_COLUMNS, **OPTIONAL_REQUEST_COLUMNS})
+    bad = valid.set_column(
+        valid.schema.get_field_index("target_context_tokens"),
         pa.field("target_context_tokens", pa.string(), metadata={b"unit": b"token"}),
         pa.array([], type=pa.string()),
     )
