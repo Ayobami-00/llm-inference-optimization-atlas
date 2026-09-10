@@ -41,6 +41,8 @@ from atlas.studies.runners.s004_lifecycle import (
     CONDITION_ENVIRONMENT,
     launch_server,
     preflight,
+    resolve_treatment,
+    resolved_server_configuration,
     verify_preregistration_pushed,
 )
 from atlas.studies.runners.s004_lifecycle import (
@@ -1083,22 +1085,83 @@ def _run_optional_probe(
             server.stop()
 
 
+def _revalidate_retained_treatment_pilot(
+    configuration: str, result_path: Path
+) -> dict[str, Any] | None:
+    attempt_root = result_path.parent
+    retained = load_data(result_path)
+    if not isinstance(retained, dict) or retained.get("status") != "pass":
+        return None
+    preflight_path = attempt_root / "preflight.json"
+    preflight_data = load_data(preflight_path) if preflight_path.is_file() else None
+    server_root = attempt_root / "server"
+    info_path = server_root / "server-info.json"
+    info = load_data(info_path) if info_path.is_file() else None
+    log_path = server_root / "server.log"
+    errors: list[str] = []
+    if retained.get("configuration") != configuration:
+        errors.append("retained configuration identity mismatch")
+    readiness_ms = retained.get("readiness_ms")
+    valid_readiness_ms: float | None = None
+    if not isinstance(readiness_ms, (int, float)) or not math.isfinite(readiness_ms):
+        errors.append("retained readiness is missing or non-finite")
+    else:
+        valid_readiness_ms = float(readiness_ms)
+    if not isinstance(preflight_data, dict):
+        errors.append("missing retained preflight")
+    else:
+        for section in ("hardware", "model", "runtime"):
+            value = preflight_data.get(section)
+            if not isinstance(value, dict) or value.get("valid") is not True:
+                errors.append(f"retained {section} preflight is not valid")
+    if not isinstance(info, dict):
+        errors.append("missing retained server info")
+        info = {}
+    if not log_path.is_file():
+        errors.append("missing retained server log")
+        log_text = ""
+    else:
+        log_text = log_path.read_text(errors="replace")
+    treatment = resolve_treatment(configuration, log_text)
+    server_configuration = resolved_server_configuration(info)
+    if not treatment["valid"]:
+        errors.append("retained treatment no longer passes the current resolver")
+    if not server_configuration["valid"]:
+        errors.append("retained server configuration no longer matches the frozen contract")
+    validation = {
+        "status": "pass" if not errors else "fail",
+        "configuration": configuration,
+        "errors": errors,
+        "treatment_resolution": treatment,
+        "server_configuration": server_configuration,
+    }
+    _write_json(attempt_root / "resume-validation.json", validation)
+    if errors:
+        return None
+    assert valid_readiness_ms is not None
+    return {
+        "status": "pass",
+        "configuration": configuration,
+        "readiness_ms": valid_readiness_ms,
+        "available_kv_cache_tokens": _server_kv_capacity(info),
+        "treatment_resolution": treatment,
+    }
+
+
 def _run_treatment_resolution_pilots(root: Path, work_dir: Path) -> dict[str, Any]:
     pilot_root = work_dir / "treatment-resolution-pilots"
     summary_path = pilot_root / "summary.json"
-    if summary_path.is_file():
-        retained = load_data(summary_path)
-        if isinstance(retained, dict) and retained.get("status") == "pass":
-            return retained
+    retained_passes = list(pilot_root.glob("*/attempt-*/result.json"))
+    if retained_passes:
+        preflight(root, pilot_root / "resume-preflight.json", verify_weights=False)
 
     results: list[dict[str, Any]] = []
     for configuration in ("CFG021", "CFG022", "CFG023"):
         configuration_root = pilot_root / configuration
         retained_result = None
         for prior_result_path in sorted(configuration_root.glob("attempt-*/result.json")):
-            retained = load_data(prior_result_path)
-            if isinstance(retained, dict) and retained.get("status") == "pass":
-                retained_result = retained
+            retained_result = _revalidate_retained_treatment_pilot(configuration, prior_result_path)
+            if retained_result is not None:
                 break
         if retained_result is not None:
             results.append(retained_result)

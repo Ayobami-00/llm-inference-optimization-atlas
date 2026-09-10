@@ -71,7 +71,9 @@ which time Atlas allocates their permanent run IDs.
 
 If a full invocation is interrupted, rerun the S004 runner against the same
 timestamped work directory. Candidate-complete block/configuration pairs and a
-complete collector pilot are discovered and skipped; failed attempts are kept
-in numbered retry directories. After all 15 primary candidates complete, the
-runner performs one non-confirmatory 256K natural-language feasibility request
-under CFG023.
+complete collector pilot are discovered and skipped. A retained treatment
+pilot is reused only after the current runner recomputes its treatment state
+from the raw server log and verifies its retained preflight and `/server_info`;
+failed attempts are kept in numbered retry directories. After all 15 primary
+candidates complete, the runner performs one non-confirmatory 256K
+natural-language feasibility request under CFG023.

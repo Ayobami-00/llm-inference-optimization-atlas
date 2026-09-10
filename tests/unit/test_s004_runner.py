@@ -30,6 +30,7 @@ from atlas.studies.runners.s004_client import RequestResult
 from atlas.studies.runners.s004_client import healthcheck as client_healthcheck
 from atlas.studies.runners.s004_lifecycle import (
     EXPECTED_RUNTIME_FILES,
+    EXPECTED_SERVER_CONFIGURATION,
     EXPECTED_TREATMENT_SOURCE_FINGERPRINT,
     host_memory_snapshot,
     resolve_treatment,
@@ -439,18 +440,39 @@ def test_treatment_resolution_pilots_cover_all_modes_and_resume(
         def stop(self) -> None:
             stopped.append(self.configuration)
 
-    def fake_preflight(*_args: object, **_kwargs: object) -> dict[str, object]:
-        return {"valid": True}
+    def fake_preflight(_root: Path, output: Path, **_kwargs: object) -> dict[str, object]:
+        result = {
+            "hardware": {"valid": True},
+            "model": {"valid": True},
+            "runtime": {"valid": True},
+        }
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(result))
+        return result
 
     def fake_launch_server(
         *, configuration: str, work_dir: Path, telemetry: bool
     ) -> tuple[FakeServer, dict[str, object], dict[str, object], float]:
-        del work_dir, telemetry
+        del telemetry
         launched.append(configuration)
+        log_text = {
+            "CFG021": "ordinary startup",
+            "CFG022": _PINNED_HOST_LOG,
+            "CFG023": _PINNED_HOST_LOG + "\n" + _PREFETCH_LOG,
+        }[configuration]
+        info: dict[str, object] = {
+            **EXPECTED_SERVER_CONFIGURATION,
+            "max_total_num_tokens": 1234,
+            "internal_states": [],
+        }
+        work_dir.mkdir(parents=True, exist_ok=True)
+        (work_dir / "server.log").write_text(log_text)
+        (work_dir / "server-info.json").write_text(json.dumps(info))
+        treatment = resolve_treatment(configuration, log_text)
         return (
             FakeServer(configuration),
-            {"max_total_num_tokens": 1234, "internal_states": []},
-            {"configuration": configuration, "valid": True},
+            info,
+            treatment,
             10.0,
         )
 
