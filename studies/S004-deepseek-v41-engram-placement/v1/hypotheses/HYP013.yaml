@@ -9,14 +9,14 @@ title: Host prefetch recovers useful capacity after Engram offload
 description: Host placement trades fixed Engram HBM residency for KV capacity,
   while asynchronous prefetch recovers enough transfer cost to improve
   long-context SLO-qualified capacity without changing greedy outputs.
-status: planned
+status: active
 authors: [{name: Ayobami-00, github: Ayobami-00, roles: [investigator], conflicts: []}]
 created_at: '2026-09-10T16:11:26Z'
-updated_at: '2026-09-10T17:00:00Z'
+updated_at: '2026-09-11T01:29:51Z'
 license: Apache-2.0
 citations: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1, atlas://source/SRC0111@v1]
 provenance:
-  method: preregistered-confirmatory-hypothesis
+  method: preregistered hypothesis evaluated descriptively under Amendment 003
   source_paths: [https://github.com/Ayobami-00/llm-inference-optimization-atlas/issues/36]
   generated: false
   parent_artifacts: [atlas://proposal/P0036@v1]

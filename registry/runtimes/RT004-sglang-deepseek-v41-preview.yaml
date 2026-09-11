@@ -6,10 +6,10 @@ version: 1
 slug: sglang-deepseek-v41-preview-85f8105
 title: SGLang DeepSeek-V4.1 preview at 85f8105
 description: Source-fingerprinted CUDA 13 preview runtime used to study DeepSeek-V4.1 Engram placement on B200.
-status: planned
+status: active
 authors: [{name: Ayobami-00, github: Ayobami-00, roles: [curator, investigator], conflicts: []}]
 created_at: '2026-09-10T00:00:00Z'
-updated_at: '2026-09-10T00:00:00Z'
+updated_at: '2026-09-11T01:29:51Z'
 license: Apache-2.0
 citations: [atlas://source/SRC0062@v1, atlas://source/SRC0111@v1]
 provenance:
@@ -27,7 +27,7 @@ extensions:
     config_py_sha256: 1035a371c565f5870d9390d9031606949d83b97eb2357279ddcb93b7e1ea76cd
     build_declared_commit: unknown
     build_declared_image: local/sglang:dev
-    container_digest: pending-before-execution
+    container_digest: unavailable-in-provider-managed-preview-image
 runtime: sglang
 upstream:
   repository: https://github.com/sgl-project/sglang
@@ -57,4 +57,4 @@ capabilities: [tensor-parallelism, expert-parallelism, DeepSeek-V4.1, Engram-dev
 limitations:
   - The upstream DeepSeek-V4.1 support pull request was open when this preregistration was written.
   - Prefetch requires a shared host table, PP1, DP-attention disabled, no vision layers, FlashInfer CuTeDSL MXFP8, and a single-row decode step.
-  - The provider-managed preview image does not expose an OCI digest; full execution remains blocked until an immutable runtime digest or equivalent clean-build fingerprint is recorded.
+  - The provider-managed preview image does not expose an OCI digest; accepted execution is pinned by byte-matched treatment-source hashes and an installed-package-manifest fingerprint instead.

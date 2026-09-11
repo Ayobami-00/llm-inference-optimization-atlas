@@ -5,10 +5,12 @@ two Engram tables in device HBM, place them in host RAM with synchronous access,
 or place them in host RAM and arm the preview runtime's asynchronous layer-14
 decode prefetch.
 
-The confirmatory result is SLO-qualified offered-load capacity for a frozen
-8K/32K/128K production mixture. Mechanism evidence covers server readiness,
-available KV-token capacity, HBM and host displacement, context-by-concurrency
-TTFT/TPOT/throughput, scheduler state, PCIe activity, and failure boundaries.
+The originally preregistered primary endpoint was SLO-qualified offered-load
+capacity for a frozen 8K/32K/128K production mixture. Mechanism evidence covers
+server readiness, available KV-token capacity, HBM and host displacement,
+context-by-concurrency TTFT/TPOT/throughput, scheduler state, and failure
+boundaries. Reliable per-run PCIe byte counters were not available, so the
+accepted evidence does not attribute latency to host-device transfer.
 The original confirmatory design specified five paired blocks with independent
 server initialization and identical traces. Compute cost constrained the
 release-day publication to one complete paired block. Amendment 003 records

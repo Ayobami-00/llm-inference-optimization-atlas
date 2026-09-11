@@ -6,10 +6,10 @@ version: 1
 slug: deepseek-v41-engram-placement-workload
 title: DeepSeek-V4.1 text-only long-context Engram workload
 description: Frozen exact-length controlled matrix, correctness replay, prefix probe, and Poisson SLO-capacity mixture.
-status: planned
+status: active
 authors: [{name: Ayobami-00, github: Ayobami-00, roles: [investigator], conflicts: []}]
 created_at: '2026-09-10T16:11:26Z'
-updated_at: '2026-09-10T17:00:00Z'
+updated_at: '2026-09-11T01:29:51Z'
 license: Apache-2.0
 citations: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1]
 provenance:
@@ -83,7 +83,7 @@ replay: {mode: shape, output_control: fixed_tokens}
 load_generation:
   warmup_requests: 128
   measurement_requests: 30
-  seeds: [41001, 41002, 41003, 41004, 41005]
+  seeds: [41001]
 server_state: warm_empty_cache
 quality_contract: atlas://quality-contract/QC004@v1
 slo_profile: atlas://slo/SLO004@v1

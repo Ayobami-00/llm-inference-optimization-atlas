@@ -6,10 +6,10 @@ version: 1
 slug: deepseek-v41-engram-equivalence
 title: DeepSeek-V4.1 Engram exact-equivalence Q0 contract
 description: Behavior-preserving gate requiring complete, finite, well-formed, non-fallback responses and exact greedy output tokens.
-status: planned
+status: active
 authors: [{name: Ayobami-00, github: Ayobami-00, roles: [investigator], conflicts: []}]
 created_at: '2026-09-10T16:11:26Z'
-updated_at: '2026-09-10T17:00:00Z'
+updated_at: '2026-09-11T01:29:51Z'
 license: Apache-2.0
 citations: []
 provenance:

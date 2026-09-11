@@ -7,11 +7,11 @@ id: S004
 version: 1
 slug: deepseek-v41-engram-placement
 title: DeepSeek-V4.1 Flash Engram placement and prefetch on 4x NVIDIA B200
-description: Establish when a text-only DeepSeek-V4.1 Flash deployment should keep Engram in HBM, use synchronous host access, or arm asynchronous host prefetch.
-status: planned
+description: Characterize how a text-only DeepSeek-V4.1 Flash deployment behaves with Engram in HBM, synchronous host access, or asynchronous host prefetch.
+status: active
 authors: [{name: Ayobami-00, github: Ayobami-00, roles: [investigator], conflicts: []}]
 created_at: '2026-09-10T16:11:26Z'
-updated_at: '2026-09-10T22:35:09Z'
+updated_at: '2026-09-11T01:29:51Z'
 license: Apache-2.0
 citations: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1, atlas://source/SRC0111@v1, atlas://source/SRC0098@v1, atlas://source/SRC0113@v1]
 provenance:
@@ -26,6 +26,17 @@ extensions:
       prospective: true
       record: experiments/E0013/AMENDMENT-001-software-power-capping.md
       prior_attempts: retained-invalid-and-ineligible-for-promotion
+    - id: E0013-AMENDMENT-003
+      approved_at: '2026-09-11T00:55:00Z'
+      prospective: false
+      record: experiments/E0013/AMENDMENT-003-cost-constrained-single-block-publication.md
+      original_design: five-independently-initialized-paired-blocks
+      published_design: one-complete-paired-block-descriptive-only
+    - id: E0013-AMENDMENT-004
+      approved_at: '2026-09-11T01:29:51Z'
+      prospective: false
+      record: experiments/E0013/AMENDMENT-004-memory-effect-publication.md
+      effect: add-already-declared-memory-and-readiness-metrics-to-native-descriptive-comparisons
   atlas.preregistration:
     analysis_seed: 20260910
     benchmark_allowed_before_commit: false
@@ -60,7 +71,7 @@ boundaries:
     - Context lengths from 1024 through 131072 tokens
     - Concurrency from 1 through 64 where preregistered
     - Open-loop Poisson capacity search and overload behavior
-    - Five paired independently initialized full-profile replicates
+    - One complete paired block published descriptively under Amendment 003
     - Q0 exact greedy-output equivalence
   excluded:
     - Vision requests, tool calling, sampling, speculative decoding, DSpark, and disaggregation
@@ -80,7 +91,7 @@ maintainers: [Ayobami-00]
 lifecycle: {phase: PHASE-7, phase_status: completed}
 completion_criteria:
   - The model, runtime, generated traces, requested treatment, and resolved treatment are checksum-verified.
-  - E0013 has five accepted independently initialized paired blocks for CFG021, CFG022, and CFG023.
+  - E0013 has one accepted independently initialized paired block for CFG021, CFG022, and CFG023 under Amendment 003.
   - Q0 passes before any performance finding is eligible.
-  - Three preregistered contrasts report overall and exactly matched scoped effects with paired 95% bootstrap intervals.
-  - A deployment decision or explicit no-recommendation is reviewed.
+  - Three preregistered contrasts report overall and exactly matched scoped descriptive effects without run-to-run confidence intervals.
+  - A provisional exact-setup decision or explicit no-recommendation is reviewed.

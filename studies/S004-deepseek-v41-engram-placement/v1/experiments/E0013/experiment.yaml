@@ -10,10 +10,10 @@ description: Cost-constrained single-block exploratory characterization of
   three DeepSeek-V4.1 Engram modes on four B200 accelerators under exact-length
   long-context workloads. The original five-block confirmatory design is
   retained in Amendment 003.
-status: planned
+status: active
 authors: [{name: Ayobami-00, github: Ayobami-00, roles: [investigator], conflicts: []}]
 created_at: '2026-09-10T16:11:26Z'
-updated_at: '2026-09-10T22:35:09Z'
+updated_at: '2026-09-11T01:29:51Z'
 license: Apache-2.0
 citations: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1, atlas://source/SRC0111@v1, atlas://source/SRC0112@v1, atlas://source/SRC0113@v1]
 provenance:
@@ -43,6 +43,14 @@ extensions:
       original_design: Five independently initialized paired blocks.
       published_design: One complete paired block with seed 41001.
       effect: Treat all effects as descriptive for the exact system; do not estimate run-to-run uncertainty or make a general deployment recommendation.
+    - id: E0013-AMENDMENT-004
+      approved_at: '2026-09-11T01:29:51Z'
+      prospective: false
+      title: Memory and readiness effects in native comparisons
+      record: AMENDMENT-004-memory-effect-publication.md
+      trigger: The comparison publication plan omitted four already-declared mechanism metrics required by the approved study outputs.
+      observed_before_change: Accepted CFG021 and CFG022 summaries; CFG023 controlled matrix still executing; no three-way comparison, finding, or decision.
+      effect: Publish MET097, MET098, MET053, and MET058 as additional descriptive effects without changing the primary endpoint or any decision rule.
   atlas.randomized-order:
     block-1: [CFG021, CFG022, CFG023]
     block-2: [CFG021, CFG022, CFG023]
@@ -148,10 +156,14 @@ analysis:
   seed: 20260910
   effect_metrics:
     - atlas://metric/MET099@v1
+    - atlas://metric/MET097@v1
+    - atlas://metric/MET098@v1
     - atlas://metric/MET010@v1
     - atlas://metric/MET013@v1
     - atlas://metric/MET014@v1
     - atlas://metric/MET019@v1
+    - atlas://metric/MET053@v1
+    - atlas://metric/MET058@v1
   report_absolute_and_relative: true
   pairing_keys: [replicate, seed, exact canonical scope]
   contrasts:
