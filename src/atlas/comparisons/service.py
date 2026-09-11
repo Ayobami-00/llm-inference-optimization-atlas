@@ -264,6 +264,18 @@ def _analysis_settings(experiment: dict[str, Any]) -> tuple[int, float, int]:
     return resamples, float(confidence), seed
 
 
+def _analysis_inference(experiment: dict[str, Any]) -> str:
+    analysis = experiment.get("analysis", {})
+    if not isinstance(analysis, dict):
+        raise ComparisonError("Experiment analysis must be an object")
+    inference = analysis.get("inference", "interval_estimated")
+    if inference not in {"interval_estimated", "descriptive_only"}:
+        raise ComparisonError(
+            "Experiment analysis.inference must be interval_estimated or descriptive_only"
+        )
+    return str(inference)
+
+
 def _planned_effect_metrics(experiment: dict[str, Any]) -> list[str]:
     try:
         return planned_effect_metrics(experiment)
@@ -303,33 +315,35 @@ def _effect(
     confidence: float,
     seed: int,
     scope: dict[str, Any] | None = None,
+    descriptive_only: bool = False,
 ) -> tuple[dict[str, Any], str]:
     baseline_mean = float(np.mean(baseline_values))
     candidate_mean = float(np.mean(candidate_values))
     absolute = candidate_mean - baseline_mean
-    lower, upper = _bootstrap_interval(
-        baseline_values,
-        candidate_values,
-        paired=paired,
-        resamples=resamples,
-        confidence=confidence,
-        seed=seed,
-    )
+    interval = None
+    if not descriptive_only:
+        lower, upper = _bootstrap_interval(
+            baseline_values,
+            candidate_values,
+            paired=paired,
+            resamples=resamples,
+            confidence=confidence,
+            seed=seed,
+        )
+        interval = {"lower": lower, "upper": upper, "level": confidence}
     value: dict[str, Any] = {
         "metric": metric_reference,
         "baseline": baseline_mean,
         "candidate": candidate_mean,
         "absolute": absolute,
         "relative": _relative_effect(absolute=absolute, baseline=baseline_mean),
-        "confidence_interval": {
-            "lower": lower,
-            "upper": upper,
-            "level": confidence,
-        },
+        "confidence_interval": interval,
         "unit": unit,
     }
     if scope is not None:
         value["scope"] = scope
+    if descriptive_only:
+        return value, "no_significant_effect"
     direction = _metric_direction(root, metric_reference)
     return value, _comparison_result(direction, lower, upper)
 
@@ -441,6 +455,8 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
         raise ComparisonError(f"Invalid experiment: {experiment_root}")
     runs = _accepted_runs(experiment_root)
     resamples, confidence, analysis_seed = _analysis_settings(experiment)
+    inference = _analysis_inference(experiment)
+    descriptive_only = inference == "descriptive_only"
     effect_metrics = _planned_effect_metrics(experiment)
     primary_metrics = set(experiment["metrics"]["primary"])
     analysis = experiment.get("analysis", {})
@@ -453,10 +469,11 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
         baseline_by_key = _runs_by_pairing_key(runs, baseline_reference)
         candidate_by_key = _runs_by_pairing_key(runs, candidate_reference)
         common_keys = sorted(set(baseline_by_key) & set(candidate_by_key))
-        if len(common_keys) < 3:
+        minimum_pairs = 1 if descriptive_only else 3
+        if len(common_keys) < minimum_pairs:
             raise ComparisonError(
-                f"Accepted comparison {contrast['id']} requires at least three paired "
-                "replicate/seed runs"
+                f"Accepted comparison {contrast['id']} requires at least {minimum_pairs} paired "
+                f"replicate/seed run{'s' if minimum_pairs != 1 else ''}"
             )
         selected_baseline = [baseline_by_key[key] for key in common_keys]
         selected_candidate = [candidate_by_key[key] for key in common_keys]
@@ -508,6 +525,7 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
                 resamples=resamples,
                 confidence=confidence,
                 seed=analysis_seed,
+                descriptive_only=descriptive_only,
             )
             effects.append(overall_effect)
             if metric_reference in primary_metrics:
@@ -532,9 +550,16 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
                     confidence=confidence,
                     seed=analysis_seed + scoped_index,
                     scope=scope,
+                    descriptive_only=descriptive_only,
                 )
                 effects.append(scoped_effect)
-        overall = overall_results[0] if len(set(overall_results)) == 1 else "mixed"
+        overall = (
+            "inconclusive"
+            if descriptive_only
+            else overall_results[0]
+            if len(set(overall_results)) == 1
+            else "mixed"
+        )
         comparison_id = next_identifier(root, "comparison")
         timestamp = datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
         comparison = {
@@ -551,6 +576,12 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
             "description": (
                 f"Controlled {contrast['id']} effects for {candidate_reference} "
                 f"against {baseline_reference}."
+                + (
+                    " Descriptive only because the experiment contains fewer than "
+                    "three independent paired blocks."
+                    if descriptive_only
+                    else ""
+                )
             ),
             "status": "accepted",
             "authors": experiment["authors"],
@@ -559,28 +590,52 @@ def compare_experiment(root: Path, value: str) -> list[Path]:
             "license": experiment["license"],
             "citations": [],
             "provenance": {
-                "method": "atlas compare paired-bootstrap effect estimation",
+                "method": (
+                    "atlas compare descriptive paired effects"
+                    if descriptive_only
+                    else "atlas compare paired-bootstrap effect estimation"
+                ),
                 "source_paths": [
                     str(path.relative_to(root))
                     for _, path in selected_baseline + selected_candidate
                 ],
                 "generated": True,
             },
-            "extensions": {},
+            "extensions": (
+                {
+                    "atlas.statistical-scope": {
+                        "inference": "descriptive_only",
+                        "independent_units": len(common_keys),
+                        "reason": "Fewer than three independent paired blocks are available.",
+                    }
+                }
+                if descriptive_only
+                else {}
+            ),
             "experiment": f"atlas://experiment/{experiment['id']}@v{experiment['version']}",
             "contrast": contrast,
             "baseline_runs": baseline_references,
             "candidate_runs": candidate_references,
             "changed_axes": experiment["changed_factors"],
             "compatibility": {"passed": True, "checks": checks},
-            "method": {
-                "paired": paired,
-                "confidence_level": confidence,
-                "bootstrap_resamples": resamples,
-                "bootstrap_seed": analysis_seed,
-                "pairing_keys": ["replicate", "seed"],
-                "effect_metrics": effect_metrics,
-            },
+            "method": (
+                {
+                    "paired": paired,
+                    "inference": "descriptive_only",
+                    "independent_units": len(common_keys),
+                    "pairing_keys": ["replicate", "seed"],
+                    "effect_metrics": effect_metrics,
+                }
+                if descriptive_only
+                else {
+                    "paired": paired,
+                    "confidence_level": confidence,
+                    "bootstrap_resamples": resamples,
+                    "bootstrap_seed": analysis_seed,
+                    "pairing_keys": ["replicate", "seed"],
+                    "effect_metrics": effect_metrics,
+                }
+            ),
             "effects": effects,
             "quality_eligible": True,
             "slo_eligible": all(

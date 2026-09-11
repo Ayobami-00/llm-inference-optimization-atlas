@@ -95,13 +95,21 @@
         "method": {
           "type": "object",
           "required": [
-            "paired",
-            "confidence_level",
-            "bootstrap_resamples"
+            "paired"
           ],
           "properties": {
             "paired": {
               "type": "boolean"
+            },
+            "inference": {
+              "enum": [
+                "interval_estimated",
+                "descriptive_only"
+              ]
+            },
+            "independent_units": {
+              "type": "integer",
+              "minimum": 1
             },
             "confidence_level": {
               "type": "number",
@@ -174,7 +182,10 @@
                 "description": "Relative effect, or null when the baseline denominator is zero or otherwise unsuitable for a relative effect."
               },
               "confidence_interval": {
-                "type": "object"
+                "type": [
+                  "object",
+                  "null"
+                ]
               },
               "unit": {
                 "type": "string"
@@ -201,12 +212,13 @@
           "type": "boolean"
         },
         "result": {
-          "enum": [
-            "improvement",
-            "degradation",
-            "no_significant_effect",
-            "mixed",
-            "invalid"
+            "enum": [
+              "improvement",
+              "degradation",
+              "no_significant_effect",
+              "inconclusive",
+              "mixed",
+              "invalid"
           ]
         }
       }

@@ -19,6 +19,12 @@ replicates.
 Three replicates are a minimum integrity floor, not a guarantee of precision. Wide intervals produce an
 inconclusive finding or motivate more replicates.
 
+When a transparently amended exploratory study has only one or two independent paired blocks, Atlas
+may publish descriptive pairwise effects if the experiment explicitly sets
+`analysis.inference: descriptive_only`. Such comparisons report no confidence interval, have an
+`inconclusive` inferential result, and cannot support a replicated or general deployment claim.
+Request-level observations must not be substituted for the missing independent units.
+
 ## Descriptive statistics
 
 Always report count, mean, p50, p90, and p95 for core latency metrics. Report p99 only with at least 100
