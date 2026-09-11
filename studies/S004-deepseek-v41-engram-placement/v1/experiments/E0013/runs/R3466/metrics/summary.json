@@ -1,0 +1,2477 @@
+{
+  "capacity_points": [
+    {
+      "classes": {
+        "context-128k": {
+          "error_rate": 0.0,
+          "observations": 3,
+          "p95_tpot_ms": 39.38195099215687,
+          "p95_ttft_ms": 5232.777384,
+          "passed": true,
+          "success_rate": 1.0,
+          "timeout_rate": 0.0
+        },
+        "context-32k": {
+          "error_rate": 0.0,
+          "observations": 7,
+          "p95_tpot_ms": 6.774632866666667,
+          "p95_ttft_ms": 975.045308,
+          "passed": true,
+          "success_rate": 1.0,
+          "timeout_rate": 0.0
+        },
+        "context-8k": {
+          "error_rate": 0.0,
+          "observations": 9,
+          "p95_tpot_ms": 56.15366326666667,
+          "p95_ttft_ms": 4896.760955,
+          "passed": false,
+          "success_rate": 1.0,
+          "timeout_rate": 0.0
+        }
+      },
+      "load_generator_scheduling_lag_ratio": 0.0,
+      "passed": false,
+      "queue_recovery": {
+        "error": null,
+        "recovered": true,
+        "snapshot": {
+          "accelerator": "NVIDIA B200",
+          "loads": [
+            {
+              "cache_hit_rate": 0.0,
+              "decode_moments": [
+                76273.0,
+                605748.0,
+                482462061.0,
+                21004950.0,
+                5445440129.0,
+                605748.0
+              ],
+              "dp_rank": 0,
+              "gen_throughput": 0.0,
+              "max_running_requests": 64,
+              "max_total_num_tokens": 42697728,
+              "memory": {
+                "graph_gb": 1.117,
+                "kv_cache_gb": 0.0,
+                "token_capacity": 42697728,
+                "weight_gb": 72.201
+              },
+              "num_active_tokens": 0,
+              "num_running_reqs": 0,
+              "num_total_tokens": 0,
+              "num_used_tokens": 0,
+              "num_waiting_reqs": 0,
+              "num_waiting_uncached_tokens": 0,
+              "timestamp": 1789091807.0436687,
+              "token_usage": 0.0,
+              "total_prefill_busy_us": 2045338686,
+              "total_prefill_uncached_tokens": 66029824,
+              "utilization": 0.0
+            }
+          ],
+          "num_accelerators": 4,
+          "timestamp": "2026-09-11T01:56:47.044049+00:00",
+          "version": "0.0.0.dev0"
+        }
+      },
+      "rate_request_per_second": 0.2,
+      "status": "fail",
+      "trace_fingerprint": "3b2f600e3e412ab4572aeaacd2b1802310b6bbdbffaeabb60b4e99daa431a5a3"
+    },
+    {
+      "classes": {
+        "context-128k": {
+          "error_rate": 0.0,
+          "observations": 9,
+          "p95_tpot_ms": 49.95048265490196,
+          "p95_ttft_ms": 7977.029441,
+          "passed": true,
+          "success_rate": 1.0,
+          "timeout_rate": 0.0
+        },
+        "context-32k": {
+          "error_rate": 0.0,
+          "observations": 19,
+          "p95_tpot_ms": 37.630163988235296,
+          "p95_ttft_ms": 6750.034796,
+          "passed": false,
+          "success_rate": 1.0,
+          "timeout_rate": 0.0
+        },
+        "context-8k": {
+          "error_rate": 0.0,
+          "observations": 26,
+          "p95_tpot_ms": 48.18707414901961,
+          "p95_ttft_ms": 4539.703547,
+          "passed": false,
+          "success_rate": 1.0,
+          "timeout_rate": 0.0
+        }
+      },
+      "load_generator_scheduling_lag_ratio": 0.0,
+      "passed": false,
+      "queue_recovery": {
+        "error": null,
+        "recovered": true,
+        "snapshot": {
+          "accelerator": "NVIDIA B200",
+          "loads": [
+            {
+              "cache_hit_rate": 0.0,
+              "decode_moments": [
+                83588.0,
+                625810.0,
+                523223480.0,
+                21128646.0,
+                5576675341.0,
+                625810.0
+              ],
+              "dp_rank": 0,
+              "gen_throughput": 0.0,
+              "max_running_requests": 64,
+              "max_total_num_tokens": 42697728,
+              "memory": {
+                "graph_gb": 1.117,
+                "kv_cache_gb": 0.0,
+                "token_capacity": 42697728,
+                "weight_gb": 72.201
+              },
+              "num_active_tokens": 0,
+              "num_running_reqs": 0,
+              "num_total_tokens": 0,
+              "num_used_tokens": 0,
+              "num_waiting_reqs": 0,
+              "num_waiting_uncached_tokens": 0,
+              "timestamp": 1789091989.8466072,
+              "token_usage": 0.0,
+              "total_prefill_busy_us": 2122149836,
+              "total_prefill_uncached_tokens": 68462848,
+              "utilization": 0.0
+            }
+          ],
+          "num_accelerators": 4,
+          "timestamp": "2026-09-11T01:59:49.847716+00:00",
+          "version": "0.0.0.dev0"
+        }
+      },
+      "rate_request_per_second": 0.4,
+      "status": "fail",
+      "trace_fingerprint": "4395ccd4cf379ad0be2f7798fd386ff9e66cde2472c6eb06106e1ad3abf68dad"
+    }
+  ],
+  "capacity_search": {
+    "boundary_relative_width": null,
+    "boundary_resolved_within_10_percent": false,
+    "highest_qualifying_rate_request_per_second": 0.0,
+    "lowest_nonqualifying_rate_above_capacity_request_per_second": 0.2,
+    "maximum_points": 8,
+    "status": "left-censored",
+    "tested_points": 2
+  },
+  "collector_policy": {
+    "collector_implementation_sha256": "2a6f81a46403ec3f1318d6114c94c02726bd6f1aef489686b9910cca3fd75c4f",
+    "decision_rule": "use one-second telemetry only when absolute median throughput change is at most 1 percent",
+    "gpu_telemetry_query_fields": [
+      "index",
+      "utilization.gpu",
+      "memory.used",
+      "power.draw",
+      "power.limit",
+      "temperature.gpu",
+      "clocks.current.sm",
+      "clocks_throttle_reasons.active",
+      "ecc.errors.uncorrected.volatile.total"
+    ],
+    "hardware_health_policy_version": "E0013-AMENDMENT-001",
+    "headline_collector_enabled": true,
+    "median_off": 663.0795377142806,
+    "median_on": 663.2344490751128,
+    "output_token_throughput": {
+      "off": [
+        663.005729281259,
+        665.9559181229671,
+        663.0795377142806
+      ],
+      "on": [
+        664.132732926324,
+        663.2344490751128,
+        662.9814310808126
+      ]
+    },
+    "relative_effect": 0.0002336241009128634,
+    "sequence": [
+      "off",
+      "on",
+      "on",
+      "off",
+      "off",
+      "on"
+    ]
+  },
+  "elapsed_seconds": 1812.994546320173,
+  "evidence_request_counts": {
+    "capacity_search": 73,
+    "controlled_matrix": 8006,
+    "repeated_prefix_probe": 496
+  },
+  "independent_load_generator_validation": {
+    "absolute_tolerance_floors": {
+      "inter_token_latency_ms": 1.0,
+      "output_token_throughput_token_per_second": 1.0,
+      "time_to_first_token_ms": 10.0
+    },
+    "aiperf_observations": 96.0,
+    "aiperf_version": "0.12.0",
+    "aiperf_version_verified": "0.12.0",
+    "atlas_observations": 96,
+    "comparisons": {
+      "inter_token_latency_ms": {
+        "absolute_difference": 0.02530139914021845,
+        "aiperf": 52.906454252645496,
+        "atlas": 52.931755651785714,
+        "symmetric_relative_difference": 0.00047800037668625637,
+        "within_tolerance": true
+      },
+      "output_token_throughput_token_per_second": {
+        "absolute_difference": 0.037207067122864146,
+        "aiperf": 64.62305188543559,
+        "atlas": 64.58584481831272,
+        "symmetric_relative_difference": 0.0005757553386495151,
+        "within_tolerance": true
+      },
+      "time_to_first_token_ms": {
+        "absolute_difference": 1.959048427082962,
+        "aiperf": 4586.604890354167,
+        "atlas": 4588.56393878125,
+        "symmetric_relative_difference": 0.00042694151225084533,
+        "within_tolerance": true
+      }
+    },
+    "headline_eligible": true,
+    "interpretation": "A disagreement blocks headline use until investigated; it does not enter the confirmatory estimates.",
+    "payload_sha256": "798f57ba0cc8b420de21ae61316d22e132d10f8cbff19df754a73a85b3a8dc7f",
+    "relative_tolerance": 0.1,
+    "role": "non-confirmatory-independent-load-generator-validation",
+    "shape_checks": {
+      "aiperf_version": true,
+      "error_request_count": true,
+      "input_sequence_length": true,
+      "input_sequence_length_unit": true,
+      "output_sequence_length": true,
+      "output_sequence_length_unit": true,
+      "request_count": true,
+      "request_count_unit_present": true
+    },
+    "status": "pass"
+  },
+  "instrumentation": {
+    "maximum_locked_host_bytes": 98304,
+    "maximum_process_tree_numa_resident_bytes": {
+      "N0": 60115996672,
+      "N1": 780060602368
+    }
+  },
+  "measurement_health": {
+    "collection_error_ratio": 0.0,
+    "collection_errors": 0,
+    "configured_power_limit": {
+      "by_gpu": {
+        "0": {
+          "maximum_w": 1000.0,
+          "minimum_w": 1000.0,
+          "mismatch_count": 0,
+          "missing_count": 0,
+          "readable_observation_count": 531,
+          "unreadable_count": 0
+        },
+        "1": {
+          "maximum_w": 1000.0,
+          "minimum_w": 1000.0,
+          "mismatch_count": 0,
+          "missing_count": 0,
+          "readable_observation_count": 531,
+          "unreadable_count": 0
+        },
+        "2": {
+          "maximum_w": 1000.0,
+          "minimum_w": 1000.0,
+          "mismatch_count": 0,
+          "missing_count": 0,
+          "readable_observation_count": 531,
+          "unreadable_count": 0
+        },
+        "3": {
+          "maximum_w": 1000.0,
+          "minimum_w": 1000.0,
+          "mismatch_count": 0,
+          "missing_count": 0,
+          "readable_observation_count": 531,
+          "unreadable_count": 0
+        }
+      },
+      "expected_w_by_gpu": {
+        "0": 1000.0,
+        "1": 1000.0,
+        "2": 1000.0,
+        "3": 1000.0
+      },
+      "incomplete_gpu_health_cycle_count": 0,
+      "missing_sample_count": 0,
+      "tolerance_w": 0.1,
+      "unreadable_sample_count": 0
+    },
+    "errors": [],
+    "gpu_health_events": 2124,
+    "software_power_cap": {
+      "by_gpu": {
+        "0": {
+          "count": 0,
+          "incidence": 0.0,
+          "observation_count": 531
+        },
+        "1": {
+          "count": 0,
+          "incidence": 0.0,
+          "observation_count": 531
+        },
+        "2": {
+          "count": 0,
+          "incidence": 0.0,
+          "observation_count": 531
+        },
+        "3": {
+          "count": 0,
+          "incidence": 0.0,
+          "observation_count": 531
+        }
+      },
+      "count": 0,
+      "incidence": 0.0,
+      "nvml_mask": "0x4",
+      "observation_count": 2124
+    },
+    "unexpected_gpu_processes": [],
+    "valid": true
+  },
+  "measurement_requests": 8006,
+  "metrics": {
+    "MET001": {
+      "unit": "count",
+      "value": 8006.0
+    },
+    "MET002": {
+      "unit": "count",
+      "value": 8006.0
+    },
+    "MET003": {
+      "unit": "count",
+      "value": 0.0
+    },
+    "MET004": {
+      "unit": "count",
+      "value": 0.0
+    },
+    "MET005": {
+      "unit": "count",
+      "value": 0.0
+    },
+    "MET006": {
+      "unit": "count",
+      "value": 0.0
+    },
+    "MET007": {
+      "unit": "token",
+      "value": 42578944.0
+    },
+    "MET008": {
+      "unit": "token",
+      "value": 512384.0
+    },
+    "MET009": {
+      "unit": "token",
+      "value": 43091328.0
+    },
+    "MET010": {
+      "breakdown": [
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "code",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 171.19445855696202
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 576.2682938738462
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "code",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 1139.0570673546194
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "code",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 1688.0590422834287
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "code",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 363.2585876206897
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 1808.7363873739837
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "code",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 4740.87305184375
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "code",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 8684.964956122807
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "code",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 1139.3185936923078
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 32768,
+            "prefix_mode": "shared-50-percent"
+          },
+          "value": 1337.6056898060606
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 5066.84510135
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "code",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 16698.46222237209
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "code",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 4647.7476412999995
+        },
+        {
+          "scope": {
+            "concurrency": 4,
+            "content_family": "code",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 10494.752534727273
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 19010.565346666666
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "high_entropy",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 171.61765616455696
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 560.8495813230769
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "high_entropy",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 1133.1151267826087
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "high_entropy",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 1686.9369433787185
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "high_entropy",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 335.9957551206897
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 1740.403040647541
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "high_entropy",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 4660.66115454375
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "high_entropy",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 8693.64307587647
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "high_entropy",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 1229.5508180769232
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 32768,
+            "prefix_mode": "shared-50-percent"
+          },
+          "value": 1380.6193326060607
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 5005.472210649999
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "high_entropy",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 16501.83284995238
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "high_entropy",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 4819.6178324
+        },
+        {
+          "scope": {
+            "concurrency": 4,
+            "content_family": "high_entropy",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 10951.399471727273
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 18198.600826666665
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "natural_language",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 171.877454278481
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 570.3763802392639
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "natural_language",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 1133.0524750883153
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "natural_language",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 1689.8394417017141
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "natural_language",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 442.27000920689653
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 1781.2640561951218
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "natural_language",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 4713.22366100625
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "natural_language",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 8705.813205345028
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "natural_language",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 1133.9431321481482
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 32768,
+            "prefix_mode": "shared-50-percent"
+          },
+          "value": 1371.7560931686746
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 5053.446889425
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "natural_language",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 16194.787550348838
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "natural_language",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 4594.4707901
+        },
+        {
+          "scope": {
+            "concurrency": 4,
+            "content_family": "natural_language",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 11264.133022818181
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 17702.777045307692
+        }
+      ],
+      "distribution": {
+        "count": 8006,
+        "mean": 2366.2839295537096,
+        "p50": 1132.4973165000001,
+        "p90": 5304.5063165,
+        "p95": 8778.937403749998,
+        "p99": 17370.587057
+      },
+      "unit": "ms",
+      "value": 2366.2839295537096
+    },
+    "MET011": {
+      "distribution": {
+        "count": 8006,
+        "mean": 2366.2839295537096,
+        "p50": 1132.4973165000001,
+        "p90": 5304.5063165,
+        "p95": 8778.937403749998,
+        "p99": 17370.587057
+      },
+      "unit": "ms",
+      "value": 2366.2839295537096
+    },
+    "MET012": {
+      "unit": "ms",
+      "value": 0.0
+    },
+    "MET013": {
+      "breakdown": [
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "code",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 5.356389395418927
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 6.531610698217338
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "code",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 9.392100236973775
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "code",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 19.851745338448982
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "code",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 4.7789477211275315
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 12.558047590398761
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "code",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 57.46970228928571
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "code",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 120.21992097855751
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "code",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 5.578847409645909
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 32768,
+            "prefix_mode": "shared-50-percent"
+          },
+          "value": 9.443666897354497
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 51.419239859523806
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "code",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 233.0821413237357
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "code",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 8.198427736507936
+        },
+        {
+          "scope": {
+            "concurrency": 4,
+            "content_family": "code",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 108.80856992496392
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 215.06376422089946
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "high_entropy",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 5.27973135965441
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 6.551841246593407
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "high_entropy",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 9.485686416774499
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "high_entropy",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 19.862161473193854
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "high_entropy",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 5.047470117679256
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 13.627552131017435
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "high_entropy",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 58.614606346230154
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "high_entropy",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 119.93089811858077
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "high_entropy",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 6.150437968864468
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 32768,
+            "prefix_mode": "shared-50-percent"
+          },
+          "value": 9.406674007696008
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 52.88947485039682
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "high_entropy",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 236.65567743121696
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "high_entropy",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 12.047989953968253
+        },
+        {
+          "scope": {
+            "concurrency": 4,
+            "content_family": "high_entropy",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 84.13740345598845
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 212.42312251322753
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "natural_language",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 5.281049215591723
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 6.531956969763366
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "natural_language",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 9.42563671292702
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "natural_language",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 19.794740849668933
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "natural_language",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 4.772014056923919
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 12.972552334752873
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "natural_language",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 58.036766447817456
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "natural_language",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 119.85990258108234
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "natural_language",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 5.520944157554379
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 32768,
+            "prefix_mode": "shared-50-percent"
+          },
+          "value": 8.600932161503156
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 51.968199376984124
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "natural_language",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 241.14216780361755
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "natural_language",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 8.790464069841269
+        },
+        {
+          "scope": {
+            "concurrency": 4,
+            "content_family": "natural_language",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 97.91692956998556
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 222.33207906959706
+        }
+      ],
+      "distribution": {
+        "count": 8006,
+        "mean": 27.981218683961234,
+        "p50": 10.825869873015872,
+        "p90": 63.61873535714285,
+        "p95": 120.94680375396825,
+        "p99": 246.6083505079365
+      },
+      "unit": "ms/token",
+      "value": 27.981218683961234
+    },
+    "MET014": {
+      "breakdown": [
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "code",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 5.356389395418927
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 6.531610698217338
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "code",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 9.392100236973775
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "code",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 19.851745338448982
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "code",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 4.7789477211275315
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 12.558047590398761
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "code",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 57.46970228928571
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "code",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 120.21992097855751
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "code",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 5.578847409645909
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 32768,
+            "prefix_mode": "shared-50-percent"
+          },
+          "value": 9.443666897354497
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 51.419239859523806
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "code",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 233.0821413237357
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "code",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 8.198427736507936
+        },
+        {
+          "scope": {
+            "concurrency": 4,
+            "content_family": "code",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 108.80856992496392
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 215.06376422089946
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "high_entropy",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 5.27973135965441
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 6.551841246593407
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "high_entropy",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 9.485686416774499
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "high_entropy",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 19.862161473193854
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "high_entropy",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 5.047470117679256
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 13.627552131017435
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "high_entropy",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 58.614606346230154
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "high_entropy",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 119.93089811858077
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "high_entropy",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 6.150437968864468
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 32768,
+            "prefix_mode": "shared-50-percent"
+          },
+          "value": 9.406674007696008
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 52.88947485039682
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "high_entropy",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 236.65567743121696
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "high_entropy",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 12.047989953968253
+        },
+        {
+          "scope": {
+            "concurrency": 4,
+            "content_family": "high_entropy",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 84.13740345598845
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 212.42312251322753
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "natural_language",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 5.281049215591723
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 6.531956969763366
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "natural_language",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 9.42563671292702
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "natural_language",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 19.794740849668933
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "natural_language",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 4.772014056923919
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 12.972552334752873
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "natural_language",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 58.036766447817456
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "natural_language",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 119.85990258108234
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "natural_language",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 5.520944157554379
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 32768,
+            "prefix_mode": "shared-50-percent"
+          },
+          "value": 8.600932161503156
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 51.968199376984124
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "natural_language",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 241.14216780361755
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "natural_language",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 8.790464069841269
+        },
+        {
+          "scope": {
+            "concurrency": 4,
+            "content_family": "natural_language",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 97.91692956998556
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 222.33207906959706
+        }
+      ],
+      "distribution": {
+        "count": 8006,
+        "mean": 27.981218683961234,
+        "p50": 10.825869873015872,
+        "p90": 63.61873535714285,
+        "p95": 120.94680375396825,
+        "p99": 246.6083505079365
+      },
+      "unit": "ms",
+      "value": 27.981218683961234
+    },
+    "MET015": {
+      "distribution": {
+        "count": 8006,
+        "mean": 4130.687898137022,
+        "p50": 2597.1661465,
+        "p90": 9113.462101500001,
+        "p95": 16397.4363945,
+        "p99": 31674.967985
+      },
+      "unit": "ms",
+      "value": 4130.687898137022
+    },
+    "MET016": {
+      "unit": "request/s",
+      "value": 4.415898556479248
+    },
+    "MET017": {
+      "unit": "request/s",
+      "value": 4.415898556479248
+    },
+    "MET018": {
+      "unit": "token/s",
+      "value": 23485.423100925644
+    },
+    "MET019": {
+      "breakdown": [
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "code",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 42.406215578853164
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 172.79375929254434
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "code",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 389.4765804510129
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "code",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 457.1620864587429
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "code",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 31.214786793847495
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 65.5704100568998
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "code",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 81.27744805394218
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "code",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 83.77451914862611
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "code",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 14.193244896515877
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 32768,
+            "prefix_mode": "shared-50-percent"
+          },
+          "value": 86.92040100452809
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 20.447619336501006
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "code",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 21.85639201402569
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "code",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 4.347201009538666
+        },
+        {
+          "scope": {
+            "concurrency": 4,
+            "content_family": "code",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 5.046640689666375
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "code",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 4.923328623171655
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "high_entropy",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 42.406369449265576
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 172.79704675922306
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "high_entropy",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 389.48201672606257
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "high_entropy",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 456.6517254168775
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "high_entropy",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 31.211262197522807
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 65.03922311769713
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "high_entropy",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 81.2789536016959
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "high_entropy",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 83.28614231808928
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "high_entropy",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 14.187197753350366
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 32768,
+            "prefix_mode": "shared-50-percent"
+          },
+          "value": 86.92517000415498
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 20.4489707907787
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "high_entropy",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 21.34983388489869
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "high_entropy",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 4.331519842042154
+        },
+        {
+          "scope": {
+            "concurrency": 4,
+            "content_family": "high_entropy",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 4.88531479455289
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "high_entropy",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 4.924115663413795
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "natural_language",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 42.40677303278078
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 173.32393450714738
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "natural_language",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 389.4749602187608
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "natural_language",
+            "context_tokens": 1024,
+            "prefix_mode": "unique"
+          },
+          "value": 457.16114400286125
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "natural_language",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 31.218931010216494
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 65.56970338850276
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "natural_language",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 81.27697105990758
+        },
+        {
+          "scope": {
+            "concurrency": 64,
+            "content_family": "natural_language",
+            "context_tokens": 8192,
+            "prefix_mode": "unique"
+          },
+          "value": 83.77277668431334
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "natural_language",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 14.237608145024206
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 32768,
+            "prefix_mode": "shared-50-percent"
+          },
+          "value": 87.445836551855
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 20.447226548316358
+        },
+        {
+          "scope": {
+            "concurrency": 32,
+            "content_family": "natural_language",
+            "context_tokens": 32768,
+            "prefix_mode": "unique"
+          },
+          "value": 21.856194209746874
+        },
+        {
+          "scope": {
+            "concurrency": 1,
+            "content_family": "natural_language",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 4.349783919113534
+        },
+        {
+          "scope": {
+            "concurrency": 4,
+            "content_family": "natural_language",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 5.046369686524364
+        },
+        {
+          "scope": {
+            "concurrency": 8,
+            "content_family": "natural_language",
+            "context_tokens": 131072,
+            "prefix_mode": "unique"
+          },
+          "value": 5.333345526250098
+        }
+      ],
+      "unit": "token/s",
+      "value": 282.61750761467187
+    },
+    "MET020": {
+      "unit": "token/s",
+      "value": 23768.040608540316
+    },
+    "MET021": {
+      "unit": "request/s",
+      "value": 0.0
+    },
+    "MET023": {
+      "distribution": {
+        "count": 531,
+        "mean": 839025333172.791,
+        "p50": 839326617600.0,
+        "p90": 839974387712.0,
+        "p95": 840114243584.0,
+        "p99": 840169181184.0
+      },
+      "unit": "byte",
+      "value": 839025333172.791
+    },
+    "MET024": {
+      "distribution": {
+        "count": 531,
+        "mean": 839101303736.6478,
+        "p50": 839326617600.0,
+        "p90": 840169234432.0,
+        "p95": 840169234432.0,
+        "p99": 840169234432.0
+      },
+      "unit": "byte",
+      "value": 840169234432.0
+    },
+    "MET025": {
+      "distribution": {
+        "count": 531,
+        "mean": 0.03139359698681733,
+        "p50": 0.031,
+        "p90": 0.035,
+        "p95": 0.037000000000000005,
+        "p99": 0.042
+      },
+      "unit": "ratio",
+      "value": 0.03139359698681733
+    },
+    "MET026": {
+      "distribution": {
+        "count": 2124,
+        "mean": 0.867090395480226,
+        "p50": 0.99,
+        "p90": 1.0,
+        "p95": 1.0,
+        "p99": 1.0
+      },
+      "unit": "ratio",
+      "value": 0.867090395480226
+    },
+    "MET027": {
+      "distribution": {
+        "count": 2124,
+        "mean": 658.5760875706216,
+        "p50": 715.6700000000001,
+        "p90": 833.982,
+        "p95": 857.7305,
+        "p99": 871.15
+      },
+      "unit": "W",
+      "value": 658.5760875706216
+    },
+    "MET028": {
+      "unit": "ratio",
+      "value": 0.0
+    },
+    "MET029": {
+      "unit": "ratio",
+      "value": 1.0
+    },
+    "MET030": {
+      "unit": "ratio",
+      "value": 1.0
+    },
+    "MET031": {
+      "distribution": {
+        "count": 531,
+        "mean": 6.374764595103578,
+        "p50": 1.0,
+        "p90": 24.0,
+        "p95": 33.0,
+        "p99": 61.0
+      },
+      "unit": "count",
+      "value": 6.374764595103578
+    },
+    "MET032": {
+      "distribution": {
+        "count": 531,
+        "mean": 3.9717514124293785,
+        "p50": 0.0,
+        "p90": 15.0,
+        "p95": 25.0,
+        "p99": 49.0
+      },
+      "unit": "count",
+      "value": 3.9717514124293785
+    },
+    "MET041": {
+      "distribution": {
+        "count": 531,
+        "mean": 0.07271826741996233,
+        "p50": 0.0922,
+        "p90": 0.1915,
+        "p95": 0.2085,
+        "p99": 0.2539
+      },
+      "unit": "ratio",
+      "value": 0.07271826741996233
+    },
+    "MET043": {
+      "distribution": {
+        "count": 531,
+        "mean": 0.0,
+        "p50": 0.0,
+        "p90": 0.0,
+        "p95": 0.0,
+        "p99": 0.0
+      },
+      "unit": "ratio",
+      "value": 0.0
+    },
+    "MET053": {
+      "distribution": {
+        "count": 531,
+        "mean": 323946680466.5612,
+        "p50": 324049178624.0,
+        "p90": 325494808576.0,
+        "p95": 325859692544.0,
+        "p99": 326340014080.0
+      },
+      "unit": "byte",
+      "value": 323946680466.5612
+    },
+    "MET058": {
+      "distribution": {
+        "count": 2124,
+        "mean": 174935085341.40866,
+        "p50": 170585489408.0,
+        "p90": 182113533952.0,
+        "p95": 187886993408.0,
+        "p99": 188243509248.0
+      },
+      "unit": "byte",
+      "value": 174935085341.40866
+    },
+    "MET063": {
+      "distribution": {
+        "count": 2124,
+        "mean": 1965000000.0,
+        "p50": 1965000000.0,
+        "p90": 1965000000.0,
+        "p95": 1965000000.0,
+        "p99": 1965000000.0
+      },
+      "unit": "Hz",
+      "value": 1965000000.0
+    },
+    "MET064": {
+      "distribution": {
+        "count": 2124,
+        "mean": 58.53060263653484,
+        "p50": 59.0,
+        "p90": 68.0,
+        "p95": 70.0,
+        "p99": 71.0
+      },
+      "unit": "Cel",
+      "value": 58.53060263653484
+    },
+    "MET097": {
+      "unit": "token",
+      "value": 42697728.0
+    },
+    "MET098": {
+      "unit": "ms",
+      "value": 233062.250276
+    },
+    "MET099": {
+      "unit": "request/s",
+      "value": 0.0
+    }
+  },
+  "profile": "full",
+  "runtime_package_manifest_sha256": "6e7610e65ff433cfd252d5f44677dc4740779991ad050071e56c7420d752daca",
+  "server_log_diagnostics": {
+    "allocator_memory_pressure": {
+      "classification": "allocator-retry-warnings-without-fatal-exception",
+      "fatal_oom_exception_mentions": 0,
+      "requested_allocation_bytes": [
+        {
+          "bytes": 6442450944,
+          "count": 8
+        },
+        {
+          "bytes": 7516192768,
+          "count": 4
+        },
+        {
+          "bytes": 8589934592,
+          "count": 16
+        }
+      ],
+      "retry_warning_count": 28,
+      "retry_warnings_by_device": {
+        "0": 7,
+        "1": 7,
+        "2": 7,
+        "3": 7
+      },
+      "source_locations": [
+        "CUDACachingAllocator.cpp:3933"
+      ],
+      "source_log_sha256": "e8dca9159bb3b2f007952697684d8e3c36eab47b1d1b568cf064dc3479699bcf"
+    },
+    "engram_host_table": {
+      "no_huge_pages_warning_count": 8,
+      "observation_count": 8,
+      "observations": [
+        {
+          "huge_page_mib": 0,
+          "huge_page_percent": 0,
+          "layer": 1,
+          "layout": "shared",
+          "pinning_status": "pinned",
+          "resident_mib": 96681,
+          "tp_rank": 0
+        },
+        {
+          "huge_page_mib": 0,
+          "huge_page_percent": 0,
+          "layer": 1,
+          "layout": "shared",
+          "pinning_status": "pinned",
+          "resident_mib": 96681,
+          "tp_rank": 1
+        },
+        {
+          "huge_page_mib": 0,
+          "huge_page_percent": 0,
+          "layer": 1,
+          "layout": "shared",
+          "pinning_status": "pinned",
+          "resident_mib": 96681,
+          "tp_rank": 2
+        },
+        {
+          "huge_page_mib": 0,
+          "huge_page_percent": 0,
+          "layer": 1,
+          "layout": "shared",
+          "pinning_status": "pinned",
+          "resident_mib": 96681,
+          "tp_rank": 3
+        },
+        {
+          "huge_page_mib": 0,
+          "huge_page_percent": 0,
+          "layer": 14,
+          "layout": "shared",
+          "pinning_status": "pinned",
+          "resident_mib": 96684,
+          "tp_rank": 0
+        },
+        {
+          "huge_page_mib": 0,
+          "huge_page_percent": 0,
+          "layer": 14,
+          "layout": "shared",
+          "pinning_status": "pinned",
+          "resident_mib": 96684,
+          "tp_rank": 1
+        },
+        {
+          "huge_page_mib": 0,
+          "huge_page_percent": 0,
+          "layer": 14,
+          "layout": "shared",
+          "pinning_status": "pinned",
+          "resident_mib": 96684,
+          "tp_rank": 2
+        },
+        {
+          "huge_page_mib": 0,
+          "huge_page_percent": 0,
+          "layer": 14,
+          "layout": "shared",
+          "pinning_status": "pinned",
+          "resident_mib": 96684,
+          "tp_rank": 3
+        }
+      ]
+    },
+    "fallback_log_mentions": 0,
+    "maximum_reported_running_batch": 64,
+    "preemption_log_mentions": 0,
+    "reported_running_batch_observations": 7683
+  },
+  "slo_boundary_status": "left-censored",
+  "slo_derivation": {
+    "implementation": "atlas.studies.runners.s004_finalize.derive_slo_status",
+    "implementation_sha256": "0302a255ea932950744fbc3749f6a75e25460cb3d2b450f87b247181309592d9",
+    "interpretation": "no qualifying offered rate in the preregistered tested domain",
+    "policy_version": "E0013-SLO-DERIVATION-001",
+    "qualifying_point_count": 0,
+    "source_fields": [
+      "capacity_points[*].passed",
+      "capacity_points[*].status",
+      "capacity_search.status",
+      "metrics.MET099.value"
+    ],
+    "tested_point_count": 2
+  },
+  "slo_eligible": true,
+  "slo_passed": false,
+  "treatment_resolution": {
+    "configuration": "CFG023",
+    "host_pinned_resolved": true,
+    "host_shared_resolved": true,
+    "host_table_status_line_count": 8,
+    "host_table_status_scopes": [
+      {
+        "layer": 1,
+        "tp_rank": 0
+      },
+      {
+        "layer": 14,
+        "tp_rank": 0
+      },
+      {
+        "layer": 1,
+        "tp_rank": 1
+      },
+      {
+        "layer": 14,
+        "tp_rank": 1
+      },
+      {
+        "layer": 1,
+        "tp_rank": 2
+      },
+      {
+        "layer": 14,
+        "tp_rank": 2
+      },
+      {
+        "layer": 1,
+        "tp_rank": 3
+      },
+      {
+        "layer": 14,
+        "tp_rank": 3
+      }
+    ],
+    "prefetch_status_line_count": 4,
+    "prefetch_stream_resolved": true,
+    "prefetch_tp_ranks": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "requested_mode": "host-prefetch",
+    "resolved_mode": "host-prefetch",
+    "valid": true
+  },
+  "warmup_requests": 768
+}
