@@ -1,0 +1,18 @@
+%YAML 1.2
+---
+inputs:
+  trace-spec.yaml: 9a7c0ef69b58649330468fc2eb7ce1fccb2e9c35079ee18b5c46890bb4c877b5
+  correctness-cases.jsonl: 5af922f2659d39ff375440181ac6b88c5248bdbe6d0292b825c5a9c6b8cc18c1
+  correctness-trace: 40a32d22eee3b941c1f7b175b4f2ef995a1c18adb0ce69622dec290a0bbad910
+runtime_artifacts:
+  model-manifest: c5a37ff491e09e9abd947d0823e428679e4e3bd94944adfe7ab16f7b91691eeb
+  trace-generator: 36f2726eb3af93147f9a4f7865280936039a4bd5f9df0beefeee10f92a8645f4
+  sglang-treatment-source-files: c292344963d409e4fb0a6c35de3ec94939121e43d5b99a78eb8e416d2c77fbd6
+  runtime-package-manifest: 6e7610e65ff433cfd252d5f44677dc4740779991ad050071e56c7420d752daca
+generated_files:
+  - metrics/requests.parquet
+  - metrics/samples.parquet
+  - metrics/summary.json
+  - quality/results.json
+  - outputs/responses.jsonl
+  - metrics/events.parquet
