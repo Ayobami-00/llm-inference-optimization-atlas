@@ -1,0 +1,36 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/quality/quality-contract.schema.json
+schema_version: 1
+kind: QualityContract
+id: QC004
+version: 1
+slug: deepseek-v41-engram-equivalence
+title: DeepSeek-V4.1 Engram exact-equivalence Q0 contract
+description: Behavior-preserving gate requiring complete, finite, well-formed, non-fallback responses and exact greedy output tokens.
+status: active
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [investigator], conflicts: []}]
+created_at: '2026-09-10T16:11:26Z'
+updated_at: '2026-09-11T01:29:51Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered behavior-preserving correctness contract
+  source_paths: [studies/S004-deepseek-v41-engram-placement/v1/inputs/correctness-cases.jsonl]
+  generated: false
+  parent_artifacts: [atlas://proposal/P0036@v1]
+extensions:
+  atlas.scope:
+    content_families: [natural_language, code, high_entropy]
+    contexts: [1024, 8192, 32768, 131072]
+    batch_shapes: [1, 8]
+    generated_tokens: 32
+gate: Q0
+reference_configuration: atlas://configuration/CFG021@v1
+dimensions:
+  - {id: request-completion, name: Request completion rate, evaluator: atlas://evaluator/EV004@v1, direction: higher_is_better, minimum: 1, allowed_regression: 0, weight: 1}
+  - {id: finite-output, name: Finite output rate, evaluator: atlas://evaluator/EV004@v1, direction: higher_is_better, minimum: 1, allowed_regression: 0, weight: 1}
+  - {id: well-formed-response, name: Well-formed response rate, evaluator: atlas://evaluator/EV004@v1, direction: higher_is_better, minimum: 1, allowed_regression: 0, weight: 1}
+  - {id: no-unexpected-fallback, name: No unexpected treatment fallback rate, evaluator: atlas://evaluator/EV004@v1, direction: higher_is_better, minimum: 1, allowed_regression: 0, weight: 1}
+  - {id: exact-output-token-agreement, name: Exact greedy output-token agreement, evaluator: atlas://evaluator/EV004@v1, direction: exact, minimum: 1, allowed_regression: 0, weight: 1}
+aggregation: all_dimensions
+missing_result: ineligible
+frozen_before_experiment: true

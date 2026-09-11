@@ -12,7 +12,7 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from atlas.metrics.tables import REQUEST_COLUMNS, SAMPLE_COLUMNS
+from atlas.metrics.tables import OPTIONAL_REQUEST_COLUMNS, REQUEST_COLUMNS, SAMPLE_COLUMNS
 from atlas.utilities.serialization import yaml_writer
 
 
@@ -63,18 +63,34 @@ class RunDraft:
     input_fingerprints: dict[str, str]
     artifact_checksums: dict[str, str]
     command: list[str]
+    measurement_started_at: str | None = None
+    measurement_ended_at: str | None = None
     environment: list[dict[str, Any]] = field(default_factory=list)
     events: list[dict[str, Any]] = field(default_factory=list)
+    hardware: str = "atlas://hardware/HW001@v1"
+    quality_gate: str = "Q1"
+    directory_name: str | None = None
 
 
 def write_run_draft(base: Path, draft: RunDraft) -> Path:
-    output = base / "runs" / draft.run_id
+    directory_name = draft.directory_name or draft.run_id
+    if Path(directory_name).name != directory_name or directory_name in {"", ".", ".."}:
+        raise ValueError(f"Unsafe draft directory name: {directory_name!r}")
+    output = base / "runs" / directory_name
     if output.exists():
         raise FileExistsError(f"Refusing to overwrite draft evidence: {output}")
     for relative in ("metrics", "quality", "outputs", "logs"):
         (output / relative).mkdir(parents=True, exist_ok=True)
 
-    pq.write_table(_table(draft.requests, REQUEST_COLUMNS), output / "metrics/requests.parquet")
+    request_columns = dict(REQUEST_COLUMNS)
+    request_columns.update(
+        {
+            name: definition
+            for name, definition in OPTIONAL_REQUEST_COLUMNS.items()
+            if any(name in row for row in draft.requests)
+        }
+    )
+    pq.write_table(_table(draft.requests, request_columns), output / "metrics/requests.parquet")
     pq.write_table(_table(draft.samples, SAMPLE_COLUMNS), output / "metrics/samples.parquet")
     if draft.events:
         event_columns = {
@@ -109,16 +125,19 @@ def write_run_draft(base: Path, draft: RunDraft) -> Path:
     (output / "environment.json").write_text(
         json.dumps(environment, indent=2, sort_keys=True) + "\n"
     )
+    generated_files = [
+        "metrics/requests.parquet",
+        "metrics/samples.parquet",
+        "metrics/summary.json",
+        "quality/results.json",
+        "outputs/responses.jsonl",
+    ]
+    if draft.events:
+        generated_files.append("metrics/events.parquet")
     artifacts = {
         "inputs": draft.input_fingerprints,
         "runtime_artifacts": draft.artifact_checksums,
-        "generated_files": [
-            "metrics/requests.parquet",
-            "metrics/samples.parquet",
-            "metrics/summary.json",
-            "quality/results.json",
-            "outputs/responses.jsonl",
-        ],
+        "generated_files": generated_files,
     }
     with (output / "artifacts.yaml").open("w") as stream:
         yaml_writer().dump(artifacts, stream)
@@ -155,7 +174,7 @@ def write_run_draft(base: Path, draft: RunDraft) -> Path:
         "started_at": draft.started_at,
         "ended_at": draft.ended_at,
         "outcome": "complete",
-        "hardware_snapshot": "atlas://hardware/HW001@v1",
+        "hardware_snapshot": draft.hardware,
         "runtime_snapshot": draft.runtime,
         "input_fingerprints": draft.input_fingerprints,
         "command": draft.command,
@@ -164,20 +183,14 @@ def write_run_draft(base: Path, draft: RunDraft) -> Path:
             "warmup": {"excluded": True, "requests": draft.summary.get("warmup_requests", 0)},
             "measurement": {
                 "requests": len(draft.requests),
-                "start": draft.started_at,
-                "end": draft.ended_at,
+                "start": draft.measurement_started_at or draft.started_at,
+                "end": draft.measurement_ended_at or draft.ended_at,
             },
         },
-        "artifacts": [
-            "metrics/requests.parquet",
-            "metrics/samples.parquet",
-            "metrics/summary.json",
-            "quality/results.json",
-            "outputs/responses.jsonl",
-        ],
+        "artifacts": generated_files,
         "checksums": draft.artifact_checksums,
         "quality": {
-            "gate": "Q1",
+            "gate": draft.quality_gate,
             "passed": draft.quality_passed,
             "results_path": "quality/results.json",
         },

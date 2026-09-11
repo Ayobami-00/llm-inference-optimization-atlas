@@ -1,0 +1,47 @@
+%YAML 1.2
+---
+schema_version: 1
+kind: Configuration
+id: CFG021
+version: 1
+slug: deepseek-v41-engram-device
+title: Configuration A — Engram device placement
+description: Resolved experimental configuration for accelerator-resident Engram tables.
+status: active
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-09-10T16:11:26Z'
+updated_at: '2026-09-11T01:29:51Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: preregistered-configuration-matrix
+  source_paths: []
+  generated: true
+  parent_artifacts:
+    - atlas://proposal/P0036@v1
+extensions:
+  atlas.condition:
+    label: A — device
+    engram_placement: device
+    asynchronous_prefetch: false
+$schema: https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/configuration.schema.json
+workload: atlas://workload-spec/WS004@v1
+quality: atlas://quality-contract/QC004@v1
+slo: atlas://slo/SLO004@v1
+model: atlas://model/M006@v1
+hardware: atlas://hardware/HW002@v1
+runtime: atlas://runtime/RT004@v1
+runtime_configuration: atlas://runtime-configuration/RTCFG021@v1
+resolved_hashes:
+  workload: 8a05cde4e0f37bba70d4b4bc7bc0f2d36d08d1ceaa62ea08a404d477b5c1b240
+  quality: 942780563cd886e3a55d5b86378653b0bc426a9b30a0b0ce6740d38bfd2da367
+  slo: de89657394be12adb9d50f6d1bfaf12fe064a1a7453862f7fda1ebdfa43e49c0
+  model: 6c233f9b4d0b3a89fa28ea174c835a458fce5931f29d8ad8b3cbbe19c9016481
+  hardware: 472fbe4475538d7e4eb982b0b027c7b4ef19a26129a542509afe632a79db7104
+  runtime: 2c97b671fe408027e92d2ec8a5d1ec086ad269217732ba44ef6457b053dc2ab4
+  runtime_configuration: 86ef8a2e6bc7c31668b2236a0451d773f09a792f2a14d5d15782237e0121cece

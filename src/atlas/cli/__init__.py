@@ -809,9 +809,12 @@ def evidence_validate(
 def evidence_promote(
     ctx: typer.Context,
     draft_run: Annotated[Path, typer.Argument(exists=True, file_okay=False)],
-    run_id: Annotated[str, typer.Option("--run-id")],
+    run_id: Annotated[
+        str | None,
+        typer.Option("--run-id", help="Optional explicit run ID; otherwise allocate the next ID."),
+    ] = None,
 ) -> None:
-    """Promote a valid draft into a new immutable accepted run directory."""
+    """Promote a valid draft and allocate its immutable accepted run ID."""
     root = find_repository_root()
     try:
         destination = promote_evidence(root, draft_run, run_id)

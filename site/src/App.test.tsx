@@ -85,6 +85,11 @@ const detail: EntityDetail = {
       baseline: "atlas://configuration/CFG022@v1",
       candidate: "atlas://configuration/CFG023@v1",
     },
+    method: {
+      paired: true,
+      inference: "descriptive_only",
+      independent_units: 1,
+    },
     effects: [
       {
         metric: "atlas://metric/MET012@v1",
@@ -231,6 +236,12 @@ describe("Atlas explorer", () => {
     expect(screen.getByText("Relative effect unavailable")).toBeVisible();
     expect(screen.getByLabelText("Comparison contrast")).toHaveTextContent(
       "Host Sync Vs PrefetchCFG022 → CFG023",
+    );
+    expect(screen.getByRole("note", { name: "Descriptive comparison limitation" })).toHaveTextContent(
+      "1 independent paired block",
+    );
+    expect(screen.getByRole("note", { name: "Descriptive comparison limitation" })).toHaveTextContent(
+      "confidence intervals and deployment claims are unavailable",
     );
     fireEvent.change(screen.getByLabelText("Metric"), {
       target: { value: "atlas://metric/MET019@v1" },

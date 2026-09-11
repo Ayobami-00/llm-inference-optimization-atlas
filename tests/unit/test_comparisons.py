@@ -35,6 +35,39 @@ def test_relative_effect_uses_the_baseline_as_denominator() -> None:
     assert service._relative_effect(absolute=5.0, baseline=20.0) == 0.25
 
 
+def test_descriptive_effect_reports_no_confidence_interval() -> None:
+    effect, result = service._effect(
+        ROOT,
+        "atlas://metric/MET019@v1",
+        np.array([100.0]),
+        np.array([110.0]),
+        unit="token/s",
+        paired=True,
+        resamples=10_000,
+        confidence=0.95,
+        seed=17,
+        descriptive_only=True,
+    )
+
+    assert effect["absolute"] == 10.0
+    assert effect["relative"] == 0.1
+    assert effect["confidence_interval"] is None
+    assert result == "no_significant_effect"
+
+
+def test_analysis_inference_defaults_to_interval_estimation() -> None:
+    assert service._analysis_inference({"analysis": {}}) == "interval_estimated"
+    assert (
+        service._analysis_inference({"analysis": {"inference": "descriptive_only"}})
+        == "descriptive_only"
+    )
+
+
+def test_analysis_inference_rejects_unknown_mode() -> None:
+    with pytest.raises(service.ComparisonError, match=r"analysis\.inference"):
+        service._analysis_inference({"analysis": {"inference": "pretend_significance"}})
+
+
 def test_compare_all_skips_experiments_without_accepted_runs(tmp_path: Path, monkeypatch) -> None:
     _experiment(tmp_path, "S001-test", "E0001")
     called = []

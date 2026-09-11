@@ -23,6 +23,10 @@ REQUEST_COLUMNS: dict[str, tuple[pa.DataType, str | None]] = {
 }
 
 OPTIONAL_REQUEST_COLUMNS: dict[str, tuple[pa.DataType, str | None]] = {
+    "retry_count": (pa.int64(), "count"),
+    "scheduling_lag_ms": (pa.float64(), "ms"),
+    "slo_eligible": (pa.bool_(), None),
+    "token_timestamps_ns": (pa.list_(pa.int64()), "ns"),
     "load_cell_id": (pa.string(), None),
     "content_family": (pa.string(), None),
     "target_context_tokens": (pa.int64(), "token"),

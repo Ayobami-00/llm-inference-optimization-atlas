@@ -204,4 +204,14 @@ entries:
     direction: lower_is_better
     mandatory: false
     aggregation: [mean, p50, p90, p95]
-
+  - id: MET097
+    name: "Available KV-cache token capacity"
+    definition: "Server-reported maximum number of token slots available to the active KV-cache pool after fixed model and runtime residency at readiness."
+    status: active
+    aliases: [KV-token-capacity]
+    level: M1
+    category: cache
+    unit: "token"
+    direction: higher_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]

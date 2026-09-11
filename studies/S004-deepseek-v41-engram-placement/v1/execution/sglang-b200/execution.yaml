@@ -1,0 +1,93 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/execution/execution-bundle.schema.json
+schema_version: 1
+kind: ExecutionBundle
+id: XB004
+version: 1
+slug: sglang-b200
+title: DeepSeek-V4.1 Flash Engram placement on 4x B200
+description: Runs the preregistered device, synchronous-host, and asynchronous-prefetch Engram treatments against one exact SGLang and DeepSeek-V4.1 Flash build.
+status: active
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [software, investigator], conflicts: []}]
+created_at: '2026-09-10T00:00:00Z'
+updated_at: '2026-09-10T22:35:09Z'
+license: Apache-2.0
+citations: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1, atlas://source/SRC0111@v1, atlas://source/SRC0112@v1, atlas://source/SRC0113@v1]
+provenance:
+  method: repository-authored CUDA execution bundle with a frozen model manifest and runtime source fingerprint
+  source_paths:
+    - src/atlas/studies/runners/s004.py
+    - src/atlas/studies/runners/s004_aiperf.py
+    - src/atlas/studies/runners/s004_client.py
+    - src/atlas/studies/runners/s004_lifecycle.py
+    - src/atlas/studies/runners/s004_trace.py
+    - studies/S004-deepseek-v41-engram-placement/v1/inputs/model-manifest.yaml
+  generated: false
+extensions:
+  atlas.model-download:
+    method: resumable Hugging Face snapshot restricted to the frozen manifest
+    repository: deepseek-ai/DeepSeek-V4.1-Flash
+    revision: dba1be0a40aa45a94ad051997016db3960a90277
+  atlas.preexecution-pilots:
+    treatment_resolution: all three requested modes must resolve before any measurement
+    failure_policy: preserve the failed pilot and stop before the collector pilot or confirmatory matrix
+  atlas.compilation-cache:
+    initialization: the all-treatment pilots materialize SGLang and FlashInfer compiled-kernel and autotune caches
+    measurement_state: the populated cache is retained unchanged for every confirmatory server process
+    readiness_scope: MET098 measures a warm-compilation-cache production restart
+  atlas.hardware-health-policy:
+    amendment: E0013-AMENDMENT-001
+    configured_power_limit: expected at 1000 W and required to be readable and unchanged in every mandatory sample
+    software_power_cap_0x4: retained and reported, non-invalidating by itself
+    invalidating_clock_event_mask: '0xE8'
+    other_invalidating_events: [GPU Xid, new ECC error, competing GPU process]
+    collector_overhead_pilot: repeated with the amended query; reuse requires exact policy, query, and implementation fingerprints
+platforms:
+  - {os: linux, architecture: x86_64}
+  - {os: macos, architecture: aarch64}
+backend: cuda
+requirements:
+  - {name: python, version: '>=3.12,<3.14'}
+  - {name: nvidia-gpu, version: 4x B200 with 180 GB class HBM each}
+  - {name: nvidia-driver, version: '595.91.07'}
+  - {name: cuda-toolkit-package, version: '13.0.3.0'}
+  - {name: nvcc, version: '13.0.88'}
+  - {name: torch, version: '2.13.0+cu130'}
+  - {name: sglang-source, version: '85f8105f5d2e2e0bdea70ff50cb5449bf9567053'}
+  - {name: huggingface-hub, version: '1.30.0'}
+  - {name: flashinfer, version: '0.6.18'}
+  - {name: sgl-deep-gemm, version: '0.1.7'}
+  - {name: nvidia-nccl-cu13, version: '2.30.7; PyTorch runtime reports 2.29.7'}
+  - {name: ruamel-yaml, version: '0.19.1 (tool-side isolated target)'}
+  - {name: aiperf, version: '0.12.0 (independent client-side virtual environment)'}
+artifacts: []
+entrypoints:
+  prepare: ./prepare.sh
+  start: ./start.sh
+  healthcheck: ./healthcheck.sh
+  run: ./run.sh
+  destroy: ./destroy.sh
+inputs:
+  trace_spec: ../../inputs/trace-spec.yaml
+  correctness_cases: ../../inputs/correctness-cases.jsonl
+  model_manifest: ../../inputs/model-manifest.yaml
+  configurations: ../../configurations
+outputs:
+  draft_directory: .atlas/work/S004-deepseek-v41-engram-placement/sglang-b200
+  required_files: [run.yaml, environment.json, artifacts.yaml, metrics/summary.json, requests.parquet]
+profiles:
+  quick: {replicates: 1, max_requests: 2, purpose: deterministic fake-server lifecycle and evidence smoke test}
+  full: {replicates: 5, accepted_runs: 15, purpose: preregistered paired 4x B200 evidence}
+resources:
+  gpu: 4x NVIDIA B200 on one node
+  minimum_host_memory_bytes: 1097364144128
+  minimum_local_storage_bytes: 650000000000
+  network_during_prepare: pinned Hugging Face model revision only
+  network_during_run: loopback-only
+timeouts: {prepare_seconds: 14400, run_seconds: 72000, cleanup_seconds: 180}
+cleanup: {required: true, idempotent: true}
+limitations:
+  - The quick profile is portable and synthetic; only the full Linux x86_64 CUDA profile can produce accepted evidence.
+  - The provider image exposes no immutable OCI digest, so RT004 pins the exact installed SGLang source files and complete package manifest instead.
+  - Engram prefetch in the measured implementation is eligible only for single-row decode steps.
+  - Shared-memory transparent huge pages remain disabled at the provider default; no host or kernel tuning is performed.
+  - NVIDIA 0x4 SW_POWER_CAP incidence under a continuously observed 1000 W configured limit is reported rather than filtered; results may not transfer to another power envelope.

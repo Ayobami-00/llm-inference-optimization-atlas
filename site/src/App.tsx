@@ -435,6 +435,11 @@ function EffectList({ detail }: { detail: EntityDetail }) {
     typeof detail.artifact.contrast === "object" && detail.artifact.contrast !== null
       ? (detail.artifact.contrast as Record<string, unknown>)
       : null;
+  const comparisonMethod =
+    typeof detail.artifact.method === "object" && detail.artifact.method !== null
+      ? (detail.artifact.method as Record<string, unknown>)
+      : null;
+  const descriptiveOnly = comparisonMethod?.inference === "descriptive_only";
 
   return (
     <section className="drawer-section">
@@ -445,6 +450,16 @@ function EffectList({ detail }: { detail: EntityDetail }) {
           <span>
             <RecordReference reference={String(contrast.baseline)} /> →{" "}
             <RecordReference reference={String(contrast.candidate)} />
+          </span>
+        </div>
+      )}
+      {descriptiveOnly && (
+        <div className="effect-inference-note" role="note" aria-label="Descriptive comparison limitation">
+          <strong>Descriptive comparison only</strong>
+          <span>
+            {String(comparisonMethod?.independent_units ?? "Fewer than three")} independent paired
+            {comparisonMethod?.independent_units === 1 ? " block" : " blocks"}; run-to-run uncertainty
+            cannot be estimated, so confidence intervals and deployment claims are unavailable.
           </span>
         </div>
       )}

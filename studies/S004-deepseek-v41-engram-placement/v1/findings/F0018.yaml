@@ -1,0 +1,55 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/finding.schema.json
+schema_version: 1
+kind: Finding
+id: F0018
+version: 1
+slug: host-engram-expanded-kv-capacity-with-a-performance-trade
+title: Synchronous host Engram expanded KV capacity with an observed performance trade
+description: Descriptive exact-setup memory and performance finding from one independently initialized paired block.
+status: inconclusive
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [analysis], conflicts: []}]
+created_at: '2026-09-11T02:08:29Z'
+updated_at: '2026-09-11T02:08:29Z'
+license: Apache-2.0
+citations: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1]
+provenance:
+  method: contributor interpretation of the descriptive paired comparison CMP0018
+  source_paths: [studies/S004-deepseek-v41-engram-placement/v1/experiments/E0013/comparisons/CMP0018.yaml]
+  generated: false
+extensions:
+  atlas.statistical-scope: {inference: descriptive_only, independent_units: 1}
+statement: Moving Engram from device HBM to shared pinned host memory increased SGLang's reported KV-token capacity from 11,841,280 to 42,697,728 tokens, while the single observed host-sync run had higher mean TTFT and TPOT and lower output throughput than device placement.
+scope:
+  workload: atlas://workload-spec/WS004@v1
+  model: atlas://model/M006@v1
+  runtime: atlas://runtime/RT004@v1
+  hardware: atlas://hardware/HW002@v1
+  traffic: [atlas://traffic/T001@v1, atlas://traffic/T002@v1, atlas://traffic/T004@v1]
+observation: Reported model-weight residency fell from 119.043 to 72.201 GB per GPU and KV capacity increased by 30,856,448 tokens (260.6%; 3.606x). Run-level mean TTFT changed from 2,047.46 to 2,314.27 ms, mean TPOT from 25.228 to 27.623 ms/token, output throughput from 330.01 to 286.26 token/s, and mean system host memory from 107.12 to 308.92 GiB.
+mechanism: Treatment-resolution logs show both Engram tables resolved to shared pinned host mappings, reducing fixed model-weight HBM residency and allowing the unchanged allocator policy to reserve a larger KV pool. The experiment did not collect a causal CPU, PCIe, or CUDA timeline and therefore does not assign the performance change to a specific low-level stall.
+baseline: atlas://configuration/CFG021@v1
+intervention: atlas://configuration/CFG022@v1
+effects:
+  - {metric: atlas://metric/MET097@v1, baseline: 11841280.0, candidate: 42697728.0, absolute: 30856448.0, relative: 2.6058372067884554, confidence_interval: null, unit: token}
+  - {metric: atlas://metric/MET010@v1, baseline: 2047.4570736936273, candidate: 2314.265955766539, absolute: 266.8088820729115, relative: 0.13031232034163548, confidence_interval: null, unit: ms}
+  - {metric: atlas://metric/MET013@v1, baseline: 25.228162169038743, candidate: 27.622537566040734, absolute: 2.3943753970019905, relative: 0.09490883168415998, confidence_interval: null, unit: ms/token}
+  - {metric: atlas://metric/MET019@v1, baseline: 330.01329669286207, candidate: 286.2591619305155, absolute: -43.75413476234655, relative: -0.13258294499287343, confidence_interval: null, unit: token/s}
+  - {metric: atlas://metric/MET053@v1, baseline: 115015095761.84712, candidate: 331703062152.9623, absolute: 216687966391.11517, relative: 1.8839958785914, confidence_interval: null, unit: B}
+works_when:
+  - The exact source-fingerprinted SGLang build resolves both DeepSeek-V4.1 Flash Engram tables to shared pinned host memory on the tested 4xB200 host.
+stops_working_when:
+  - Host DRAM is insufficient for the roughly 195-202 GiB observed system-level increase or host-table registration fails.
+  - A different allocator, memory fraction, model build, or runtime changes the conversion from released model HBM to KV-token capacity.
+interactions:
+  - The useful trade depends on whether KV capacity is actually binding and whether the product can tolerate the measured latency and throughput envelope.
+limitations:
+  - One paired block cannot estimate run-to-run variance or establish a general performance effect.
+  - Reported KV slots are an allocator capacity value, not demonstrated SLO-qualified concurrent context capacity.
+  - Host mappings used no huge pages and no host, NUMA, kernel, or memory-lock tuning was tested.
+evidence:
+  comparisons: [atlas://comparison/CMP0018@v1]
+  runs: [atlas://run/R3464@v1, atlas://run/R3465@v1]
+mechanism_sources: [atlas://source/SRC0109@v1, atlas://source/SRC0110@v1]
+evidence_confidence: low
+transferability: exact_setup
+claim_status: inconclusive

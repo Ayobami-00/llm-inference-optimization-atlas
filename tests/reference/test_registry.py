@@ -45,11 +45,13 @@ def test_bootstrap_registry_identities_are_unique() -> None:
         "M003",
         "M004",
         "M005",
+        "M006",
     }
     assert {identifier for identifier in identifiers if identifier.startswith("RT")} == {
         "RT001",
         "RT002",
         "RT003",
+        "RT004",
     }
 
 
@@ -66,8 +68,6 @@ def test_models_and_runtimes_are_immutably_pinned() -> None:
 
 
 def test_hardware_inventory_contains_no_private_identifier_fields() -> None:
-    hardware = load_data(REGISTRY / "hardware" / "HW001-local-apple-m3.yaml")
-    assert isinstance(hardware, dict)
     forbidden = {
         "serial",
         "serial_number",
@@ -78,14 +78,9 @@ def test_hardware_inventory_contains_no_private_identifier_fields() -> None:
         "private_ip",
         "cloud_account",
     }
-    present = _keys({key: value for key, value in hardware.items() if key != "redactions"})
-    assert not (forbidden & present)
-    assert set(hardware["redactions"]) == {
-        "serial_number",
-        "uuid",
-        "mac_address",
-        "hostname",
-        "username",
-        "private_ip",
-        "cloud_account",
-    }
+    for path, hardware in _records():
+        if hardware["kind"] != "HardwareTopology":
+            continue
+        present = _keys({key: value for key, value in hardware.items() if key != "redactions"})
+        assert not (forbidden & present), path
+        assert set(hardware["redactions"]) == forbidden - {"serial"}, path

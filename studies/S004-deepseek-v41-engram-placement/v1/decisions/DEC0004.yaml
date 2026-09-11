@@ -1,0 +1,55 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/decision.schema.json
+schema_version: 1
+kind: DeploymentDecision
+id: DEC0004
+version: 1
+slug: no-general-engram-placement-recommendation-from-one-block
+title: No general Engram placement recommendation from the day-zero block
+description: Exact-setup no-recommendation decision grounded in the three descriptive S004 contrasts.
+status: reviewed
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [decision], conflicts: []}]
+created_at: '2026-09-11T02:08:29Z'
+updated_at: '2026-09-11T02:08:29Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: Pareto judgment under the preregistered thresholds and cost-constrained Amendment 003
+  source_paths: [studies/S004-deepseek-v41-engram-placement/v1/findings/F0018.yaml, studies/S004-deepseek-v41-engram-placement/v1/findings/F0019.yaml, studies/S004-deepseek-v41-engram-placement/v1/findings/F0020.yaml]
+  generated: false
+extensions:
+  atlas.statistical-scope: {inference: descriptive_only, independent_units: 1}
+study: atlas://study/S004@v1
+outcome: no_recommendation
+pareto_rationale: Device placement had the best observed aggregate latency and throughput when its 11.84M-token KV pool was sufficient. Host placement reduced reported model-weight residency by 46.842 GB per GPU and expanded the reported KV pool to 42.70M tokens, but neither host mode established SLO-qualified capacity and prefetch did not show a consistent throughput recovery over host-sync. With one paired block and every capacity estimate left-censored below 0.2 request/s, no mode satisfies the evidence requirements for a general deployment recommendation.
+operating_envelope:
+  workload: text-only DeepSeek-V4.1 Flash exact-token controlled matrix and open-loop Poisson long-context mixture
+  model: atlas://model/M006@v1
+  runtime: atlas://runtime/RT004@v1
+  hardware: atlas://hardware/HW002@v1
+  configurations: [atlas://configuration/CFG021@v1, atlas://configuration/CFG022@v1, atlas://configuration/CFG023@v1]
+  contexts: [1024, 8192, 32768, 131072]
+  maximum_controlled_concurrency: 64
+  quality_gate: atlas://quality-contract/QC004@v1
+  slo_profile: atlas://slo/SLO004@v1
+  interpretation: Device is the observed performance reference; host placement is a memory-constrained option requiring workload-specific validation.
+supporting_findings: [atlas://finding/F0018@v1, atlas://finding/F0019@v1, atlas://finding/F0020@v1]
+rejected_alternatives:
+  - configuration: atlas://configuration/CFG021@v1
+    reason: Device placement had the best observed performance but offers only 11.84M reported KV-token slots and did not meet the lowest tested mixed-workload SLO rate.
+  - configuration: atlas://configuration/CFG022@v1
+    reason: Synchronous host placement expanded the KV pool but increased observed latency, reduced throughput, increased host-memory use, and did not establish SLO-qualified capacity.
+  - configuration: atlas://configuration/CFG023@v1
+    reason: Host prefetch preserved the larger KV pool but exceeded the batch-one throughput-regression guardrail, showed mixed concurrency-cell effects, and did not establish a capacity improvement.
+caveats:
+  - The published experiment contains one independently initialized paired block on one physical 4xB200 machine and cannot estimate run-to-run or host-to-host variance.
+  - All capacity estimates are left-censored below 0.2 request/s because the 8K class failed the latency SLO at the lowest tested rate.
+  - The tested prefetch revision applies the asynchronous path only to single-row decode, and no per-step activation counter was available.
+  - Host mappings were shared and pinned but used no huge pages; no host, kernel, memory-lock, or NUMA tuning was evaluated.
+  - Results apply only to the source- and package-fingerprinted runtime, pinned model revision, hardware topology, workload, and seed recorded by S004.
+  - No causal CPU, PCIe, or CUDA profiler trace was collected, so performance effects are not attributed to one low-level component.
+revisit_conditions:
+  - At least the remaining four preregistered independent blocks establish run-to-run variability and reproduce the directional effects.
+  - A lower-rate capacity search brackets a passing SLO-qualified boundary for every configuration.
+  - A scheduler-level counter quantifies how often real batches use the single-row asynchronous prefetch path.
+  - A clean newer SGLang revision changes host-table placement, prefetch eligibility, huge-page use, or dynamic-batch behavior.
+  - A memory-constrained production workload demonstrates that device KV capacity is binding and supplies an application-specific latency trade threshold.

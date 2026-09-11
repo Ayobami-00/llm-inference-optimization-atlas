@@ -1,0 +1,30 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/common/source.schema.json
+schema_version: 1
+kind: Source
+id: SRC0111
+version: 1
+slug: sglang-deepseek-v41-pr
+title: SGLang DeepSeek-V4.1 Support Pull Request
+description: Official SGLang implementation and review history for DeepSeek-V4.1 day-zero support.
+status: active
+authors: [{name: Atlas maintainers, roles: [curator], conflicts: []}]
+created_at: '2026-09-10T00:00:00Z'
+updated_at: '2026-09-10T00:00:00Z'
+license: metadata-only
+citations: []
+provenance:
+  method: curated from the official SGLang repository
+  source_paths: [https://github.com/sgl-project/sglang/pull/38798]
+  generated: false
+extensions: {}
+type: official_documentation
+source_authors: [SGLang maintainers and contributors]
+url: https://github.com/sgl-project/sglang/pull/38798
+published: {year: 2026}
+upstream:
+  product: SGLang
+  version: day-zero-preview
+  revision: 85f8105f5d2e2e0bdea70ff50cb5449bf9567053
+  retrieved_at: '2026-09-10'
+topics: [runtime, serving, deepseek-v41, engram]
+relevance: Supplies the exact preview implementation whose Engram host-table and prefetch paths are evaluated by S004.

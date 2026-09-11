@@ -1,0 +1,397 @@
+{
+  "details": [
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-1024-batch1-code-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-1024-batch1-code-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-1024-batch1-entropy-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-1024-batch1-entropy-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-1024-batch1-nl-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-1024-batch1-nl-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-1024-batch8-code-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-1024-batch8-code-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-1024-batch8-entropy-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-1024-batch8-entropy-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-1024-batch8-nl-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-1024-batch8-nl-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-131072-batch1-code-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-131072-batch1-code-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-131072-batch1-entropy-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-131072-batch1-entropy-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-131072-batch1-nl-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-131072-batch1-nl-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-131072-batch8-code-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-131072-batch8-code-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-131072-batch8-entropy-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-131072-batch8-entropy-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-131072-batch8-nl-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-131072-batch8-nl-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-32768-batch1-code-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-32768-batch1-code-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-32768-batch1-entropy-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-32768-batch1-entropy-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-32768-batch1-nl-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-32768-batch1-nl-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-32768-batch8-code-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-32768-batch8-code-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-32768-batch8-entropy-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-32768-batch8-entropy-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-32768-batch8-nl-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-32768-batch8-nl-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-8192-batch1-code-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-8192-batch1-code-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-8192-batch1-entropy-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-8192-batch1-entropy-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-8192-batch1-nl-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-8192-batch1-nl-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-8192-batch8-code-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-8192-batch8-code-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-8192-batch8-entropy-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-8192-batch8-entropy-02",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-8192-batch8-nl-01",
+      "well_formed": true
+    },
+    {
+      "complete": true,
+      "exact_output_tokens": true,
+      "finite": true,
+      "no_unexpected_fallback": true,
+      "request_id": "correctness-20260910-8192-batch8-nl-02",
+      "well_formed": true
+    }
+  ],
+  "dimensions": {
+    "exact_output_token_agreement": 1.0,
+    "finite_output_rate": 1.0,
+    "no_unexpected_fallback_rate": 1.0,
+    "request_completion_rate": 1.0,
+    "well_formed_response_rate": 1.0
+  },
+  "gate": "Q0",
+  "passed": true
+}

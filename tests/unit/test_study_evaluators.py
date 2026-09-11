@@ -3,6 +3,7 @@ from __future__ import annotations
 from atlas.studies.evaluators import (
     evaluate_chat_records,
     evaluate_code_results,
+    evaluate_engram_equivalence,
     evaluate_rag_records,
     extract_python,
 )
@@ -42,3 +43,33 @@ def test_rag_evaluator_checks_retrieval_answer_and_citation() -> None:
         ]
     )
     assert result["passed"]
+
+
+def test_engram_evaluator_requires_exact_tokens_and_resolved_treatment() -> None:
+    reference = [{"request_id": "q1", "outcome": "complete", "output_token_ids": [1, 2, 3]}]
+    matching = [
+        {
+            "request_id": "q1",
+            "outcome": "complete",
+            "output_token_ids": [1, 2, 3],
+            "finite": True,
+        }
+    ]
+    assert evaluate_engram_equivalence(matching, reference)["passed"]
+
+    matching[0]["unexpected_fallback"] = True
+    result = evaluate_engram_equivalence(matching, reference)
+    assert not result["passed"]
+    assert result["dimensions"]["no_unexpected_fallback_rate"] == 0.0
+
+
+def test_engram_evaluator_rejects_missing_or_changed_responses() -> None:
+    reference = [
+        {"request_id": "q1", "outcome": "complete", "output_token_ids": [1, 2, 3]},
+        {"request_id": "q2", "outcome": "complete", "output_token_ids": [4, 5, 6]},
+    ]
+    candidate = [{"request_id": "q1", "outcome": "complete", "output_token_ids": [1, 9, 3]}]
+    result = evaluate_engram_equivalence(candidate, reference)
+    assert not result["passed"]
+    assert result["dimensions"]["request_completion_rate"] == 0.5
+    assert result["dimensions"]["exact_output_token_agreement"] == 0.0

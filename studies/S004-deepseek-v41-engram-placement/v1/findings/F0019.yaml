@@ -1,0 +1,55 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/finding.schema.json
+schema_version: 1
+kind: Finding
+id: F0019
+version: 1
+slug: host-prefetch-did-not-establish-throughput-recovery
+title: Host prefetch did not establish a repeatable throughput recovery
+description: Descriptive exact-setup comparison of synchronous host access and asynchronous prefetch from one paired block.
+status: inconclusive
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [analysis], conflicts: []}]
+created_at: '2026-09-11T02:08:29Z'
+updated_at: '2026-09-11T02:08:29Z'
+license: Apache-2.0
+citations: [atlas://source/SRC0110@v1]
+provenance:
+  method: contributor interpretation of the descriptive paired comparison CMP0019
+  source_paths: [studies/S004-deepseek-v41-engram-placement/v1/experiments/E0013/comparisons/CMP0019.yaml]
+  generated: false
+extensions:
+  atlas.statistical-scope: {inference: descriptive_only, independent_units: 1}
+statement: Enabling the resolved asynchronous Engram prefetch path preserved the host-mode KV allocation but did not establish the preregistered positive throughput recovery over synchronous host access.
+scope:
+  workload: atlas://workload-spec/WS004@v1
+  model: atlas://model/M006@v1
+  runtime: atlas://runtime/RT004@v1
+  hardware: atlas://hardware/HW002@v1
+  traffic: [atlas://traffic/T001@v1, atlas://traffic/T002@v1, atlas://traffic/T004@v1]
+observation: Host-sync and host-prefetch each reported 42,697,728 KV-token slots. Prefetch changed run-level mean TTFT by +2.25%, mean TPOT by +1.30%, and output throughput by -1.27%. Across nine unique-prefix context cells at concurrency 8 or greater, throughput was higher in four and lower in five, with a median effect of -0.29% and a range from -6.56% to +2.45%.
+mechanism: The tested source creates a prefetch stream but uses it only for ordinary single-row decode steps; multi-row dynamic-batch decode and prefill use the normal path. Logs prove stream construction on all four ranks but do not count eligible activations, so the mixed end-to-end result cannot identify overlap effectiveness per decode shape.
+baseline: atlas://configuration/CFG022@v1
+intervention: atlas://configuration/CFG023@v1
+effects:
+  - {metric: atlas://metric/MET097@v1, baseline: 42697728.0, candidate: 42697728.0, absolute: 0.0, relative: 0.0, confidence_interval: null, unit: token}
+  - {metric: atlas://metric/MET098@v1, baseline: 273071.627761, candidate: 233062.250276, absolute: -40009.377485000005, relative: -0.14651605446178884, confidence_interval: null, unit: ms}
+  - {metric: atlas://metric/MET010@v1, baseline: 2314.265955766539, candidate: 2366.2839295537096, absolute: 52.01797378717083, relative: 0.022477094154868326, confidence_interval: null, unit: ms}
+  - {metric: atlas://metric/MET013@v1, baseline: 27.622537566040734, candidate: 27.981218683961234, absolute: 0.3586811179205007, relative: 0.012985089333771595, confidence_interval: null, unit: ms/token}
+  - {metric: atlas://metric/MET019@v1, baseline: 286.2591619305155, candidate: 282.61750761467187, absolute: -3.6416543158436525, relative: -0.012721529299829367, confidence_interval: null, unit: token/s}
+works_when:
+  - The source-defined text-only, PP1, non-DP-attention, CuTeDSL MXFP8 eligibility conditions hold and layer 14 uses a shared pinned host table.
+stops_working_when:
+  - Prefill or multi-row decode dominates execution because the tested revision bypasses the asynchronous path for those shapes.
+  - The scheduler's eligible single-row decode frequency is too low to create measurable overlap at the workload level.
+interactions:
+  - Prefetch effectiveness interacts with dynamic-batch shape, context length, concurrency, scheduler behavior, and host-memory access.
+limitations:
+  - One paired block and mixed cell directions provide no estimate of repeatability or statistical uncertainty.
+  - No per-step prefetch activation counter or causal profiler trace was available.
+  - The comparison is source- and build-specific; later SGLang implementations may change eligibility or overlap.
+evidence:
+  comparisons: [atlas://comparison/CMP0019@v1]
+  runs: [atlas://run/R3465@v1, atlas://run/R3466@v1]
+mechanism_sources: [atlas://source/SRC0110@v1]
+evidence_confidence: low
+transferability: exact_setup
+claim_status: inconclusive

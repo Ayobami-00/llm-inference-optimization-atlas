@@ -119,3 +119,62 @@ def evaluate_rag_records(responses: list[dict[str, Any]]) -> dict[str, Any]:
         "dimensions": dimensions,
         "details": details,
     }
+
+
+def evaluate_engram_equivalence(
+    candidate: list[dict[str, Any]], reference: list[dict[str, Any]]
+) -> dict[str, Any]:
+    """Apply S004's exact, behavior-preserving Engram placement gate.
+
+    Records are matched by request identity rather than list position.  A
+    candidate passes only when every expected response is present, completed
+    without a runtime fallback or malformed/non-finite state, and has exactly
+    the same generated token IDs as the device-resident reference.
+    """
+
+    reference_by_id = {str(item["request_id"]): item for item in reference}
+    candidate_by_id = {str(item["request_id"]): item for item in candidate}
+    request_ids = sorted(set(reference_by_id) | set(candidate_by_id))
+    details: list[dict[str, Any]] = []
+    for request_id in request_ids:
+        expected = reference_by_id.get(request_id)
+        observed = candidate_by_id.get(request_id)
+        if expected is None or observed is None:
+            complete = finite = well_formed = no_fallback = exact_tokens = False
+        else:
+            complete = observed.get("outcome") == "complete" and not observed.get("error")
+            finite = bool(complete and observed.get("finite", True))
+            well_formed = bool(complete and not observed.get("malformed", False))
+            no_fallback = bool(complete and not observed.get("unexpected_fallback", False))
+            exact_tokens = bool(
+                complete
+                and list(observed.get("output_token_ids", []))
+                == list(expected.get("output_token_ids", []))
+            )
+        details.append(
+            {
+                "request_id": request_id,
+                "complete": complete,
+                "finite": finite,
+                "well_formed": well_formed,
+                "no_unexpected_fallback": no_fallback,
+                "exact_output_tokens": exact_tokens,
+            }
+        )
+
+    def rate(name: str) -> float:
+        return fmean(float(item[name]) for item in details) if details else 0.0
+
+    dimensions = {
+        "request_completion_rate": rate("complete"),
+        "finite_output_rate": rate("finite"),
+        "well_formed_response_rate": rate("well_formed"),
+        "no_unexpected_fallback_rate": rate("no_unexpected_fallback"),
+        "exact_output_token_agreement": rate("exact_output_tokens"),
+    }
+    return {
+        "gate": "Q0",
+        "passed": bool(details) and all(value == 1.0 for value in dimensions.values()),
+        "dimensions": dimensions,
+        "details": details,
+    }

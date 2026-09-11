@@ -1,0 +1,63 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/workloads/dataset-revision.schema.json
+schema_version: 1
+kind: DatasetRevision
+id: DS004
+version: 1
+slug: deepseek-v41-generated-load
+title: S004 deterministic long-context load specification
+description: Repository-owned generator specification and semantic seeds for exact-length natural-language, code, and high-entropy requests.
+status: active
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [dataset-author, investigator], conflicts: []}]
+created_at: '2026-09-10T00:00:00Z'
+updated_at: '2026-09-10T00:00:00Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: repository-authored deterministic generator specification
+  source_paths:
+    - studies/S004-deepseek-v41-engram-placement/v1/inputs/trace-spec.yaml
+    - studies/S004-deepseek-v41-engram-placement/v1/inputs/correctness-cases.jsonl
+  generated: false
+extensions:
+  atlas.generation:
+    materialization_location: .atlas/work/S004-deepseek-v41-engram-placement
+    exact_length_verification: required
+dataset_type: generated
+tasks: [long-context-generation, open-loop-serving, exact-output-equivalence]
+modalities: [text, code]
+languages: [en, synthetic-token-stream]
+terms:
+  license: Apache-2.0
+  redistribution: true
+  commercial_use: true
+  attribution: Retain the repository license and provenance.
+  restrictions: []
+composition:
+  records: 7
+  units: one generator specification and six correctness prompt seeds
+  splits: {generator_specifications: 1, correctness_seeds: 6}
+  statistics: {content_families: 3, controlled_cells: 14, context_lengths: 4, maximum_concurrency: 64}
+sampling: {method: deterministic seeded expansion, replacement: false}
+transformations:
+  - {name: exact-token-length-materialization, implementation: pinned DeepSeek encoding}
+  - {name: unique-prefix-injection, tokens: 32, exception: repeated-prefix-probe}
+fingerprint:
+  algorithm: sha256
+  value: 122b39d27397fc21a2aa6c28e2cebe9db68aaf4908be59eb79ce09b4ad8ac01a
+files:
+  - path: studies/S004-deepseek-v41-engram-placement/v1/inputs/trace-spec.yaml
+    media_type: application/yaml
+    sha256: fbb0b229e2ab24b561de78041af7cf8cf4e4d8fe3f0cfb40bad252ee914ec9c3
+    size_bytes: 4189
+  - path: studies/S004-deepseek-v41-engram-placement/v1/inputs/correctness-cases.jsonl
+    media_type: application/x-ndjson
+    sha256: 5af922f2659d39ff375440181ac6b88c5248bdbe6d0292b825c5a9c6b8cc18c1
+    size_bytes: 1629
+sensitive_data:
+  contains_personal_data: false
+  contains_secrets: false
+  review_method: Manual review plus deterministic generation from repository-owned vocabularies.
+limitations:
+  - Shape-controlled synthetic content does not estimate application-level model quality.
+  - High-entropy token streams are a cache and memory stressor, not natural user language.
+  - Findings apply only to the declared length and traffic distributions.

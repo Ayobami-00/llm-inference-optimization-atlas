@@ -7,8 +7,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from atlas.identities import next_identifier
 from atlas.metrics import validate_result_tables
-from atlas.utilities.serialization import load_data
+from atlas.utilities.serialization import load_data, yaml_writer
 from atlas.validation import Validator
 
 RUN_ID = re.compile(r"^R[0-9]{4}$")
@@ -121,29 +122,58 @@ def _experiment_directory(root: Path, reference: str) -> Path:
     return matches[0]
 
 
-def promote_evidence(root: Path, draft: Path, run_id: str) -> Path:
-    if not RUN_ID.fullmatch(run_id):
-        raise ValueError(f"Invalid run ID: {run_id}")
+def _rewrite_run_identity(path: Path, run_id: str) -> None:
+    run_path = path / "run.yaml"
+    run = load_data(run_path)
+    if not isinstance(run, dict):
+        raise ValueError("Run record must be an object")
+    run["id"] = run_id
+    run["slug"] = f"run-{run_id.lower()}"
+    run["title"] = f"Run {run_id}"
+    with run_path.open("w") as stream:
+        yaml_writer().dump(run, stream)
+
+    manifest_paths = sorted(
+        candidate
+        for candidate in path.rglob("*")
+        if candidate.is_file() and candidate.name != "checksums.sha256"
+    )
+    lines = [
+        f"{_sha256(candidate)}  {candidate.relative_to(path).as_posix()}"
+        for candidate in manifest_paths
+    ]
+    (path / "checksums.sha256").write_text("\n".join(lines) + "\n")
+
+
+def promote_evidence(root: Path, draft: Path, run_id: str | None = None) -> Path:
     report = validate_evidence(root, draft)
     if not report.ok:
         raise ValueError("Draft evidence is invalid: " + "; ".join(report.errors))
     run = load_data(draft / "run.yaml")
     if not isinstance(run, dict):
         raise ValueError("Run record must be an object")
-    if report.run_id != run_id:
+    allocated = run_id or next_identifier(root, "run")
+    if not RUN_ID.fullmatch(allocated):
+        raise ValueError(f"Invalid run ID: {allocated}")
+    if run_id is not None and report.run_id not in {run_id, "R0000"}:
         raise ValueError(f"Run record ID {report.run_id} does not match requested {run_id}")
     experiment = run.get("experiment")
     if not isinstance(experiment, str):
         raise ValueError("Run record has no experiment reference")
-    destination = _experiment_directory(root, experiment) / "runs" / run_id
+    destination = _experiment_directory(root, experiment) / "runs" / allocated
     if destination.exists():
         raise FileExistsError(f"Accepted evidence is immutable: {destination}")
     destination.parent.mkdir(parents=True, exist_ok=True)
-    temporary = destination.with_name(f".{run_id}.promoting")
+    temporary = destination.with_name(f".{allocated}.promoting")
     if temporary.exists():
         raise FileExistsError(f"Stale promotion directory exists: {temporary}")
     try:
         shutil.copytree(draft, temporary)
+        if report.run_id != allocated:
+            _rewrite_run_identity(temporary, allocated)
+        rewritten = validate_evidence(root, temporary)
+        if not rewritten.ok:
+            raise ValueError("Promoted evidence became invalid: " + "; ".join(rewritten.errors))
         temporary.replace(destination)
     except BaseException:
         if temporary.exists():

@@ -1,0 +1,91 @@
+%YAML 1.2
+---
+$schema: https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/run-record.schema.json
+schema_version: 1
+kind: RunRecord
+id: R3464
+version: 1
+slug: run-r3464
+title: Run R3464
+description: Replicate 1 for atlas://experiment/E0013@v1.
+status: complete
+authors:
+  - name: Atlas study runner
+    roles:
+      - software
+    conflicts: []
+created_at: '2026-09-10T23:07:33Z'
+updated_at: '2026-09-11T00:02:21Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: reproducible-execution-bundle
+  source_paths:
+    - execution.yaml
+  generated: true
+  parent_artifacts:
+    - atlas://experiment/E0013@v1
+    - atlas://configuration/CFG021@v1
+extensions: {}
+experiment: atlas://experiment/E0013@v1
+configuration: atlas://configuration/CFG021@v1
+replicate: 1
+seed: 41001
+started_at: '2026-09-10T23:07:33Z'
+ended_at: '2026-09-11T00:02:21Z'
+outcome: complete
+hardware_snapshot: atlas://hardware/HW002@v1
+runtime_snapshot: atlas://runtime/RT004@v1
+input_fingerprints:
+  trace-spec.yaml: 9a7c0ef69b58649330468fc2eb7ce1fccb2e9c35079ee18b5c46890bb4c877b5
+  correctness-cases.jsonl: 5af922f2659d39ff375440181ac6b88c5248bdbe6d0292b825c5a9c6b8cc18c1
+  correctness-trace: 40a32d22eee3b941c1f7b175b4f2ef995a1c18adb0ce69622dec290a0bbad910
+command:
+  - atlas
+  - execution
+  - run
+  - S004
+  - sglang-b200
+  - --profile
+  - full
+environment:
+  - name: SGLANG_ENABLE_DSV41_ENGRAM_HOST_TABLE
+    value: '0'
+    redacted: false
+  - name: SGLANG_ENABLE_DSV41_ENGRAM_KV_PREFETCH
+    value: '0'
+    redacted: false
+  - name: configuration
+    value: CFG021
+    redacted: false
+  - name: atlas_git_head
+    value: d850e251bb314bbbe8f6cf4e6f8deab149a17440
+    redacted: false
+windows:
+  warmup:
+    excluded: true
+    requests: 768
+  measurement:
+    requests: 9796
+    start: '2026-09-10T23:14:02Z'
+    end: '2026-09-11T00:02:21Z'
+artifacts:
+  - metrics/requests.parquet
+  - metrics/samples.parquet
+  - metrics/summary.json
+  - quality/results.json
+  - outputs/responses.jsonl
+  - metrics/events.parquet
+checksums:
+  model-manifest: c5a37ff491e09e9abd947d0823e428679e4e3bd94944adfe7ab16f7b91691eeb
+  trace-generator: 36f2726eb3af93147f9a4f7865280936039a4bd5f9df0beefeee10f92a8645f4
+  sglang-treatment-source-files: c292344963d409e4fb0a6c35de3ec94939121e43d5b99a78eb8e416d2c77fbd6
+  runtime-package-manifest: 6e7610e65ff433cfd252d5f44677dc4740779991ad050071e56c7420d752daca
+quality:
+  gate: Q0
+  passed: true
+  results_path: quality/results.json
+validation:
+  passed: true
+  validated_at: '2026-09-11T00:02:21Z'
+  errors: []

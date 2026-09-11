@@ -232,3 +232,67 @@ test("presents a guided study story and expands replicate runs", async ({ page }
     "45",
   );
 });
+
+test("renders the complete S004 story and native comparison evidence", async ({ page }) => {
+  await page.goto("./studies/S004-deepseek-v41-engram-placement/v1/");
+
+  const canvas = page.getByLabel("Interactive evidence graph");
+  await expect(page.getByRole("heading", { name: "Story" })).toBeVisible();
+  await expect(canvas).toHaveAttribute("data-rendered-nodes", "10");
+  await expect(page.getByLabel("Graph reading order")).toContainText(
+    "Workload→Study→Experiments→Comparisons→Findings→Decision",
+  );
+
+  const navigator = page.getByRole("navigation", { name: "Graph node navigator" });
+  for (const code of [
+    "WS004",
+    "S004",
+    "E0013",
+    "CMP0018",
+    "CMP0019",
+    "CMP0020",
+    "F0018",
+    "F0019",
+    "F0020",
+    "DEC0004",
+  ]) {
+    await expect(
+      navigator.getByRole("button", { name: new RegExp(`^${code}\\b`) }),
+    ).toBeVisible();
+  }
+
+  const decision = navigator.getByRole("button", { name: /DEC0004/ });
+  await decision.focus();
+  await page.keyboard.press("Enter");
+  const decisionDetails = page.getByRole("complementary", { name: "Evidence details" });
+  await expect(decisionDetails).toContainText("No general Engram placement recommendation");
+  await decisionDetails.getByRole("button", { name: "Why this decision?" }).click();
+  await expect.poll(async () => Number(await canvas.getAttribute("data-highlighted-elements"))).toBeGreaterThan(1);
+  await page.getByRole("button", { name: "Close details" }).click();
+
+  await page
+    .getByRole("navigation", { name: "Graph views" })
+    .getByRole("button", { name: /Evidence/ })
+    .click();
+  const evidenceNavigator = page.getByRole("navigation", { name: "Graph node navigator" });
+  const comparison = evidenceNavigator.getByRole("button", { name: /CMP0018/ });
+  await comparison.focus();
+  await page.keyboard.press("Enter");
+
+  const comparisonDetails = page.getByRole("complementary", { name: "Evidence details" });
+  await expect(comparisonDetails.getByLabel("Comparison contrast")).toContainText(
+    "Device Vs Host SyncConfiguration A — Engram device placement → Configuration B — Engram synchronous host access",
+  );
+  await expect(
+    comparisonDetails.getByRole("note", { name: "Descriptive comparison limitation" }),
+  ).toContainText("1 independent paired block");
+  await expect(comparisonDetails.getByText("Relative effect unavailable")).toBeVisible();
+
+  await comparisonDetails.getByLabel("Metric").selectOption("atlas://metric/MET019@v1");
+  await expect(
+    comparisonDetails.getByRole("table", { name: "Scoped measured effects" }),
+  ).toBeVisible();
+  await expect(
+    comparisonDetails.getByLabel("Context by concurrency effect heatmaps"),
+  ).toBeVisible();
+});

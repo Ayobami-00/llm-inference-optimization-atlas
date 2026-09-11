@@ -336,4 +336,25 @@ entries:
     direction: higher_is_better
     mandatory: true
     aggregation: [mean, p50, p90, p95]
-
+  - id: MET098
+    name: "Server readiness latency"
+    definition: "Elapsed wall-clock time from launching the declared server process until its health endpoint is ready and its requested runtime treatment is resolved."
+    status: active
+    aliases: [startup-to-ready]
+    level: M0
+    category: latency
+    unit: "ms"
+    direction: lower_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
+  - id: MET099
+    name: "SLO-qualified offered-load capacity"
+    definition: "Highest tested open-loop offered request rate that satisfies every declared latency, quality, reliability, timeout, recovery, and sustainability constraint."
+    status: active
+    aliases: [sustainable-offered-rate, SLO-capacity]
+    level: M0
+    category: goodput
+    unit: "request/s"
+    direction: higher_is_better
+    mandatory: false
+    aggregation: [mean, p50, p90, p95]
