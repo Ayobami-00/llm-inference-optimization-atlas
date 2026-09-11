@@ -9,7 +9,12 @@ The confirmatory result is SLO-qualified offered-load capacity for a frozen
 8K/32K/128K production mixture. Mechanism evidence covers server readiness,
 available KV-token capacity, HBM and host displacement, context-by-concurrency
 TTFT/TPOT/throughput, scheduler state, PCIe activity, and failure boundaries.
-Five paired blocks use independent server initialization and identical traces.
+The original confirmatory design specified five paired blocks with independent
+server initialization and identical traces. Compute cost constrained the
+release-day publication to one complete paired block. Amendment 003 records
+when that decision was made and requires every effect to remain descriptive;
+the resulting study cannot estimate run-to-run variance or support a general
+deployment recommendation.
 
 Preregistration amendment E0013-AMENDMENT-001 prospectively refines the hardware
 health rule after two CFG021 attempts encountered sparse NVIDIA `0x4`
@@ -22,6 +27,11 @@ remain invalidating. Both pre-amendment attempts remain invalid, preserved only
 in `.atlas/work`, and cannot enter the study.
 See [the amendment](experiments/E0013/AMENDMENT-001-software-power-capping.md)
 for its scope and temporal boundary.
+
+[Amendment 003](experiments/E0013/AMENDMENT-003-cost-constrained-single-block-publication.md)
+records the post-data reduction from five planned blocks to one published
+block. The remaining four blocks were not run; they are neither failed nor
+invalid evidence.
 
 The Atlas-native controller is intentionally narrow rather than a replacement
 for a general benchmark suite: it preserves exact integer token IDs, the
