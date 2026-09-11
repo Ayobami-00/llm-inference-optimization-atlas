@@ -1,0 +1,54 @@
+'$schema': https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/finding.schema.json
+schema_version: 1
+kind: Finding
+id: F0020
+version: 1
+slug: host-prefetch-capacity-boundary-remained-left-censored
+title: Host prefetch did not resolve the SLO-qualified capacity boundary
+description: Inconclusive exact-setup capacity finding from one independently initialized paired block.
+status: inconclusive
+authors: [{name: Ayobami-00, github: Ayobami-00, roles: [analysis], conflicts: []}]
+created_at: '2026-09-11T02:08:29Z'
+updated_at: '2026-09-11T02:08:29Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: contributor interpretation of the descriptive paired comparison CMP0020
+  source_paths: [studies/S004-deepseek-v41-engram-placement/v1/experiments/E0013/comparisons/CMP0020.yaml]
+  generated: false
+extensions:
+  atlas.statistical-scope: {inference: descriptive_only, independent_units: 1}
+statement: Device and host-prefetch placement both failed the preregistered mixed-workload SLO at the lowest tested 0.2 request/s rate, so their SLO-qualified capacity boundary is left-censored and no capacity improvement can be computed.
+scope:
+  workload: atlas://workload-spec/WS004@v1
+  model: atlas://model/M006@v1
+  runtime: atlas://runtime/RT004@v1
+  hardware: atlas://hardware/HW002@v1
+  traffic: [atlas://traffic/T001@v1, atlas://traffic/T002@v1, atlas://traffic/T004@v1]
+observation: 'At 0.2 request/s, the 8K class failed in both modes: device p95 TTFT/TPOT was 4,693.73/54.584 ms and host-prefetch was 4,896.76/56.154 ms, against 2,500/50 ms limits. The 32K and 128K classes passed and all classes had 100% request success, but the conjunctive point failed. MET099 is stored as the 0.0 sentinel for no qualifying tested rate and its relative effect is unavailable.'
+mechanism: The tested rate grid did not bracket a passing lower boundary because the 8K class already violated both latency limits at the first point. This is a measurement-boundary result, not evidence of zero physical throughput.
+baseline: atlas://configuration/CFG021@v1
+intervention: atlas://configuration/CFG023@v1
+effects:
+  - {metric: atlas://metric/MET099@v1, baseline: 0.0, candidate: 0.0, absolute: 0.0, relative: null, confidence_interval: null, unit: request/s}
+  - {metric: atlas://metric/MET097@v1, baseline: 11841280.0, candidate: 42697728.0, absolute: 30856448.0, relative: 2.6058372067884554, confidence_interval: null, unit: token}
+  - {metric: atlas://metric/MET010@v1, baseline: 2047.4570736936273, candidate: 2366.2839295537096, absolute: 318.82685586008233, relative: 0.1557184567903621, confidence_interval: null, unit: ms}
+  - {metric: atlas://metric/MET013@v1, baseline: 25.228162169038743, candidate: 27.981218683961234, absolute: 2.7530565149224913, relative: 0.10912632067591428, confidence_interval: null, unit: ms/token}
+  - {metric: atlas://metric/MET019@v1, baseline: 330.01329669286207, candidate: 282.61750761467187, absolute: -47.395789078190205, relative: -0.1436178164733183, confidence_interval: null, unit: token/s}
+works_when:
+  - The preregistered 8K, 32K, and 128K Poisson mixture, latency limits, and minimum tested 0.2 request/s rate define the capacity endpoint.
+stops_working_when:
+  - A lower-rate search brackets a qualifying point or a product owner prospectively changes the SLO.
+interactions:
+  - The capacity boundary depends jointly on context-class weights, output length, arrival process, queueing, and every class-specific latency limit.
+limitations:
+  - The search cannot compare the preregistered 15% capacity threshold because neither mode produced a positive, bracketed capacity estimate.
+  - Class-level p95 values at 0.2 request/s contain 9, 7, and 3 observations for 8K, 32K, and 128K respectively and are boundary diagnostics, not precise tail estimates.
+  - One paired block cannot establish reproducibility on another initialization or host.
+evidence:
+  comparisons: [atlas://comparison/CMP0020@v1]
+  runs: [atlas://run/R3464@v1, atlas://run/R3466@v1]
+mechanism_sources: []
+evidence_confidence: low
+transferability: exact_setup
+claim_status: inconclusive

@@ -1,0 +1,2297 @@
+%YAML 1.2
+---
+$schema: https://ayobami-00.github.io/llm-inference-optimization-atlas/schemas/v1/studies/comparison.schema.json
+schema_version: 1
+kind: Comparison
+id: CMP0019
+version: 1
+slug: deepseek-v41-engram-placement-and-prefetch-host-sync-vs-host-prefetch-cmp0019
+title: 'Engram device placement, synchronous host access, and asynchronous host prefetch: host-sync-vs-host-prefetch'
+description: Controlled host-sync-vs-host-prefetch effects for atlas://configuration/CFG023@v1 against atlas://configuration/CFG022@v1. Descriptive only because the experiment contains fewer than three independent paired blocks.
+status: accepted
+authors:
+  - name: Ayobami-00
+    github: Ayobami-00
+    roles:
+      - investigator
+    conflicts: []
+created_at: '2026-09-11T02:04:46Z'
+updated_at: '2026-09-11T02:04:46Z'
+license: Apache-2.0
+citations: []
+provenance:
+  method: atlas compare descriptive paired effects
+  source_paths:
+    - studies/S004-deepseek-v41-engram-placement/v1/experiments/E0013/runs/R3465
+    - studies/S004-deepseek-v41-engram-placement/v1/experiments/E0013/runs/R3466
+  generated: true
+extensions:
+  atlas.statistical-scope:
+    inference: descriptive_only
+    independent_units: 1
+    reason: Fewer than three independent paired blocks are available.
+experiment: atlas://experiment/E0013@v1
+contrast:
+  id: host-sync-vs-host-prefetch
+  baseline: atlas://configuration/CFG022@v1
+  candidate: atlas://configuration/CFG023@v1
+baseline_runs:
+  - atlas://run/R3465@v1
+candidate_runs:
+  - atlas://run/R3466@v1
+changed_axes:
+  - Engram table placement
+  - asynchronous Engram prefetch
+compatibility:
+  passed: true
+  checks:
+    - workload identity is frozen
+    - quality identity is frozen
+    - slo identity is frozen
+    - model identity is frozen
+    - hardware identity is frozen
+    - runtime identity is frozen
+method:
+  paired: true
+  inference: descriptive_only
+  independent_units: 1
+  pairing_keys:
+    - replicate
+    - seed
+  effect_metrics:
+    - atlas://metric/MET099@v1
+    - atlas://metric/MET097@v1
+    - atlas://metric/MET098@v1
+    - atlas://metric/MET010@v1
+    - atlas://metric/MET013@v1
+    - atlas://metric/MET014@v1
+    - atlas://metric/MET019@v1
+    - atlas://metric/MET053@v1
+    - atlas://metric/MET058@v1
+effects:
+  - metric: atlas://metric/MET099@v1
+    baseline: 0.0
+    candidate: 0.0
+    absolute: 0.0
+    relative:
+    confidence_interval:
+    unit: request/s
+  - metric: atlas://metric/MET097@v1
+    baseline: 42697728.0
+    candidate: 42697728.0
+    absolute: 0.0
+    relative: 0.0
+    confidence_interval:
+    unit: token
+  - metric: atlas://metric/MET098@v1
+    baseline: 273071.627761
+    candidate: 233062.250276
+    absolute: -40009.377485000005
+    relative: -0.14651605446178884
+    confidence_interval:
+    unit: ms
+  - metric: atlas://metric/MET010@v1
+    baseline: 2314.265955766539
+    candidate: 2366.2839295537096
+    absolute: 52.01797378717083
+    relative: 0.022477094154868326
+    confidence_interval:
+    unit: ms
+  - metric: atlas://metric/MET010@v1
+    baseline: 169.5413521125
+    candidate: 171.19445855696202
+    absolute: 1.6531064444620256
+    relative: 0.009750461606352524
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: code
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 4295.4506748
+    candidate: 4647.7476412999995
+    absolute: 352.29696649999914
+    relative: 0.0820162989105683
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: code
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 1085.9126507407407
+    candidate: 1139.3185936923078
+    absolute: 53.40594295156711
+    relative: 0.04918069875614486
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: code
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 391.43861951851846
+    candidate: 363.2585876206897
+    absolute: -28.18003189782877
+    relative: -0.071990934191652
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: code
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 169.53288515189874
+    candidate: 171.61765616455696
+    absolute: 2.084771012658223
+    relative: 0.012297148195114484
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: high_entropy
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 4794.9914712
+    candidate: 4819.6178324
+    absolute: 24.626361200000247
+    relative: 0.005135850886891615
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: high_entropy
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 1280.0052105185184
+    candidate: 1229.5508180769232
+    absolute: -50.454392441595246
+    relative: -0.03941733363816279
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: high_entropy
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 435.1556917962963
+    candidate: 335.9957551206897
+    absolute: -99.15993667560662
+    relative: -0.227872319137733
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: high_entropy
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 169.69651733749998
+    candidate: 171.877454278481
+    absolute: 2.180936940981013
+    relative: 0.012851984090182999
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: natural_language
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 4704.7535717
+    candidate: 4594.4707901
+    absolute: -110.28278159999991
+    relative: -0.023440713720559586
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: natural_language
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 1081.1967725925927
+    candidate: 1133.9431321481482
+    absolute: 52.7463595555555
+    relative: 0.048785161861957325
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: natural_language
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 398.5693810363636
+    candidate: 442.27000920689653
+    absolute: 43.70062817053292
+    relative: 0.10964371637606021
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: natural_language
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 1110.1258158524138
+    candidate: 1139.0570673546194
+    absolute: 28.93125150220567
+    relative: 0.02606123656352475
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: code
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 16499.212318209302
+    candidate: 16698.46222237209
+    absolute: 199.24990416278888
+    relative: 0.012076328270707043
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: code
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 4630.43268719375
+    candidate: 4740.87305184375
+    absolute: 110.44036464999954
+    relative: 0.02385098156279027
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: code
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 1100.753384964138
+    candidate: 1133.1151267826087
+    absolute: 32.36174181847082
+    relative: 0.029399629617786867
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: high_entropy
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 16324.348078690475
+    candidate: 16501.83284995238
+    absolute: 177.48477126190664
+    relative: 0.01087239566360339
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: high_entropy
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 4620.20107391875
+    candidate: 4660.66115454375
+    absolute: 40.460080625000046
+    relative: 0.008757212073171249
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: high_entropy
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 1103.0635805055097
+    candidate: 1133.0524750883153
+    absolute: 29.988894582805642
+    relative: 0.02718691389399548
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: natural_language
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 16178.77218711628
+    candidate: 16194.787550348838
+    absolute: 16.01536323255823
+    relative: 0.0009898997926005672
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: natural_language
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 4637.5660712750005
+    candidate: 4713.22366100625
+    absolute: 75.65758973124957
+    relative: 0.016314072633891147
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: natural_language
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 10866.523335272728
+    candidate: 10494.752534727273
+    absolute: -371.77080054545513
+    relative: -0.03421248812292036
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 4
+      content_family: code
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 10705.833174818183
+    candidate: 10951.399471727273
+    absolute: 245.56629690908994
+    relative: 0.022937616615089876
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 4
+      content_family: high_entropy
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 11352.983284545455
+    candidate: 11264.133022818181
+    absolute: -88.85026172727339
+    relative: -0.007826159829568597
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 4
+      content_family: natural_language
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 1603.0899517197383
+    candidate: 1688.0590422834287
+    absolute: 84.96909056369032
+    relative: 0.05300332053889956
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 64
+      content_family: code
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 8650.151060274853
+    candidate: 8684.964956122807
+    absolute: 34.81389584795397
+    relative: 0.004024657558621616
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 64
+      content_family: code
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 1600.7056806946566
+    candidate: 1686.9369433787185
+    absolute: 86.2312626840619
+    relative: 0.053870779446875086
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 64
+      content_family: high_entropy
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 8648.177362488235
+    candidate: 8693.64307587647
+    absolute: 45.4657133882356
+    relative: 0.005257259591534822
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 64
+      content_family: high_entropy
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 1601.1632640043574
+    candidate: 1689.8394417017141
+    absolute: 88.6761776973567
+    relative: 0.05538234587994856
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 64
+      content_family: natural_language
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 8678.40407663158
+    candidate: 8705.813205345028
+    absolute: 27.40912871344881
+    relative: 0.0031583144171926296
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 64
+      content_family: natural_language
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 542.9963153907693
+    candidate: 576.2682938738462
+    absolute: 33.271978483076964
+    relative: 0.06127477763662662
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 18539.76504925
+    candidate: 19010.565346666666
+    absolute: 470.8002974166666
+    relative: 0.02539408110976639
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 1337.2433470920246
+    candidate: 1337.6056898060606
+    absolute: 0.3623427140360036
+    relative: 0.00027096243538915764
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 32768
+      prefix_mode: shared-50-percent
+  - metric: atlas://metric/MET010@v1
+    baseline: 4944.818933925
+    candidate: 5066.84510135
+    absolute: 122.02616742499958
+    relative: 0.02467758052530754
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 1893.8193382416669
+    candidate: 1808.7363873739837
+    absolute: -85.08295086768317
+    relative: -0.04492664593164371
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 534.4871094553846
+    candidate: 560.8495813230769
+    absolute: 26.362471867692307
+    relative: 0.04932293296007519
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 18263.37851275
+    candidate: 18198.600826666665
+    absolute: -64.77768608333645
+    relative: -0.003546862155767836
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 1405.4954411049382
+    candidate: 1380.6193326060607
+    absolute: -24.876108498877556
+    relative: -0.017699174092888598
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 32768
+      prefix_mode: shared-50-percent
+  - metric: atlas://metric/MET010@v1
+    baseline: 4835.985857925
+    candidate: 5005.472210649999
+    absolute: 169.48635272499905
+    relative: 0.03504690826323495
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 1813.9745002083332
+    candidate: 1740.403040647541
+    absolute: -73.57145956079216
+    relative: -0.04055815533919719
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 540.1446288251534
+    candidate: 570.3763802392639
+    absolute: 30.231751414110477
+    relative: 0.0559697344021847
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 18367.210106615385
+    candidate: 17702.777045307692
+    absolute: -664.4330613076927
+    relative: -0.036174958387849086
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 1367.581797822086
+    candidate: 1371.7560931686746
+    absolute: 4.1742953465886785
+    relative: 0.003052318591280146
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 32768
+      prefix_mode: shared-50-percent
+  - metric: atlas://metric/MET010@v1
+    baseline: 4846.330543275
+    candidate: 5053.446889425
+    absolute: 207.11634615000003
+    relative: 0.04273673541261121
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET010@v1
+    baseline: 1839.6167517583335
+    candidate: 1781.2640561951218
+    absolute: -58.35269556321168
+    relative: -0.03172002837408242
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 27.622537566040734
+    candidate: 27.981218683961234
+    absolute: 0.3586811179205007
+    relative: 0.012985089333771595
+    confidence_interval:
+    unit: ms/token
+  - metric: atlas://metric/MET013@v1
+    baseline: 5.2825299843253966
+    candidate: 5.356389395418927
+    absolute: 0.07385941109353045
+    relative: 0.013981825245230981
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 1
+      content_family: code
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 10.5615302
+    candidate: 8.198427736507936
+    absolute: -2.363102463492064
+    relative: -0.22374622036227892
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 1
+      content_family: code
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 5.340609131687243
+    candidate: 5.578847409645909
+    absolute: 0.2382382779586658
+    relative: 0.044608821219500085
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 1
+      content_family: code
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 5.536605144914756
+    candidate: 4.7789477211275315
+    absolute: -0.7576574237872249
+    relative: -0.13684512511843394
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 1
+      content_family: code
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 5.281565159734781
+    candidate: 5.27973135965441
+    absolute: -0.0018338000803703736
+    relative: -0.0003472076978905359
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 1
+      content_family: high_entropy
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 11.011912461904762
+    candidate: 12.047989953968253
+    absolute: 1.036077492063491
+    relative: 0.09408697132743804
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 1
+      content_family: high_entropy
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 5.543102408583187
+    candidate: 6.150437968864468
+    absolute: 0.6073355602812809
+    relative: 0.10956600032156277
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 1
+      content_family: high_entropy
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 5.053290643445032
+    candidate: 5.047470117679256
+    absolute: -0.005820525765775741
+    relative: -0.0011518288134338647
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 1
+      content_family: high_entropy
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 5.2804449755952385
+    candidate: 5.281049215591723
+    absolute: 0.0006042399964840683
+    relative: 0.00011442974962843077
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 1
+      content_family: natural_language
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 10.725445615873017
+    candidate: 8.790464069841269
+    absolute: -1.9349815460317483
+    relative: -0.18041036385174444
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 1
+      content_family: natural_language
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 5.541739075837743
+    candidate: 5.520944157554379
+    absolute: -0.02079491828336355
+    relative: -0.0037524174268742504
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 1
+      content_family: natural_language
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 5.118996715151516
+    candidate: 4.772014056923919
+    absolute: -0.34698265822759655
+    relative: -0.06778333285516208
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 1
+      content_family: natural_language
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 10.185883708089765
+    candidate: 9.392100236973775
+    absolute: -0.7937834711159901
+    relative: -0.07792975983866345
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 32
+      content_family: code
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 232.0897528298265
+    candidate: 233.0821413237357
+    absolute: 0.9923884939092034
+    relative: 0.004275882419663936
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 32
+      content_family: code
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 56.96063545892857
+    candidate: 57.46970228928571
+    absolute: 0.509066830357142
+    relative: 0.008937169086257898
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 32
+      content_family: code
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 10.380009232862616
+    candidate: 9.485686416774499
+    absolute: -0.8943228160881169
+    relative: -0.08615819080938131
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 32
+      content_family: high_entropy
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 234.46154474981103
+    candidate: 236.65567743121696
+    absolute: 2.1941326814059323
+    relative: 0.009358177195954437
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 32
+      content_family: high_entropy
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 57.062556464484125
+    candidate: 58.614606346230154
+    absolute: 1.5520498817460293
+    relative: 0.027199094781391875
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 32
+      content_family: high_entropy
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 10.199799296995932
+    candidate: 9.42563671292702
+    absolute: -0.7741625840689128
+    relative: -0.07589978601803674
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 32
+      content_family: natural_language
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 236.70941511775564
+    candidate: 241.14216780361755
+    absolute: 4.432752685861914
+    relative: 0.01872655839927937
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 32
+      content_family: natural_language
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 56.835100202678575
+    candidate: 58.036766447817456
+    absolute: 1.201666245138881
+    relative: 0.021143030290324848
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 32
+      content_family: natural_language
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 103.54785084704184
+    candidate: 108.80856992496392
+    absolute: 5.260719077922076
+    relative: 0.05080471525858196
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 4
+      content_family: code
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 90.12454453535354
+    candidate: 84.13740345598845
+    absolute: -5.987141079365088
+    relative: -0.06643185949213298
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 4
+      content_family: high_entropy
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 97.15676147619048
+    candidate: 97.91692956998556
+    absolute: 0.7601680937950732
+    relative: 0.007824139897678271
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 4
+      content_family: natural_language
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 18.05560783754825
+    candidate: 19.851745338448982
+    absolute: 1.7961375009007305
+    relative: 0.09947809661469839
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 64
+      content_family: code
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 121.2507371294904
+    candidate: 120.21992097855751
+    absolute: -1.0308161509328926
+    relative: -0.008501524818212253
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 64
+      content_family: code
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 18.101691597877828
+    candidate: 19.862161473193854
+    absolute: 1.7604698753160264
+    relative: 0.0972544397741489
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 64
+      content_family: high_entropy
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 121.21521314556489
+    candidate: 119.93089811858077
+    absolute: -1.2843150269841175
+    relative: -0.01059532870219689
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 64
+      content_family: high_entropy
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 18.054396403620707
+    candidate: 19.794740849668933
+    absolute: 1.7403444460482262
+    relative: 0.09639449622914062
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 64
+      content_family: natural_language
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 120.9366367013831
+    candidate: 119.85990258108234
+    absolute: -1.076734120300756
+    relative: -0.008903291423255216
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 64
+      content_family: natural_language
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 6.96666983042735
+    candidate: 6.531610698217338
+    absolute: -0.4350591322100126
+    relative: -0.062448650904893696
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 225.235053
+    candidate: 215.06376422089946
+    absolute: -10.171288779100536
+    relative: -0.045158551671353464
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 9.72589698091343
+    candidate: 9.443666897354497
+    absolute: -0.2822300835589324
+    relative: -0.029018411783796844
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 32768
+      prefix_mode: shared-50-percent
+  - metric: atlas://metric/MET013@v1
+    baseline: 52.62525347896825
+    candidate: 51.419239859523806
+    absolute: -1.206013619444441
+    relative: -0.022917013025437038
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 12.440007603968253
+    candidate: 12.558047590398761
+    absolute: 0.11803998643050839
+    relative: 0.00948873908990656
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 6.989192501391941
+    candidate: 6.551841246593407
+    absolute: -0.43735125479853476
+    relative: -0.06257536256319074
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 212.48324189550263
+    candidate: 212.42312251322753
+    absolute: -0.06011938227510427
+    relative: -0.0002829370530061399
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 9.279767628355868
+    candidate: 9.406674007696008
+    absolute: 0.1269063793401397
+    relative: 0.013675598832060862
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 32768
+      prefix_mode: shared-50-percent
+  - metric: atlas://metric/MET013@v1
+    baseline: 54.087463700396825
+    candidate: 52.88947485039682
+    absolute: -1.1979888500000015
+    relative: -0.022149103841066452
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 13.152927137433862
+    candidate: 13.627552131017435
+    absolute: 0.47462499358357313
+    relative: 0.03608512300146236
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 6.968491512269938
+    candidate: 6.531956969763366
+    absolute: -0.4365345425065721
+    relative: -0.06264405169152226
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 213.21717708424907
+    candidate: 222.33207906959706
+    absolute: 9.114901985347984
+    relative: 0.04274937934173281
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 8.887016206057066
+    candidate: 8.600932161503156
+    absolute: -0.2860840445539097
+    relative: -0.03219123695970367
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 32768
+      prefix_mode: shared-50-percent
+  - metric: atlas://metric/MET013@v1
+    baseline: 53.817520211904764
+    candidate: 51.968199376984124
+    absolute: -1.8493208349206398
+    relative: -0.034362802812894354
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET013@v1
+    baseline: 13.073221126984127
+    candidate: 12.972552334752873
+    absolute: -0.10066879223125369
+    relative: -0.007700381662134179
+    confidence_interval:
+    unit: ms/token
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 27.622537566040734
+    candidate: 27.981218683961234
+    absolute: 0.3586811179205007
+    relative: 0.012985089333771595
+    confidence_interval:
+    unit: ms
+  - metric: atlas://metric/MET014@v1
+    baseline: 5.2825299843253966
+    candidate: 5.356389395418927
+    absolute: 0.07385941109353045
+    relative: 0.013981825245230981
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: code
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 10.5615302
+    candidate: 8.198427736507936
+    absolute: -2.363102463492064
+    relative: -0.22374622036227892
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: code
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 5.340609131687243
+    candidate: 5.578847409645909
+    absolute: 0.2382382779586658
+    relative: 0.044608821219500085
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: code
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 5.536605144914756
+    candidate: 4.7789477211275315
+    absolute: -0.7576574237872249
+    relative: -0.13684512511843394
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: code
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 5.281565159734781
+    candidate: 5.27973135965441
+    absolute: -0.0018338000803703736
+    relative: -0.0003472076978905359
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: high_entropy
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 11.011912461904762
+    candidate: 12.047989953968253
+    absolute: 1.036077492063491
+    relative: 0.09408697132743804
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: high_entropy
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 5.543102408583187
+    candidate: 6.150437968864468
+    absolute: 0.6073355602812809
+    relative: 0.10956600032156277
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: high_entropy
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 5.053290643445032
+    candidate: 5.047470117679256
+    absolute: -0.005820525765775741
+    relative: -0.0011518288134338647
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: high_entropy
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 5.2804449755952385
+    candidate: 5.281049215591723
+    absolute: 0.0006042399964840683
+    relative: 0.00011442974962843077
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: natural_language
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 10.725445615873017
+    candidate: 8.790464069841269
+    absolute: -1.9349815460317483
+    relative: -0.18041036385174444
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: natural_language
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 5.541739075837743
+    candidate: 5.520944157554379
+    absolute: -0.02079491828336355
+    relative: -0.0037524174268742504
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: natural_language
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 5.118996715151516
+    candidate: 4.772014056923919
+    absolute: -0.34698265822759655
+    relative: -0.06778333285516208
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 1
+      content_family: natural_language
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 10.185883708089765
+    candidate: 9.392100236973775
+    absolute: -0.7937834711159901
+    relative: -0.07792975983866345
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: code
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 232.0897528298265
+    candidate: 233.0821413237357
+    absolute: 0.9923884939092034
+    relative: 0.004275882419663936
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: code
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 56.96063545892857
+    candidate: 57.46970228928571
+    absolute: 0.509066830357142
+    relative: 0.008937169086257898
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: code
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 10.380009232862616
+    candidate: 9.485686416774499
+    absolute: -0.8943228160881169
+    relative: -0.08615819080938131
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: high_entropy
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 234.46154474981103
+    candidate: 236.65567743121696
+    absolute: 2.1941326814059323
+    relative: 0.009358177195954437
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: high_entropy
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 57.062556464484125
+    candidate: 58.614606346230154
+    absolute: 1.5520498817460293
+    relative: 0.027199094781391875
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: high_entropy
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 10.199799296995932
+    candidate: 9.42563671292702
+    absolute: -0.7741625840689128
+    relative: -0.07589978601803674
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: natural_language
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 236.70941511775564
+    candidate: 241.14216780361755
+    absolute: 4.432752685861914
+    relative: 0.01872655839927937
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: natural_language
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 56.835100202678575
+    candidate: 58.036766447817456
+    absolute: 1.201666245138881
+    relative: 0.021143030290324848
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 32
+      content_family: natural_language
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 103.54785084704184
+    candidate: 108.80856992496392
+    absolute: 5.260719077922076
+    relative: 0.05080471525858196
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 4
+      content_family: code
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 90.12454453535354
+    candidate: 84.13740345598845
+    absolute: -5.987141079365088
+    relative: -0.06643185949213298
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 4
+      content_family: high_entropy
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 97.15676147619048
+    candidate: 97.91692956998556
+    absolute: 0.7601680937950732
+    relative: 0.007824139897678271
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 4
+      content_family: natural_language
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 18.05560783754825
+    candidate: 19.851745338448982
+    absolute: 1.7961375009007305
+    relative: 0.09947809661469839
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 64
+      content_family: code
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 121.2507371294904
+    candidate: 120.21992097855751
+    absolute: -1.0308161509328926
+    relative: -0.008501524818212253
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 64
+      content_family: code
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 18.101691597877828
+    candidate: 19.862161473193854
+    absolute: 1.7604698753160264
+    relative: 0.0972544397741489
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 64
+      content_family: high_entropy
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 121.21521314556489
+    candidate: 119.93089811858077
+    absolute: -1.2843150269841175
+    relative: -0.01059532870219689
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 64
+      content_family: high_entropy
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 18.054396403620707
+    candidate: 19.794740849668933
+    absolute: 1.7403444460482262
+    relative: 0.09639449622914062
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 64
+      content_family: natural_language
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 120.9366367013831
+    candidate: 119.85990258108234
+    absolute: -1.076734120300756
+    relative: -0.008903291423255216
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 64
+      content_family: natural_language
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 6.96666983042735
+    candidate: 6.531610698217338
+    absolute: -0.4350591322100126
+    relative: -0.062448650904893696
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 225.235053
+    candidate: 215.06376422089946
+    absolute: -10.171288779100536
+    relative: -0.045158551671353464
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 9.72589698091343
+    candidate: 9.443666897354497
+    absolute: -0.2822300835589324
+    relative: -0.029018411783796844
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 32768
+      prefix_mode: shared-50-percent
+  - metric: atlas://metric/MET014@v1
+    baseline: 52.62525347896825
+    candidate: 51.419239859523806
+    absolute: -1.206013619444441
+    relative: -0.022917013025437038
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 12.440007603968253
+    candidate: 12.558047590398761
+    absolute: 0.11803998643050839
+    relative: 0.00948873908990656
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 6.989192501391941
+    candidate: 6.551841246593407
+    absolute: -0.43735125479853476
+    relative: -0.06257536256319074
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 212.48324189550263
+    candidate: 212.42312251322753
+    absolute: -0.06011938227510427
+    relative: -0.0002829370530061399
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 9.279767628355868
+    candidate: 9.406674007696008
+    absolute: 0.1269063793401397
+    relative: 0.013675598832060862
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 32768
+      prefix_mode: shared-50-percent
+  - metric: atlas://metric/MET014@v1
+    baseline: 54.087463700396825
+    candidate: 52.88947485039682
+    absolute: -1.1979888500000015
+    relative: -0.022149103841066452
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 13.152927137433862
+    candidate: 13.627552131017435
+    absolute: 0.47462499358357313
+    relative: 0.03608512300146236
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 6.968491512269938
+    candidate: 6.531956969763366
+    absolute: -0.4365345425065721
+    relative: -0.06264405169152226
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 213.21717708424907
+    candidate: 222.33207906959706
+    absolute: 9.114901985347984
+    relative: 0.04274937934173281
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 8.887016206057066
+    candidate: 8.600932161503156
+    absolute: -0.2860840445539097
+    relative: -0.03219123695970367
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 32768
+      prefix_mode: shared-50-percent
+  - metric: atlas://metric/MET014@v1
+    baseline: 53.817520211904764
+    candidate: 51.968199376984124
+    absolute: -1.8493208349206398
+    relative: -0.034362802812894354
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET014@v1
+    baseline: 13.073221126984127
+    candidate: 12.972552334752873
+    absolute: -0.10066879223125369
+    relative: -0.007700381662134179
+    confidence_interval:
+    unit: ms
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 286.2591619305155
+    candidate: 282.61750761467187
+    absolute: -3.6416543158436525
+    relative: -0.012721529299829367
+    confidence_interval:
+    unit: token/s
+  - metric: atlas://metric/MET019@v1
+    baseline: 42.71826162606902
+    candidate: 42.406215578853164
+    absolute: -0.3120460472158584
+    relative: -0.007304745917503131
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 1
+      content_family: code
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 4.319609126707188
+    candidate: 4.347201009538666
+    absolute: 0.027591882831478287
+    relative: 0.0063875878631896995
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 1
+      content_family: code
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 14.603341824042563
+    candidate: 14.193244896515877
+    absolute: -0.4100969275266859
+    relative: -0.028082402813547305
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 1
+      content_family: code
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 29.154812095495316
+    candidate: 31.214786793847495
+    absolute: 2.0599746983521783
+    relative: 0.07065642171195688
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 1
+      content_family: code
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 42.72186268089471
+    candidate: 42.406369449265576
+    absolute: -0.3154932316291337
+    relative: -0.007384819196336745
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 1
+      content_family: high_entropy
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 4.314011335368558
+    candidate: 4.331519842042154
+    absolute: 0.017508506673596713
+    relative: 0.004058521249133648
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 1
+      content_family: high_entropy
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 14.506373562086406
+    candidate: 14.187197753350366
+    absolute: -0.31917580873603946
+    relative: -0.022002453429865582
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 1
+      content_family: high_entropy
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 29.159599949625154
+    candidate: 31.211262197522807
+    absolute: 2.051662247897653
+    relative: 0.07035975292672103
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 1
+      content_family: high_entropy
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 42.717591171064974
+    candidate: 42.40677303278078
+    absolute: -0.3108181382841977
+    relative: -0.007276115758482474
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 1
+      content_family: natural_language
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 4.283853701940094
+    candidate: 4.349783919113534
+    absolute: 0.06593021717343994
+    relative: 0.015390398869966338
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 1
+      content_family: natural_language
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 14.603996105804887
+    candidate: 14.237608145024206
+    absolute: -0.36638796078068125
+    relative: -0.025088199019379847
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 1
+      content_family: natural_language
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 29.143645479385196
+    candidate: 31.218931010216494
+    absolute: 2.075285530831298
+    relative: 0.07120885176493293
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 1
+      content_family: natural_language
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 385.05399864217566
+    candidate: 389.4765804510129
+    absolute: 4.422581808837265
+    relative: 0.01148561454869372
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 32
+      content_family: code
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 22.05052661808549
+    candidate: 21.85639201402569
+    absolute: -0.19413460405980132
+    relative: -0.008804080166528776
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 32
+      content_family: code
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 82.60094931796172
+    candidate: 81.27744805394218
+    absolute: -1.3235012640195407
+    relative: -0.016022833574525795
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 32
+      content_family: code
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 385.05447982535236
+    candidate: 389.48201672606257
+    absolute: 4.427536900710209
+    relative: 0.011498468743224048
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 32
+      content_family: high_entropy
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 21.538957706991802
+    candidate: 21.34983388489869
+    absolute: -0.18912382209311218
+    relative: -0.008780546610745251
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 32
+      content_family: high_entropy
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 82.60371691435017
+    candidate: 81.2789536016959
+    absolute: -1.3247633126542695
+    relative: -0.0160375750891196
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 32
+      content_family: high_entropy
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 385.5766079610184
+    candidate: 389.4749602187608
+    absolute: 3.898352257742431
+    relative: 0.01011044803355019
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 32
+      content_family: natural_language
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 22.050200986289987
+    candidate: 21.856194209746874
+    absolute: -0.19400677654311238
+    relative: -0.008798413069510737
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 32
+      content_family: natural_language
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 82.59869803398264
+    candidate: 81.27697105990758
+    absolute: -1.3217269740750623
+    relative: -0.016001789441418064
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 32
+      content_family: natural_language
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 5.023285644497664
+    candidate: 5.046640689666375
+    absolute: 0.02335504516871101
+    relative: 0.004649356381772422
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 4
+      content_family: code
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 4.863089242462814
+    candidate: 4.88531479455289
+    absolute: 0.022225552090076484
+    relative: 0.004570253799994178
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 4
+      content_family: high_entropy
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 5.023196298744081
+    candidate: 5.046369686524364
+    absolute: 0.023173387780283328
+    relative: 0.004613275373307077
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 4
+      content_family: natural_language
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 488.91385799301264
+    candidate: 457.1620864587429
+    absolute: -31.75177153426972
+    relative: -0.06494348854133626
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 64
+      content_family: code
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 83.50299400670951
+    candidate: 83.77451914862611
+    absolute: 0.27152514191659805
+    relative: 0.0032516815132973657
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 64
+      content_family: code
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 488.91964493180194
+    candidate: 456.6517254168775
+    absolute: -32.267919514924415
+    relative: -0.06599841067835469
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 64
+      content_family: high_entropy
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 83.01766783952688
+    candidate: 83.28614231808928
+    absolute: 0.26847447856239626
+    relative: 0.0032339438766378903
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 64
+      content_family: high_entropy
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 489.4386291799568
+    candidate: 457.16114400286125
+    absolute: -32.27748517709557
+    relative: -0.06594797233552194
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 64
+      content_family: natural_language
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 83.50160939914315
+    candidate: 83.77277668431334
+    absolute: 0.2711672851701934
+    relative: 0.0032474498051168815
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 64
+      content_family: natural_language
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 173.3022373475072
+    candidate: 172.79375929254434
+    absolute: -0.5084780549628647
+    relative: -0.00293405360914793
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 4.908062665117249
+    candidate: 4.923328623171655
+    absolute: 0.015265958054405893
+    relative: 0.0031103836882329624
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 86.46626430827665
+    candidate: 86.92040100452809
+    absolute: 0.4541366962514388
+    relative: 0.005252183610388362
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 32768
+      prefix_mode: shared-50-percent
+  - metric: atlas://metric/MET019@v1
+    baseline: 20.61918434079843
+    candidate: 20.447619336501006
+    absolute: -0.17156500429742394
+    relative: -0.008320649423457286
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 63.82978457358403
+    candidate: 65.5704100568998
+    absolute: 1.7406254833157746
+    relative: 0.027269800375233178
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 8
+      content_family: code
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 173.303106967991
+    candidate: 172.79704675922306
+    absolute: -0.5060602087679342
+    relative: -0.002920087340738809
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 4.908940709670695
+    candidate: 4.924115663413795
+    absolute: 0.015174953743099628
+    relative: 0.003091288862626659
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 85.93980758826153
+    candidate: 86.92517000415498
+    absolute: 0.985362415893448
+    relative: 0.011465727507959165
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 32768
+      prefix_mode: shared-50-percent
+  - metric: atlas://metric/MET019@v1
+    baseline: 20.620449209022865
+    candidate: 20.4489707907787
+    absolute: -0.17147841824416687
+    relative: -0.008315939992671608
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 63.83170558634931
+    candidate: 65.03922311769713
+    absolute: 1.2075175313478255
+    relative: 0.01891720611654874
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 8
+      content_family: high_entropy
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 173.83217967175554
+    candidate: 173.32393450714738
+    absolute: -0.5082451646081552
+    relative: -0.002923769152339148
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 1024
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 5.316629501200222
+    candidate: 5.333345526250098
+    absolute: 0.01671602504987657
+    relative: 0.003144101925120596
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 131072
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 86.46488492528967
+    candidate: 87.445836551855
+    absolute: 0.9809516265653286
+    relative: 0.011345086822389504
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 32768
+      prefix_mode: shared-50-percent
+  - metric: atlas://metric/MET019@v1
+    baseline: 20.618814224972176
+    candidate: 20.447226548316358
+    absolute: -0.1715876766558182
+    relative: -0.008321898378035836
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 32768
+      prefix_mode: unique
+  - metric: atlas://metric/MET019@v1
+    baseline: 63.82828925857414
+    candidate: 65.56970338850276
+    absolute: 1.7414141299286214
+    relative: 0.027282794982550703
+    confidence_interval:
+    unit: token/s
+    scope:
+      concurrency: 8
+      content_family: natural_language
+      context_tokens: 8192
+      prefix_mode: unique
+  - metric: atlas://metric/MET053@v1
+    baseline: 331703062152.9623
+    candidate: 323946680466.5612
+    absolute: -7756381686.401062
+    relative: -0.023383509443829817
+    confidence_interval:
+    unit: byte
+  - metric: atlas://metric/MET058@v1
+    baseline: 176520572641.20645
+    candidate: 174935085341.40866
+    absolute: -1585487299.7977905
+    relative: -0.00898188395876345
+    confidence_interval:
+    unit: byte
+quality_eligible: true
+slo_eligible: true
+result: inconclusive

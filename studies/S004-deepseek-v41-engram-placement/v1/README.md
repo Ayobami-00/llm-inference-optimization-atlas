@@ -35,6 +35,54 @@ records the post-data reduction from five planned blocks to one published
 block. The remaining four blocks were not run; they are neither failed nor
 invalid evidence.
 
+## One-block result
+
+The accepted block consists of device run R3464, host-sync run R3465, and
+host-prefetch run R3466. All three passed Q0: 48 fixed cases per configuration,
+144 executions in total, produced exact greedy token-ID agreement with complete,
+finite, well-formed responses and no treatment fallback. Machine health and the
+independent AIPerf measurement cross-check also passed for every configuration.
+
+Moving Engram to host memory reduced SGLang's reported model-weight residency
+from 119.043 to 72.201 GB per GPU. With the memory fraction frozen at 0.80, the
+reported KV-token pool increased from 11,841,280 to 42,697,728 tokens: an
+additional 30,856,448 slots, or 260.6%. Mean system host memory increased from
+107.12 GiB in device mode to 308.92 GiB for host-sync and 301.70 GiB for
+host-prefetch. These are exact-setup observations from one block, not estimates
+of a population effect.
+
+Host-prefetch did not establish the preregistered performance recovery. Relative
+to host-sync, its run-level mean TTFT changed by +2.25%, mean TPOT by +1.30%,
+and output throughput by -1.27%. Across the nine unique-prefix cells at
+concurrency 8 or greater, throughput improved in four and regressed in five;
+the median effect was -0.29%, ranging from -6.56% to +2.45%. Relative to device
+mode, host-prefetch's run-level mean TTFT was 15.57% higher, TPOT was 10.91%
+higher, and output throughput was 14.36% lower.
+
+No configuration passed the complete SLO at the lowest tested 0.2 request/s
+rate because the 8K class missed its TTFT and TPOT limits. SLO-qualified
+capacity is therefore left-censored below 0.2 request/s for all three modes.
+The stored MET099 value of 0.0 is a sentinel for no qualifying tested rate, not
+zero physical serving capacity, and its relative effect is intentionally null.
+
+The formal decision is [DEC0004](decisions/DEC0004.yaml): `no_recommendation`.
+Device placement is the observed performance reference when its 11.84M-token
+KV pool is sufficient. Host placement is a memory-constrained option that needs
+application-specific latency validation. The remaining independent blocks and
+a lower-rate capacity bracket are required before making a general deployment
+recommendation.
+
+## Atlas evidence path
+
+Readers can follow the complete graph from [the workload](workload.yaml) through
+[the hypothesis](hypotheses/HYP013.yaml), [the experiment](experiments/E0013/experiment.yaml),
+the three accepted runs and comparisons, [the findings](findings), and
+[the decision](decisions/DEC0004.yaml). Comparison effects retain exact
+content-family, context, concurrency, and prefix scopes for native tables,
+filters, and context-by-concurrency heatmaps. Because there is only one paired
+block, the comparison records are explicitly marked `descriptive_only` and do
+not manufacture confidence intervals.
+
 The Atlas-native controller is intentionally narrow rather than a replacement
 for a general benchmark suite: it preserves exact integer token IDs, the
 class-stratified Poisson schedule, dispatch-lag invalidation, exact output-token
@@ -53,5 +101,5 @@ resolution pilot before any confirmatory run. Unsupported or fallback attempts
 remain in `.atlas/work` and cannot be promoted.
 
 No model weights, provider identifiers, unrestricted logs, or generated site
-output belong in Git. Accepted evidence is promoted through the Atlas
-contribution flow after the paid execution completes.
+output belong in Git. Accepted evidence was privacy-scanned, checksummed, and
+promoted through the Atlas contribution flow.
