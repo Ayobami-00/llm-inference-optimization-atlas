@@ -59,6 +59,34 @@ def test_server_log_diagnostics_identifies_fatal_oom_signal(tmp_path: Path) -> N
     assert diagnostics["allocator_memory_pressure"]["fatal_oom_exception_mentions"] == 2
 
 
+def test_server_log_diagnostics_retains_engram_huge_page_state(tmp_path: Path) -> None:
+    server_log = tmp_path / "server.log"
+    server_log.write_text(
+        "\n".join(
+            f"[2026-09-11 00:06:31 TP{rank} EP{rank}] engram host table layer {layer}: "
+            f"layout=shared, {96680 + layer} MiB resident, 0 MiB in huge pages (0%), "
+            "pinned. No huge pages: expect ~10x slower lookups (one TLB miss per row)"
+            for rank in range(4)
+            for layer in (1, 14)
+        )
+    )
+
+    diagnostics = server_log_diagnostics(server_log)
+
+    host_table = diagnostics["engram_host_table"]
+    assert host_table["observation_count"] == 8
+    assert host_table["no_huge_pages_warning_count"] == 8
+    assert host_table["observations"][0] == {
+        "tp_rank": 0,
+        "layer": 1,
+        "layout": "shared",
+        "resident_mib": 96681,
+        "huge_page_mib": 0,
+        "huge_page_percent": 0,
+        "pinning_status": "pinned",
+    }
+
+
 def test_server_log_diagnostics_rejects_symlink(tmp_path: Path) -> None:
     target = tmp_path / "actual.log"
     target.write_text("ordinary log")

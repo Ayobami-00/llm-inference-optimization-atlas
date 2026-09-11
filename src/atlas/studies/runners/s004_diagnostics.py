@@ -14,6 +14,16 @@ _ALLOCATOR_RETRY_PATTERN = re.compile(
     r"\(free: (?P<free_bytes>[0-9]+), total: (?P<total_bytes>[0-9]+)\)",
     re.IGNORECASE,
 )
+_HOST_TABLE_PATTERN = re.compile(
+    r"TP(?P<tp_rank>[0-9]+)\s+EP[0-9]+\].*?"
+    r"engram host table layer (?P<layer>[0-9]+): "
+    r"layout=(?P<layout>[^,\s]+), "
+    r"(?P<resident_mib>[0-9]+) MiB resident, "
+    r"(?P<huge_page_mib>[0-9]+) MiB in huge pages "
+    r"\((?P<huge_page_percent>[0-9]+)%\), "
+    r"(?P<pinning_status>pinned|unpinned)",
+    re.IGNORECASE,
+)
 _FATAL_OOM_PATTERNS = (
     re.compile(r"\btorch\.OutOfMemoryError\b"),
     re.compile(r"\bCUDA out of memory\b", re.IGNORECASE),
@@ -40,6 +50,18 @@ def server_log_diagnostics(server_log: Path) -> dict[str, Any]:
         {name: int(value) for name, value in match.groupdict().items()}
         for match in _ALLOCATOR_RETRY_PATTERN.finditer(text)
     ]
+    host_table_observations = [
+        {
+            "tp_rank": int(match.group("tp_rank")),
+            "layer": int(match.group("layer")),
+            "layout": match.group("layout").lower(),
+            "resident_mib": int(match.group("resident_mib")),
+            "huge_page_mib": int(match.group("huge_page_mib")),
+            "huge_page_percent": int(match.group("huge_page_percent")),
+            "pinning_status": match.group("pinning_status").lower(),
+        }
+        for match in _HOST_TABLE_PATTERN.finditer(text)
+    ]
     by_device = Counter(warning["device"] for warning in warnings)
     requested_bytes = Counter(warning["requested_bytes"] for warning in warnings)
     fatal_oom_mentions = sum(len(pattern.findall(text)) for pattern in _FATAL_OOM_PATTERNS)
@@ -54,6 +76,13 @@ def server_log_diagnostics(server_log: Path) -> dict[str, Any]:
         "reported_running_batch_observations": len(batch_sizes),
         "preemption_log_mentions": len(re.findall(r"\bpreempt(?:ion|ed|ing)?\b", text, re.I)),
         "fallback_log_mentions": len(re.findall(r"\bfallback\b", text, re.I)),
+        "engram_host_table": {
+            "observation_count": len(host_table_observations),
+            "observations": host_table_observations,
+            "no_huge_pages_warning_count": len(
+                re.findall(r"\bNo huge pages:\s*expect\s*~?10x slower lookups\b", text, re.I)
+            ),
+        },
         "allocator_memory_pressure": {
             "classification": allocator_classification,
             "retry_warning_count": len(warnings),

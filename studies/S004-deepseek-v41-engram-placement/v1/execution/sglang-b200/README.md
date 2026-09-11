@@ -129,7 +129,8 @@ draft checksum manifest. It refuses an allocated run, so accepted evidence is
 never mutated.
 
 The finalizer also converts the retained server log into privacy-safe diagnostic
-counts and a source-log fingerprint. PyTorch 2.13 reports a warning at
+counts, exact Engram host-table huge-page observations, and a source-log
+fingerprint. PyTorch 2.13 reports a warning at
 `CUDACachingAllocator.cpp:3933` for an initial failed `cudaMalloc`, including
 cases where the caching allocator releases cached blocks, retries, and the
 request completes. This behavior is documented in PyTorch's
@@ -139,3 +140,10 @@ The study reports these as allocator memory-pressure retry warnings, separately
 from a raised `torch.OutOfMemoryError`, request failure, or server failure. A
 real OOM failure remains invalid under the frozen failure policy; a recovered
 allocator retry is not relabeled as a failed request.
+
+Host-table evidence retains the resolved layout, pinning state, resident MiB,
+huge-page MiB and percentage, TP rank, layer, and any runtime warning about the
+absence of huge pages. The primary study does not change the node's frozen
+kernel or huge-page policy. Results therefore remain scoped to the recorded
+host-memory state instead of silently attributing its effect to Engram
+placement alone.
